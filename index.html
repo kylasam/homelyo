@@ -359,7 +359,7 @@ body {
 }
 .amenities-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(4, minmax(200px, 1fr));
     gap: 24px;
     margin-top: 40px;
 }
@@ -395,6 +395,16 @@ body {
 .amenity-desc {
     color: var(--text-gray);
     font-size: 14px;
+}
+@media (max-width: 1100px) {
+    .amenities-grid {
+        grid-template-columns: repeat(2, minmax(200px, 1fr));
+    }
+}
+@media (max-width: 640px) {
+    .amenities-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Steps Section */
@@ -501,6 +511,38 @@ body {
     font-size: 14px;
     color: var(--text-gray);
     line-height: 1.7;
+}
+
+/* CTA Section */
+.cta-section {
+    padding: 100px 20px;
+    position: relative;
+}
+.cta-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, rgba(255,90,95,0.18) 0%, rgba(255,180,0,0.18) 100%);
+    border: 3px solid rgba(255,90,95,0.35);
+    border-radius: 32px;
+    padding: 60px 50px;
+    text-align: center;
+    box-shadow: 10px 10px 0px rgba(255,90,95,0.2);
+}
+.cta-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 48px);
+    margin-bottom: 12px;
+}
+.cta-subtitle {
+    color: var(--text-gray);
+    font-size: 18px;
+    margin-bottom: 28px;
+}
+.cta-actions {
+    display: flex;
+    gap: 18px;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 /* Availability Section */
@@ -1136,19 +1178,19 @@ body {
     <div class="stats-container">
         <div class="stat-item">
             <div class="stat-number">4</div>
-            <div class="stat-label">Premium Rooms</div>
+            <div class="stat-label">🛏️ Premium Rooms</div>
         </div>
         <div class="stat-item">
             <div class="stat-number">100%</div>
-            <div class="stat-label">Fully Furnished</div>
+            <div class="stat-label">🪑 Fully Furnished</div>
         </div>
         <div class="stat-item">
-            <div class="stat-number">24/7</div>
-            <div class="stat-label">Support Available</div>
+            <div class="stat-number">1</div>
+            <div class="stat-label">🧳 Extra Storage Room</div>
         </div>
         <div class="stat-item">
             <div class="stat-number">5★</div>
-            <div class="stat-label">Guest Rating</div>
+            <div class="stat-label">⭐ Guest Rating</div>
         </div>
     </div>
 </section>
@@ -1165,7 +1207,7 @@ body {
             <div class="amenity-card">
                 <div class="amenity-icon">🛏️</div>
                 <div class="amenity-title">Fully Furnished</div>
-                <div class="amenity-desc">Move in ready with quality furniture, bedding, and essentials.</div>
+                <div class="amenity-desc">Move in ready with quality furniture, bedding, and essentials, plus fresh bedspread and pillow covers.</div>
             </div>
             <div class="amenity-card">
                 <div class="amenity-icon">🥘</div>
@@ -1175,7 +1217,7 @@ body {
             <div class="amenity-card">
                 <div class="amenity-icon">🚿</div>
                 <div class="amenity-title">Modern Bathrooms</div>
-                <div class="amenity-desc">Clean, well-maintained bathrooms with hot water 24/7.</div>
+                <div class="amenity-desc">Fully renovated bathroom with new shower, brand new toilets, and adjustable hand showers.</div>
             </div>
             <div class="amenity-card">
                 <div class="amenity-icon">🌳</div>
@@ -1188,9 +1230,9 @@ body {
                 <div class="amenity-desc">Easy access to public transport and city center.</div>
             </div>
             <div class="amenity-card">
-                <div class="amenity-icon">🔒</div>
-                <div class="amenity-title">Safe & Secure</div>
-                <div class="amenity-desc">Secure building with modern safety features.</div>
+                <div class="amenity-icon">📄</div>
+                <div class="amenity-title">Welcome Kit & Docs</div>
+                <div class="amenity-desc">Personalized QR code to access docs online, plus a warm welcome kit with Anmeldung docs, S+U map, contacts, and emergency info.</div>
             </div>
             <div class="amenity-card">
                 <div class="amenity-icon">📶</div>
@@ -1244,42 +1286,27 @@ body {
         </div>
         <div class="testimonials-grid">
             <div class="testimonial-card">
-                <div class="testimonial-title">Experience</div>
-                <div class="testimonial-subtitle">Landlord • 5.0/5</div>
+                <div class="testimonial-title">5.0/5 Tenant Love</div>
+                <div class="testimonial-subtitle">Highlights from recent residents</div>
                 <div class="rating-list">
                     <div class="rating-row"><span>Communication</span><span class="rating-score">5.0/5</span></div>
                     <div class="rating-row"><span>Move-in process</span><span class="rating-score">5.0/5</span></div>
                     <div class="rating-row"><span>Listing accuracy</span><span class="rating-score">5.0/5</span></div>
                 </div>
                 <div class="testimonial-comment">
-                    Met him in person on the day of move in. He was very nice and amazing person. Both for me and my girlfriend who moved into the same house with me in a different room.
-                </div>
-                <div class="rating-list" style="margin-top: 16px;">
-                    <div class="rating-row"><span>Cleanliness</span><span class="rating-score">5.0/5</span></div>
-                    <div class="rating-row"><span>Amenities</span><span class="rating-score">5.0/5</span></div>
-                    <div class="rating-row"><span>Furniture</span><span class="rating-score">5.0/5</span></div>
-                    <div class="rating-row"><span>Location</span><span class="rating-score">5.0/5</span></div>
-                </div>
-                <div class="testimonial-comment" style="margin-top: 14px;">
-                    Additional comment: It was amazing. Both me and my girlfriend love the property, and our roommates and landlord both are very nice people so far. So we are happy.
+                    “Met him in person on the day of move in… very nice and amazing person. Both for me and my girlfriend.” 
                 </div>
             </div>
             <div class="testimonial-card">
-                <div class="testimonial-title">Experience</div>
-                <div class="testimonial-subtitle">Tenant Review • 5.0/5</div>
+                <div class="testimonial-title">Calm, Connected Living</div>
+                <div class="testimonial-subtitle">Neighborhood & property feedback</div>
                 <div class="rating-list">
-                    <div class="rating-row"><span>Communication</span><span class="rating-score">5.0/5</span></div>
-                    <div class="rating-row"><span>Move-in process</span><span class="rating-score">5.0/5</span></div>
-                    <div class="rating-row"><span>Listing accuracy</span><span class="rating-score">5.0/5</span></div>
-                </div>
-                <div class="testimonial-comment">
-                    Additional comment: A little bit out of the city. But, very calm to live and work. Almost everything nearby supermarkets and restaurants. Neighbours very friendly and prompt response from the landlord. Everything fine! Thank you!!
-                </div>
-                <div class="rating-list" style="margin-top: 16px;">
                     <div class="rating-row"><span>Cleanliness</span><span class="rating-score">5.0/5</span></div>
                     <div class="rating-row"><span>Amenities</span><span class="rating-score">5.0/5</span></div>
-                    <div class="rating-row"><span>Furniture</span><span class="rating-score">5.0/5</span></div>
                     <div class="rating-row"><span>Location</span><span class="rating-score">5.0/5</span></div>
+                </div>
+                <div class="testimonial-comment">
+                    “A little bit out of the city, but very calm… supermarkets and restaurants nearby. Everything fine!”
                 </div>
             </div>
         </div>
@@ -1566,6 +1593,24 @@ body {
         style="width:100%; height:100%; object-fit: cover;"
     ></video>
 </div>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="cta-container">
+        <h2 class="cta-title">Ready to Call Homelyo Home?</h2>
+        <p class="cta-subtitle">Join our community of happy residents in Berlin Lichtenrade</p>
+        <div class="cta-actions">
+            <a href="https://www.homelyo.eu/book-your-stay" class="btn-primary">
+                <span>Book Your Room Now</span>
+                <span>→</span>
+            </a>
+            <a href="mailto:support@homelyo.eu" class="btn-secondary">
+                <span>Contact Us</span>
+                <span>📧</span>
+            </a>
+        </div>
+    </div>
+</section>
 
 <!-- Footer -->
 <footer class="footer">
