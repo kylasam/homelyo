@@ -348,6 +348,161 @@ body {
     font-weight: 500;
 }
 
+/* Amenities Section */
+.amenities-section {
+    padding: 100px 20px;
+    position: relative;
+}
+.amenities-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.amenities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+    margin-top: 40px;
+}
+.amenity-card {
+    background: var(--bg-card);
+    border: 2px solid rgba(255, 90, 95, 0.15);
+    border-radius: 22px;
+    padding: 26px;
+    text-align: left;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.amenity-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(255, 90, 95, 0.2);
+    border-color: rgba(255, 180, 0, 0.5);
+}
+.amenity-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, rgba(255,90,95,0.2) 0%, rgba(255,180,0,0.25) 100%);
+    font-size: 26px;
+    margin-bottom: 16px;
+}
+.amenity-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+.amenity-desc {
+    color: var(--text-gray);
+    font-size: 14px;
+}
+
+/* Steps Section */
+.steps-section {
+    padding: 100px 20px;
+    position: relative;
+}
+.steps-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 26px;
+    margin-top: 40px;
+}
+.step-card {
+    background: var(--bg-card);
+    border-radius: 24px;
+    padding: 30px;
+    border: 2px dashed rgba(255, 90, 95, 0.3);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.step-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+}
+.step-number {
+    width: 52px;
+    height: 52px;
+    border-radius: 18px;
+    display: grid;
+    place-items: center;
+    font-size: 22px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    color: #fff;
+    margin-bottom: 18px;
+}
+.step-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+.step-desc {
+    color: var(--text-gray);
+    font-size: 14px;
+}
+
+/* Testimonials Section */
+.testimonials-section {
+    padding: 100px 20px;
+    position: relative;
+}
+.testimonials-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 28px;
+    margin-top: 40px;
+}
+.testimonial-card {
+    background: var(--bg-card);
+    border-radius: 24px;
+    padding: 28px;
+    border: 2px solid rgba(255, 90, 95, 0.2);
+    box-shadow: 0 14px 36px rgba(0,0,0,0.25);
+}
+.testimonial-title {
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 6px;
+}
+.testimonial-subtitle {
+    color: var(--text-gray);
+    font-size: 14px;
+    margin-bottom: 18px;
+}
+.rating-list {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+.rating-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255,90,95,0.1);
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-size: 14px;
+}
+.rating-score {
+    font-weight: 700;
+    color: var(--available-color);
+}
+.testimonial-comment {
+    font-size: 14px;
+    color: var(--text-gray);
+    line-height: 1.7;
+}
+
 /* Availability Section */
 .availability-section {
     padding: 100px 20px;
@@ -998,6 +1153,139 @@ body {
     </div>
 </section>
 
+<!-- Amenities Section -->
+<section class="amenities-section" id="amenities">
+    <div class="amenities-container">
+        <div class="section-header">
+            <div class="section-tag">Why Choose Us</div>
+            <h2 class="section-title">Premium Amenities Included</h2>
+            <p class="section-subtitle">Everything you need for comfortable living</p>
+        </div>
+        <div class="amenities-grid">
+            <div class="amenity-card">
+                <div class="amenity-icon">🛏️</div>
+                <div class="amenity-title">Fully Furnished</div>
+                <div class="amenity-desc">Move in ready with quality furniture, bedding, and essentials.</div>
+            </div>
+            <div class="amenity-card">
+                <div class="amenity-icon">🥘</div>
+                <div class="amenity-title">Functional Kitchen</div>
+                <div class="amenity-desc">Modern shared kitchen with all appliances and cookware.</div>
+            </div>
+            <div class="amenity-card">
+                <div class="amenity-icon">🚿</div>
+                <div class="amenity-title">Modern Bathrooms</div>
+                <div class="amenity-desc">Clean, well-maintained bathrooms with hot water 24/7.</div>
+            </div>
+            <div class="amenity-card">
+                <div class="amenity-icon">🌳</div>
+                <div class="amenity-title">Green Neighborhood</div>
+                <div class="amenity-desc">Peaceful area with parks and nature nearby.</div>
+            </div>
+            <div class="amenity-card">
+                <div class="amenity-icon">🚇</div>
+                <div class="amenity-title">Great Transport</div>
+                <div class="amenity-desc">Easy access to public transport and city center.</div>
+            </div>
+            <div class="amenity-card">
+                <div class="amenity-icon">🔒</div>
+                <div class="amenity-title">Safe & Secure</div>
+                <div class="amenity-desc">Secure building with modern safety features.</div>
+            </div>
+            <div class="amenity-card">
+                <div class="amenity-icon">📶</div>
+                <div class="amenity-title">High-Speed WiFi</div>
+                <div class="amenity-desc">Reliable internet connection throughout the property.</div>
+            </div>
+            <div class="amenity-card">
+                <div class="amenity-icon">🧺</div>
+                <div class="amenity-title">Laundry Facilities</div>
+                <div class="amenity-desc">On-site washing machine for your convenience.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Steps Section -->
+<section class="steps-section" id="move-in">
+    <div class="steps-container">
+        <div class="section-header">
+            <div class="section-tag">Move In 3 Easy Steps</div>
+            <h2 class="section-title">From Booking to Moving In</h2>
+            <p class="section-subtitle">We make it seamless from start to finish</p>
+        </div>
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <div class="step-title">Choose Your Room</div>
+                <div class="step-desc">Browse available rooms and select the one that fits your needs and budget.</div>
+            </div>
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <div class="step-title">Submit Booking</div>
+                <div class="step-desc">Fill out our simple booking form with your details and preferred move-in date.</div>
+            </div>
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <div class="step-title">Move In & Settle</div>
+                <div class="step-desc">Receive your move-in package and keys, then start your new life in Berlin.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials-section" id="reviews">
+    <div class="testimonials-container">
+        <div class="section-header">
+            <div class="section-tag">Tenant Experiences</div>
+            <h2 class="section-title">What Our Tenants Say</h2>
+            <p class="section-subtitle">Real feedback from residents who love living here</p>
+        </div>
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <div class="testimonial-title">Experience</div>
+                <div class="testimonial-subtitle">Landlord • 5.0/5</div>
+                <div class="rating-list">
+                    <div class="rating-row"><span>Communication</span><span class="rating-score">5.0/5</span></div>
+                    <div class="rating-row"><span>Move-in process</span><span class="rating-score">5.0/5</span></div>
+                    <div class="rating-row"><span>Listing accuracy</span><span class="rating-score">5.0/5</span></div>
+                </div>
+                <div class="testimonial-comment">
+                    Met him in person on the day of move in. He was very nice and amazing person. Both for me and my girlfriend who moved into the same house with me in a different room.
+                </div>
+                <div class="rating-list" style="margin-top: 16px;">
+                    <div class="rating-row"><span>Cleanliness</span><span class="rating-score">5.0/5</span></div>
+                    <div class="rating-row"><span>Amenities</span><span class="rating-score">5.0/5</span></div>
+                    <div class="rating-row"><span>Furniture</span><span class="rating-score">5.0/5</span></div>
+                    <div class="rating-row"><span>Location</span><span class="rating-score">5.0/5</span></div>
+                </div>
+                <div class="testimonial-comment" style="margin-top: 14px;">
+                    Additional comment: It was amazing. Both me and my girlfriend love the property, and our roommates and landlord both are very nice people so far. So we are happy.
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-title">Experience</div>
+                <div class="testimonial-subtitle">Tenant Review • 5.0/5</div>
+                <div class="rating-list">
+                    <div class="rating-row"><span>Communication</span><span class="rating-score">5.0/5</span></div>
+                    <div class="rating-row"><span>Move-in process</span><span class="rating-score">5.0/5</span></div>
+                    <div class="rating-row"><span>Listing accuracy</span><span class="rating-score">5.0/5</span></div>
+                </div>
+                <div class="testimonial-comment">
+                    Additional comment: A little bit out of the city. But, very calm to live and work. Almost everything nearby supermarkets and restaurants. Neighbours very friendly and prompt response from the landlord. Everything fine! Thank you!!
+                </div>
+                <div class="rating-list" style="margin-top: 16px;">
+                    <div class="rating-row"><span>Cleanliness</span><span class="rating-score">5.0/5</span></div>
+                    <div class="rating-row"><span>Amenities</span><span class="rating-score">5.0/5</span></div>
+                    <div class="rating-row"><span>Furniture</span><span class="rating-score">5.0/5</span></div>
+                    <div class="rating-row"><span>Location</span><span class="rating-score">5.0/5</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- Availability Section -->
 <section class="availability-section" id="availability">
     <div class="availability-container">
@@ -1355,7 +1643,7 @@ const observer = new IntersectionObserver((entries) => {
     });
 }, { threshold: 0.1, rootMargin: '0px 0px -100px 0px' });
 
-document.querySelectorAll('.room-card, .stat-item, .location-item').forEach(el => {
+document.querySelectorAll('.room-card, .stat-item, .location-item, .amenity-card, .step-card, .testimonial-card').forEach(el => {
     el.style.opacity = '0';
     el.style.transform = 'translateY(30px)';
     el.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
