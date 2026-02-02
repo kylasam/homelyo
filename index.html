@@ -3,784 +3,1171 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Homelyo - Premium Co-Living in Berlin Lichtenrade</title>
+<title>Homelyo - Your Perfect Home in Berlin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
+:root {
+    --primary: #FF5A5F;
+    --primary-dark: #E74C3C;
+    --accent: #FFB400;
+    --teal: #00A699;
+    --peach: #FFDAB9;
+    --bg-dark: #1A1A2E;
+    --bg-card: #232337;
+    --text-light: #ffffff;
+    --text-gray: #B8B8D1;
+    --border-color: #3A3A52;
+    --available-color: #00D9A5;
+    --booked-color: #FF6B9D;
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #fff; overflow-x: hidden; }
-.container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+
+body { 
+    font-family: 'Inter', sans-serif; 
+    background: var(--bg-dark); 
+    color: var(--text-light); 
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+/* Smooth Scrollbar */
+::-webkit-scrollbar { width: 12px; }
+::-webkit-scrollbar-track { background: var(--bg-dark); }
+::-webkit-scrollbar-thumb { 
+    background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+    border-radius: 10px;
+}
+
+/* Playful Cartoon Decorations */
+.cartoon-star {
+    position: absolute;
+    font-size: 28px;
+    animation: twinkle 3s ease-in-out infinite;
+    pointer-events: none;
+    filter: drop-shadow(0 0 8px rgba(255,180,0,0.6));
+}
+@keyframes twinkle {
+    0%, 100% { opacity: 0.4; transform: scale(1) rotate(0deg); }
+    50% { opacity: 1; transform: scale(1.3) rotate(180deg); }
+}
+
+.cartoon-cloud {
+    position: absolute;
+    opacity: 0.15;
+    font-size: 70px;
+    animation: float-cloud 25s ease-in-out infinite;
+    pointer-events: none;
+}
+@keyframes float-cloud {
+    0%, 100% { transform: translateX(0) translateY(0); }
+    50% { transform: translateX(40px) translateY(-25px); }
+}
+
+.cartoon-heart {
+    position: absolute;
+    font-size: 24px;
+    animation: heartbeat 2s ease-in-out infinite;
+    pointer-events: none;
+    filter: drop-shadow(0 0 10px rgba(255,90,95,0.5));
+}
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.2); opacity: 1; }
+}
+
+/* Navigation */
+.nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: rgba(26, 26, 46, 0.95);
+    backdrop-filter: blur(15px);
+    z-index: 1000;
+    border-bottom: 2px solid rgba(255, 90, 95, 0.2);
+    transition: all 0.3s ease;
+}
+.nav.scrolled {
+    background: rgba(26, 26, 46, 0.98);
+    box-shadow: 0 4px 25px rgba(255, 90, 95, 0.15);
+}
+.nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-decoration: none;
+}
+.logo {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--primary);
+    transition: transform 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 90, 95, 0.4);
+}
+.logo:hover { 
+    transform: scale(1.15) rotate(5deg); 
+    box-shadow: 0 6px 20px rgba(255, 90, 95, 0.6);
+}
+.logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.brand-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 30px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.nav-links {
+    display: flex;
+    gap: 35px;
+    align-items: center;
+}
+.nav-link {
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+}
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+    transition: width 0.3s ease;
+    border-radius: 2px;
+}
+.nav-link:hover::after { width: 100%; }
+.nav-link:hover { color: var(--primary); }
+.btn-book {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    padding: 12px 28px;
+    border-radius: 30px;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    box-shadow: 0 5px 20px rgba(255, 90, 95, 0.4);
+    transition: all 0.3s ease;
+}
+.btn-book:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(255, 90, 95, 0.6);
+}
 
 /* Hero Section */
-.hero { 
-    min-height: 100vh; 
-    display: flex; 
-    align-items: center; 
+.hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
     position: relative;
     overflow: hidden;
+    padding-top: 80px;
 }
-.hero::before {
+.hero-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+.hero-bg::before {
     content: '';
     position: absolute;
     top: -50%;
-    right: -20%;
-    width: 800px;
-    height: 800px;
-    background: radial-gradient(circle, rgba(255,107,157,0.15) 0%, transparent 70%);
-    animation: pulse 4s ease-in-out infinite;
+    right: -10%;
+    width: 900px;
+    height: 900px;
+    background: radial-gradient(circle, rgba(255,90,95,0.18) 0%, transparent 70%);
+    animation: float 8s ease-in-out infinite;
 }
-.hero::after {
+.hero-bg::after {
     content: '';
     position: absolute;
-    bottom: -50%;
-    left: -20%;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(196,69,105,0.1) 0%, transparent 70%);
-    animation: pulse 6s ease-in-out infinite;
+    bottom: -30%;
+    left: -10%;
+    width: 700px;
+    height: 700px;
+    background: radial-gradient(circle, rgba(255,180,0,0.12) 0%, transparent 70%);
+    animation: float 10s ease-in-out infinite reverse;
 }
-@keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 0.3; }
-    50% { transform: scale(1.1); opacity: 0.5; }
+@keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(35px, 35px) scale(1.1); }
 }
-.hero-content { 
-    text-align: center; 
-    z-index: 2; 
+.hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 1200px;
+    padding: 0 20px;
     animation: fadeInUp 1s ease;
 }
 @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(30px); }
+    from { opacity: 0; transform: translateY(50px); }
     to { opacity: 1; transform: translateY(0); }
 }
 .hero-badge {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    background: rgba(255,107,157,0.1);
-    border: 1px solid rgba(255,107,157,0.3);
-    padding: 8px 20px;
+    gap: 12px;
+    background: rgba(255,90,95,0.12);
+    border: 2px solid rgba(255,90,95,0.3);
+    padding: 12px 30px;
     border-radius: 50px;
-    font-size: 14px;
-    margin-bottom: 30px;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 35px;
     animation: slideIn 1s ease 0.2s backwards;
+    box-shadow: 0 4px 15px rgba(255,90,95,0.2);
 }
 @keyframes slideIn {
-    from { opacity: 0; transform: translateX(-20px); }
+    from { opacity: 0; transform: translateX(-40px); }
     to { opacity: 1; transform: translateX(0); }
 }
-.hero-title { 
+.hero-title {
     font-family: 'Playfair Display', serif;
-    font-size: 72px; 
-    font-weight: 700; 
-    margin-bottom: 20px;
-    background: linear-gradient(135deg, #fff 0%, #ff6b9d 100%);
+    font-size: clamp(45px, 7vw, 88px);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 28px;
+    background: linear-gradient(135deg, #ffffff 0%, var(--primary) 45%, var(--accent) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    line-height: 1.2;
     animation: fadeIn 1s ease 0.4s backwards;
 }
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
 }
-.hero-subtitle { 
-    font-size: 24px; 
-    color: #ccc; 
-    margin-bottom: 40px;
+.hero-subtitle {
+    font-size: clamp(18px, 3vw, 28px);
+    color: var(--text-gray);
+    margin-bottom: 45px;
     animation: fadeIn 1s ease 0.6s backwards;
 }
 .hero-cta {
     display: inline-flex;
-    gap: 20px;
+    gap: 22px;
+    flex-wrap: wrap;
+    justify-content: center;
     animation: fadeIn 1s ease 0.8s backwards;
 }
 .btn-primary, .btn-secondary {
-    padding: 16px 40px;
+    padding: 18px 45px;
     border-radius: 50px;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 600;
     text-decoration: none;
     transition: all 0.3s ease;
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 .btn-primary {
-    background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
     color: white;
-    border: none;
-    box-shadow: 0 8px 24px rgba(255,107,157,0.4);
+    box-shadow: 0 6px 20px rgba(255, 90, 95, 0.4);
 }
 .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(255,107,157,0.6);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 10px 35px rgba(255, 90, 95, 0.6);
 }
 .btn-secondary {
-    background: transparent;
-    color: white;
-    border: 2px solid rgba(255,255,255,0.2);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-light);
+    border: 3px solid rgba(255, 90, 95, 0.35);
 }
 .btn-secondary:hover {
-    border-color: #ff6b9d;
-    background: rgba(255,107,157,0.1);
+    background: rgba(255, 90, 95, 0.15);
+    border-color: var(--primary);
+    transform: translateY(-2px);
 }
 
 /* Stats Section */
-.stats {
-    background: #0f0f0f;
-    padding: 80px 0;
-    border-top: 1px solid #1a1a1a;
-    border-bottom: 1px solid #1a1a1a;
+.stats-section {
+    padding: 90px 20px;
+    position: relative;
 }
-.stats-grid {
+.stats-container {
+    max-width: 1400px;
+    margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 40px;
-    text-align: center;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 35px;
 }
 .stat-item {
-    padding: 20px;
-    transition: transform 0.3s ease;
+    background: linear-gradient(135deg, rgba(255,90,95,0.1) 0%, rgba(255,180,0,0.08) 100%);
+    border: 3px solid rgba(255,90,95,0.25);
+    border-radius: 28px;
+    padding: 45px 35px;
+    text-align: center;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 7px 7px 0px rgba(255, 90, 95, 0.2);
 }
 .stat-item:hover {
-    transform: translateY(-5px);
-}
-.stat-icon {
-    font-size: 48px;
-    margin-bottom: 15px;
-    filter: drop-shadow(0 4px 8px rgba(255,107,157,0.3));
+    transform: translateY(-18px) rotate(-3deg);
+    border-color: var(--primary);
+    box-shadow: 12px 12px 0px rgba(255, 90, 95, 0.35);
 }
 .stat-number {
-    font-size: 48px;
-    font-weight: 700;
-    background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+    font-size: 52px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 }
 .stat-label {
-    font-size: 16px;
-    color: #999;
+    font-size: 19px;
+    color: var(--text-gray);
+    font-weight: 500;
+}
+
+/* Availability Section */
+.availability-section {
+    padding: 100px 20px;
+    position: relative;
+    overflow: hidden;
+}
+.availability-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.section-header {
+    text-align: center;
+    margin-bottom: 65px;
+}
+.section-tag {
+    display: inline-block;
+    background: rgba(255,90,95,0.12);
+    border: 2px solid rgba(255,90,95,0.3);
+    padding: 10px 25px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-bottom: 22px;
+    color: var(--primary);
+}
+.section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(38px, 5vw, 60px);
+    font-weight: 800;
+    margin-bottom: 22px;
+    background: linear-gradient(135deg, #ffffff 0%, var(--primary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.section-subtitle {
+    font-size: 19px;
+    color: var(--text-gray);
+    max-width: 650px;
+    margin: 0 auto;
+}
+
+/* Room Selector */
+.room-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 18px;
+    margin-bottom: 45px;
+    max-width: 850px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.room-select-card {
+    background: linear-gradient(135deg, rgba(255,90,95,0.15) 0%, rgba(255,180,0,0.1) 100%);
+    border: 3px solid rgba(255,90,95,0.3);
+    border-radius: 22px;
+    padding: 25px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 5px 5px 0px rgba(255,90,95,0.2);
+}
+.room-select-card:hover {
+    transform: translateY(-8px) rotate(-2deg);
+    border-color: var(--primary);
+    box-shadow: 10px 10px 0px rgba(255,90,95,0.35);
+}
+.room-select-card.active {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    border-color: var(--primary);
+    box-shadow: 8px 8px 0px rgba(255,90,95,0.5);
+    transform: scale(1.08);
+}
+.room-select-card h3 {
+    font-size: 22px;
+    margin-bottom: 6px;
+}
+.room-select-card p {
+    font-size: 14px;
+    color: var(--text-gray);
+}
+.room-select-card.active p {
+    color: rgba(255,255,255,0.95);
+}
+
+/* Simplified Month Calendar */
+.calendar-wrapper {
+    background: linear-gradient(135deg, rgba(35,35,55,0.9) 0%, rgba(35,35,55,0.7) 100%);
+    border: 3px solid rgba(255,90,95,0.25);
+    border-radius: 35px;
+    padding: 50px;
+    box-shadow: 10px 10px 0px rgba(255,90,95,0.15);
+}
+
+.year-display {
+    text-align: center;
+    font-size: 42px;
+    font-weight: 800;
+    margin-bottom: 45px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.months-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.month-block {
+    background: rgba(35,35,55,0.6);
+    border: 3px solid rgba(255,90,95,0.2);
+    border-radius: 20px;
+    padding: 30px 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 5px 5px 0px rgba(255,90,95,0.15);
+}
+
+.month-block:hover {
+    transform: translateY(-8px) rotate(2deg);
+    box-shadow: 10px 10px 0px rgba(255,90,95,0.3);
+}
+
+.month-block.available {
+    background: linear-gradient(135deg, rgba(0,217,165,0.2) 0%, rgba(0,217,165,0.1) 100%);
+    border-color: var(--available-color);
+}
+
+.month-block.booked {
+    background: linear-gradient(135deg, rgba(255,107,157,0.2) 0%, rgba(255,107,157,0.1) 100%);
+    border-color: var(--booked-color);
+}
+
+.month-block.available:hover {
+    border-color: var(--available-color);
+    box-shadow: 10px 10px 0px rgba(0,217,165,0.3);
+}
+
+.month-name {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 15px;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
-/* Rooms Section */
-.rooms {
-    padding: 100px 0;
-    background: linear-gradient(180deg, #0a0a0a 0%, #0f0f0f 100%);
+.month-status {
+    font-size: 32px;
+    margin-bottom: 10px;
 }
-.section-header {
-    text-align: center;
-    margin-bottom: 60px;
-}
-.section-tag {
-    display: inline-block;
-    background: rgba(255,107,157,0.1);
-    border: 1px solid rgba(255,107,157,0.3);
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 12px;
+
+.month-label {
+    font-size: 13px;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 20px;
 }
-.section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 48px;
-    font-weight: 700;
-    margin-bottom: 15px;
+
+.month-block.available .month-name,
+.month-block.available .month-label {
+    color: var(--available-color);
 }
-.section-subtitle {
-    font-size: 18px;
-    color: #999;
+
+.month-block.booked .month-name,
+.month-block.booked .month-label {
+    color: var(--booked-color);
+}
+
+.availability-legend {
+    display: flex;
+    justify-content: center;
+    gap: 45px;
+    margin-top: 35px;
+    flex-wrap: wrap;
+}
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.legend-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+}
+.legend-dot.available {
+    background: var(--available-color);
+    box-shadow: 0 0 20px rgba(0, 217, 165, 0.6);
+}
+.legend-dot.booked {
+    background: var(--booked-color);
+    box-shadow: 0 0 20px rgba(255, 107, 157, 0.6);
+}
+
+/* Photo Carousel */
+.carousel-container {
+    position: relative;
+    width: 100%;
+    height: 280px;
+    overflow: hidden;
+    border-radius: 20px;
+}
+
+.carousel-track {
+    display: flex;
+    transition: transform 0.5s ease;
+    height: 100%;
+}
+
+.carousel-slide {
+    min-width: 100%;
+    height: 100%;
+}
+
+.carousel-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,90,95,0.9);
+    border: none;
+    color: white;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.carousel-btn:hover {
+    background: var(--primary);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-btn.prev {
+    left: 15px;
+}
+
+.carousel-btn.next {
+    right: 15px;
+}
+
+.carousel-indicators {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+}
+
+.carousel-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.carousel-indicator.active {
+    background: var(--primary);
+    width: 30px;
+    border-radius: 5px;
+}
+
+/* Rooms Section */
+.rooms-section {
+    padding: 100px 20px;
+}
+.rooms-container {
+    max-width: 1400px;
+    margin: 0 auto;
 }
 .rooms-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 30px;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 40px;
+    margin-top: 65px;
 }
 .room-card {
-    background: #1a1a1a;
-    border-radius: 20px;
+    background: var(--bg-card);
+    border: 3px solid var(--border-color);
+    border-radius: 28px;
     overflow: hidden;
-    transition: all 0.4s ease;
-    border: 1px solid #2a2a2a;
-    position: relative;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    box-shadow: 8px 8px 0px rgba(255, 90, 95, 0.2);
 }
 .room-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(255,107,157,0.2);
-    border-color: rgba(255,107,157,0.5);
+    transform: translateY(-12px) translateX(-6px);
+    border-color: var(--primary);
+    box-shadow: 18px 18px 0px rgba(255, 90, 95, 0.35);
 }
 .room-badge {
     position: absolute;
-    top: 20px;
-    right: 20px;
-    background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 12px;
+    top: 22px;
+    right: 22px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    padding: 10px 22px;
+    border-radius: 25px;
+    font-size: 11px;
     font-weight: 700;
-    z-index: 2;
-    box-shadow: 0 4px 12px rgba(255,107,157,0.4);
-}
-.room-image {
-    width: 100%;
-    height: 280px;
-    background: #2a2a2a;
-    position: relative;
-    overflow: hidden;
-}
-.room-image::before {
-    content: '🏠';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 80px;
-    opacity: 0.3;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    box-shadow: 0 5px 20px rgba(255, 90, 95, 0.5);
+    z-index: 5;
 }
 .room-content {
-    padding: 30px;
+    padding: 35px;
 }
 .room-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 15px;
+    margin-bottom: 22px;
 }
 .room-name {
-    font-size: 24px;
+    font-size: 26px;
     font-weight: 700;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
 }
 .room-size {
-    font-size: 14px;
-    color: #ff6b9d;
+    font-size: 15px;
+    color: var(--text-gray);
 }
 .room-price {
     text-align: right;
 }
 .price-amount {
-    font-size: 32px;
-    font-weight: 700;
-    color: #ff6b9d;
+    font-size: 30px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 .price-period {
     font-size: 14px;
-    color: #999;
+    color: var(--text-gray);
 }
 .room-features {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
-    margin: 20px 0;
+    gap: 12px;
+    margin-bottom: 28px;
 }
 .feature-tag {
-    background: rgba(255,107,157,0.1);
-    border: 1px solid rgba(255,107,157,0.2);
-    padding: 6px 12px;
-    border-radius: 12px;
-    font-size: 12px;
+    background: rgba(255,90,95,0.12);
+    padding: 8px 16px;
+    border-radius: 22px;
+    font-size: 13px;
+    border: 2px solid rgba(255,90,95,0.25);
 }
-.room-cta {
-    width: 100%;
-    padding: 14px;
-    background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 15px;
-}
-.room-cta:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(255,107,157,0.4);
-}
-
-/* Features Section */
-.features {
-    padding: 100px 0;
-    background: #0a0a0a;
-}
-.features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 30px;
-    margin-top: 60px;
-}
-.feature-card {
-    background: linear-gradient(135deg, #1a1a1a 0%, #151515 100%);
-    padding: 40px 30px;
-    border-radius: 20px;
-    border: 1px solid #2a2a2a;
-    text-align: center;
-    transition: all 0.3s ease;
-}
-.feature-card:hover {
-    border-color: rgba(255,107,157,0.5);
-    transform: translateY(-5px);
-}
-.feature-icon {
-    font-size: 56px;
-    margin-bottom: 20px;
-    display: block;
-    filter: drop-shadow(0 4px 8px rgba(255,107,157,0.3));
-}
-.feature-title {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 12px;
-}
-.feature-desc {
-    font-size: 14px;
-    color: #999;
-    line-height: 1.6;
-}
-
-/* Location Section */
-.location {
-    padding: 100px 0;
-    background: linear-gradient(180deg, #0f0f0f 0%, #0a0a0a 100%);
-}
-.location-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
+.room-link {
+    display: inline-flex;
     align-items: center;
-    margin-top: 60px;
+    gap: 10px;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s ease;
 }
-.location-info h3 {
-    font-size: 32px;
-    font-weight: 700;
-    margin-bottom: 20px;
+.room-link:hover {
+    gap: 18px;
+}
+
+/* Map Section */
+.map-section {
+    padding: 100px 20px;
+}
+.map-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.map-content {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 55px;
+    margin-top: 65px;
+}
+.map-info h3 {
+    font-size: 30px;
+    margin-bottom: 35px;
 }
 .location-details {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    margin-top: 30px;
+    gap: 35px;
 }
 .location-item {
     display: flex;
-    align-items: flex-start;
-    gap: 15px;
-    padding: 20px;
-    background: rgba(255,107,157,0.05);
-    border: 1px solid rgba(255,107,157,0.1);
-    border-radius: 12px;
+    gap: 22px;
+    padding: 28px;
+    background: rgba(35,35,55,0.7);
+    border: 3px solid rgba(255,90,95,0.25);
+    border-radius: 25px;
     transition: all 0.3s ease;
+    box-shadow: 5px 5px 0px rgba(255,90,95,0.15);
 }
 .location-item:hover {
-    background: rgba(255,107,157,0.1);
-    border-color: rgba(255,107,157,0.3);
+    border-color: var(--primary);
+    transform: translateX(12px);
+    box-shadow: 10px 10px 0px rgba(255,90,95,0.25);
 }
 .location-icon {
-    font-size: 28px;
-    flex-shrink: 0;
+    font-size: 40px;
+    min-width: 55px;
+    height: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(255,90,95,0.15) 0%, rgba(255,180,0,0.1) 100%);
+    border-radius: 18px;
 }
 .location-text h4 {
-    font-size: 18px;
-    margin-bottom: 5px;
+    font-size: 20px;
+    margin-bottom: 10px;
 }
 .location-text p {
-    color: #999;
-    font-size: 14px;
-}
-.location-map {
-    background: #1a1a1a;
-    border-radius: 20px;
-    border: 1px solid #2a2a2a;
-    padding: 30px;
-    min-height: 400px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 64px;
-}
-
-/* Process Section */
-.process {
-    padding: 100px 0;
-    background: #0a0a0a;
-}
-.process-steps {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 40px;
-    margin-top: 60px;
-    position: relative;
-}
-.process-step {
-    text-align: center;
-    position: relative;
-}
-.step-number {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 32px;
-    font-weight: 700;
-    margin: 0 auto 25px;
-    box-shadow: 0 8px 24px rgba(255,107,157,0.4);
-}
-.step-title {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 12px;
-}
-.step-desc {
-    color: #999;
-    font-size: 14px;
-    line-height: 1.6;
-}
-
-/* Testimonials */
-.testimonials {
-    padding: 100px 0;
-    background: linear-gradient(180deg, #0f0f0f 0%, #0a0a0a 100%);
-}
-.testimonials-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 30px;
-    margin-top: 60px;
-}
-.testimonial-card {
-    background: #1a1a1a;
-    padding: 35px;
-    border-radius: 20px;
-    border: 1px solid #2a2a2a;
-    transition: all 0.3s ease;
-}
-.testimonial-card:hover {
-    border-color: rgba(255,107,157,0.5);
-    transform: translateY(-5px);
-}
-.testimonial-stars {
-    font-size: 20px;
-    color: #ffd700;
-    margin-bottom: 20px;
-}
-.testimonial-text {
-    font-size: 16px;
+    color: var(--text-gray);
+    font-size: 15px;
     line-height: 1.7;
-    color: #ccc;
-    margin-bottom: 25px;
-    font-style: italic;
 }
-.testimonial-author {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-.author-avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-}
-.author-info h4 {
-    font-size: 16px;
-    margin-bottom: 3px;
-}
-.author-info p {
-    font-size: 13px;
-    color: #999;
-}
-
-/* CTA Section */
-.cta {
-    padding: 100px 0;
-    background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
-    text-align: center;
-    position: relative;
+.map-embed {
+    border-radius: 28px;
     overflow: hidden;
+    border: 3px solid rgba(255,90,95,0.25);
+    box-shadow: 8px 8px 0px rgba(255,90,95,0.2);
 }
-.cta::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(circle at center, rgba(255,107,157,0.1) 0%, transparent 70%);
-}
-.cta-content {
-    position: relative;
-    z-index: 2;
-}
-.cta-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 56px;
-    font-weight: 700;
-    margin-bottom: 20px;
-}
-.cta-subtitle {
-    font-size: 20px;
-    color: #999;
-    margin-bottom: 40px;
+.map-embed iframe {
+    width: 100%;
+    height: 520px;
+    border: none;
 }
 
 /* Footer */
 .footer {
-    background: #0a0a0a;
-    border-top: 1px solid #1a1a1a;
-    padding: 60px 0 30px;
+    background: linear-gradient(180deg, var(--bg-dark) 0%, #121220 100%);
+    border-top: 2px solid rgba(255,90,95,0.2);
+    padding: 85px 20px 35px;
 }
 .footer-content {
+    max-width: 1400px;
+    margin: 0 auto;
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
-    gap: 60px;
-    margin-bottom: 40px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 55px;
+    margin-bottom: 55px;
 }
 .footer-brand h3 {
-    font-size: 28px;
-    margin-bottom: 15px;
-    background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+    font-family: 'Playfair Display', serif;
+    font-size: 34px;
+    margin-bottom: 18px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
 .footer-brand p {
-    color: #999;
-    line-height: 1.6;
-    margin-bottom: 20px;
-}
-.footer-social {
-    display: flex;
-    gap: 15px;
-}
-.social-link {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: rgba(255,107,157,0.1);
-    border: 1px solid rgba(255,107,157,0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    transition: all 0.3s ease;
-    text-decoration: none;
-}
-.social-link:hover {
-    background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
-    border-color: transparent;
+    color: var(--text-gray);
+    line-height: 1.9;
 }
 .footer-section h4 {
-    font-size: 18px;
-    margin-bottom: 20px;
+    font-size: 20px;
+    margin-bottom: 22px;
 }
 .footer-links {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
 }
 .footer-link {
-    color: #999;
+    color: var(--text-gray);
     text-decoration: none;
-    transition: color 0.3s ease;
-    font-size: 14px;
+    transition: all 0.3s ease;
+    display: inline-block;
 }
 .footer-link:hover {
-    color: #ff6b9d;
+    color: var(--primary);
+    transform: translateX(8px);
 }
 .footer-bottom {
-    padding-top: 30px;
-    border-top: 1px solid #1a1a1a;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding-top: 35px;
+    border-top: 2px solid rgba(255,90,95,0.15);
     text-align: center;
-    color: #666;
-    font-size: 14px;
+    color: var(--text-gray);
 }
 
-/* Scroll to top button */
+/* Scroll to Top */
 .scroll-top {
     position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 50px;
-    height: 50px;
+    bottom: 35px;
+    right: 150px;
+    width: 55px;
+    height: 55px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
     border-radius: 50%;
-    background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
-    color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    font-size: 26px;
+    color: white;
     cursor: pointer;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
-    z-index: 1000;
-    box-shadow: 0 4px 12px rgba(255,107,157,0.4);
+    box-shadow: 0 5px 20px rgba(255, 90, 95, 0.4);
+    z-index: 998;
 }
 .scroll-top.visible {
     opacity: 1;
     visibility: visible;
 }
 .scroll-top:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(255,107,157,0.6);
+    transform: translateY(-8px) scale(1.1);
+    box-shadow: 0 8px 30px rgba(255, 90, 95, 0.6);
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
-    .hero-title { font-size: 56px; }
-    .section-title { font-size: 40px; }
-    .location-content { grid-template-columns: 1fr; }
-    .footer-content { grid-template-columns: 1fr 1fr; }
-}
-
+/* Responsive */
 @media (max-width: 768px) {
-    .hero-title { font-size: 42px; }
-    .hero-subtitle { font-size: 18px; }
-    .hero-cta { flex-direction: column; width: 100%; }
-    .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
-    .section-title { font-size: 32px; }
-    .cta-title { font-size: 36px; }
-    .footer-content { grid-template-columns: 1fr; gap: 40px; }
+    .nav-links {
+        gap: 18px;
+        font-size: 14px;
+    }
+    .hero-cta {
+        flex-direction: column;
+        width: 100%;
+    }
+    .btn-primary, .btn-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+    .map-content {
+        grid-template-columns: 1fr;
+    }
+    .room-selector {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .months-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+    }
+    .month-block {
+        padding: 20px 15px;
+    }
+    .scroll-top {
+        right: 35px;
+    }
+    .carousel-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 16px;
+    }
 }
 </style>
 </head>
 <body>
 
+<!-- Navigation -->
+<nav class="nav" id="navbar">
+    <div class="nav-container">
+        <a href="https://www.homelyo.eu" class="logo-container">
+            <div class="logo">
+                <img src="https://raw.githubusercontent.com/kylasam/homelyo/main/assests/Homelyo-logo-new.jpg" alt="Homelyo Logo">
+            </div>
+            <div class="brand-name">Homelyo</div>
+        </a>
+        <div class="nav-links">
+            <a href="#availability" class="nav-link">Availability</a>
+            <a href="#rooms" class="nav-link">Rooms</a>
+            <a href="#location" class="nav-link">Location</a>
+            <a href="https://www.homelyo.eu/contact-us" class="btn-book">Book Now</a>
+        </div>
+    </div>
+</nav>
+
 <!-- Hero Section -->
 <section class="hero">
-    <div class="container">
-        <div class="hero-content">
-            <div class="hero-badge">
+    <div class="hero-bg">
+        <div class="cartoon-star" style="top: 12%; left: 8%;">⭐</div>
+        <div class="cartoon-star" style="top: 22%; right: 12%; animation-delay: 0.8s;">✨</div>
+        <div class="cartoon-star" style="bottom: 28%; left: 18%; animation-delay: 1.6s;">💫</div>
+        <div class="cartoon-heart" style="top: 35%; right: 25%; animation-delay: 0.5s;">💖</div>
+        <div class="cartoon-heart" style="bottom: 40%; left: 30%; animation-delay: 1.2s;">❤️</div>
+        <div class="cartoon-cloud" style="top: 8%; right: 3%;">☁️</div>
+        <div class="cartoon-cloud" style="bottom: 18%; left: 4%; animation-delay: 6s;">☁️</div>
+    </div>
+    <div class="hero-content">
+        <div class="hero-badge">
+            <span>🏠</span>
+            <span>Premium Co-Living in Berlin</span>
+        </div>
+        <h1 class="hero-title">Your Perfect Home Awaits</h1>
+        <p class="hero-subtitle">Experience modern living in the heart of Berlin Lichtenrade with fully furnished rooms and premium amenities</p>
+        <div class="hero-cta">
+            <a href="#availability" class="btn-primary">
+                <span>📅</span>
+                <span>Check Availability</span>
+            </a>
+            <a href="#rooms" class="btn-secondary">
                 <span>🏠</span>
-                <span>Berlin's Premier Co-Living</span>
-            </div>
-            <h1 class="hero-title">Your Next Home<br>Awaits in Berlin</h1>
-            <p class="hero-subtitle">Premium furnished rooms in peaceful Lichtenrade 🌳</p>
-            <div class="hero-cta">
-                <a href="https://www.homelyo.eu/book-your-stay" class="btn-primary">
-                    <span>Book Your Stay</span>
-                    <span>→</span>
-                </a>
-                <a href="#rooms" class="btn-secondary">
-                    <span>Explore Rooms</span>
-                    <span>↓</span>
-                </a>
-            </div>
+                <span>Explore Rooms</span>
+            </a>
         </div>
     </div>
 </section>
 
 <!-- Stats Section -->
-<section class="stats">
-    <div class="container">
-        <div class="stats-grid">
-            <div class="stat-item">
-                <div class="stat-icon">🏡</div>
-                <div class="stat-number">4</div>
-                <div class="stat-label">Available Rooms</div>
+<section class="stats-section">
+    <div class="stats-container">
+        <div class="stat-item">
+            <div class="stat-number">4</div>
+            <div class="stat-label">Premium Rooms</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">100%</div>
+            <div class="stat-label">Fully Furnished</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">24/7</div>
+            <div class="stat-label">Support Available</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">5★</div>
+            <div class="stat-label">Guest Rating</div>
+        </div>
+    </div>
+</section>
+
+<!-- Availability Section -->
+<section class="availability-section" id="availability">
+    <div class="availability-container">
+        <div class="cartoon-star" style="position: absolute; top: 4%; right: 8%; font-size: 35px;">🌟</div>
+        <div class="cartoon-star" style="position: absolute; bottom: 8%; left: 4%; font-size: 28px; animation-delay: 1.3s;">⭐</div>
+        <div class="cartoon-heart" style="position: absolute; top: 15%; left: 10%; font-size: 32px;">💝</div>
+        
+        <div class="section-header">
+            <div class="section-tag">🗓️ Live Availability</div>
+            <h2 class="section-title">When Can You Move In?</h2>
+            <p class="section-subtitle">Select a room to see month-by-month availability for 2026</p>
+            <div style="text-align: center; margin-top: 18px; padding: 14px 30px; background: linear-gradient(135deg, rgba(255,90,95,0.18) 0%, rgba(255,180,0,0.12) 100%); border: 3px solid rgba(255,90,95,0.35); border-radius: 30px; display: inline-block; box-shadow: 5px 5px 0px rgba(255,90,95,0.25);">
+                <span style="font-size: 15px; font-weight: 600; color: var(--primary);">⏱️ Minimum booking: 6 months</span>
             </div>
-            <div class="stat-item">
-                <div class="stat-icon">⭐</div>
-                <div class="stat-number">5.0</div>
-                <div class="stat-label">Guest Rating</div>
+        </div>
+
+        <!-- Room Selector -->
+        <div class="room-selector">
+            <div class="room-select-card active" data-room="KE1">
+                <h3>KE1</h3>
+                <p>€669/month</p>
             </div>
-            <div class="stat-item">
-                <div class="stat-icon">🚇</div>
-                <div class="stat-number">15</div>
-                <div class="stat-label">Min to City</div>
+            <div class="room-select-card" data-room="KE2">
+                <h3>KE2</h3>
+                <p>€649/month</p>
             </div>
-            <div class="stat-item">
-                <div class="stat-icon">✨</div>
-                <div class="stat-number">100%</div>
-                <div class="stat-label">Furnished</div>
+            <div class="room-select-card" data-room="KE3">
+                <h3>KE3</h3>
+                <p>€619/month</p>
+            </div>
+            <div class="room-select-card" data-room="KE4">
+                <h3>KE4</h3>
+                <p>€569/month</p>
+            </div>
+        </div>
+
+        <!-- Simplified Month Calendar -->
+        <div class="calendar-wrapper">
+            <div class="year-display" id="yearDisplay">2026</div>
+            <div class="months-grid" id="monthsGrid">
+                <!-- Months will be generated here -->
+            </div>
+            <div class="availability-legend">
+                <div class="legend-item">
+                    <div class="legend-dot available"></div>
+                    <span>Available to Book</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot booked"></div>
+                    <span>Already Booked</span>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
 <!-- Rooms Section -->
-<section class="rooms" id="rooms">
-    <div class="container">
+<section class="rooms-section" id="rooms">
+    <div class="rooms-container">
         <div class="section-header">
-            <div class="section-tag">Available Now</div>
-            <h2 class="section-title">Choose Your Perfect Room</h2>
-            <p class="section-subtitle">Four uniquely designed spaces for modern living</p>
+            <div class="section-tag">Our Rooms</div>
+            <h2 class="section-title">Choose Your Space</h2>
+            <p class="section-subtitle">Each room is thoughtfully designed with your comfort in mind</p>
         </div>
+        
         <div class="rooms-grid">
+            <!-- Room KE1 -->
             <div class="room-card">
-                <div class="room-badge">XL + BALCONY</div>
-                <div class="room-image"></div>
-                <div class="room-content">
-                    <div class="room-header">
-                        <div>
-                            <div class="room-name">Room KE2</div>
-                            <div class="room-size">Extra Large • 25m²</div>
-                        </div>
-                        <div class="room-price">
-                            <div class="price-amount">€790</div>
-                            <div class="price-period">/month</div>
-                        </div>
+                <div class="carousel-container">
+                    <div class="room-badge">SPACIOUS</div>
+                    <div class="carousel-track" id="carousel-ke1">
+                        <div class="carousel-slide"><img src="assests/home_photos/KE1/IMG_4349.jpg" alt="KE1 Room" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE1/IMG_4349.jpg'"></div>
+                        <div class="carousel-slide"><img src="assests/home_photos/KE1/IMG_4350.jpg" alt="KE1 Room View" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE1/IMG_4350.jpg'"></div>
+                        <div class="carousel-slide"><img src="assests/home_photos/KITCHEN/IMG_5847.jpg" alt="Kitchen" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KITCHEN/IMG_5847.jpg'"></div>
+                        <div class="carousel-slide"><img src="assests/home_photos/BAD/IMG_6614.jpg" alt="Bathroom" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/BAD/IMG_6614.jpg'"></div>
+                        <div class="carousel-slide"><img src="assests/home_photos/OVERVIEW/overview.JPG" alt="Overview" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/OVERVIEW/overview.JPG'"></div>
+                        <div class="carousel-slide"><img src="assests/home_photos/PLAY_GROUND/play_ground.JPG" alt="Playground" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/PLAY_GROUND/play_ground.JPG'"></div>
+                        <div class="carousel-slide"><img src="assests/home_photos/FLOOR_MAP/Floor_map.png" alt="Floor Map" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/FLOOR_MAP/Floor_map.png'"></div>
+                        <div class="carousel-slide"><img src="assests/home_photos/HALL/jpg/IMG_4369.jpg" alt="Hall" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/HALL/jpg/IMG_4369.jpg'"></div>
                     </div>
-                    <div class="room-features">
-                        <span class="feature-tag">🪴 Private Balcony</span>
-                        <span class="feature-tag">🛏️ Double Bed</span>
-                        <span class="feature-tag">🪑 Work Desk</span>
-                        <span class="feature-tag">🚪 En-suite</span>
-                    </div>
-                    <a href="https://www.homelyo.eu/ke2" class="room-cta">View Details & Book →</a>
+                    <button class="carousel-btn prev" onclick="moveCarousel('ke1', -1)">‹</button>
+                    <button class="carousel-btn next" onclick="moveCarousel('ke1', 1)">›</button>
+                    <div class="carousel-indicators" id="indicators-ke1"></div>
                 </div>
-            </div>
-            
-            <div class="room-card">
-                <div class="room-badge">LARGE</div>
-                <div class="room-image"></div>
                 <div class="room-content">
                     <div class="room-header">
                         <div>
                             <div class="room-name">Room KE1</div>
-                            <div class="room-size">Large • 22m²</div>
+                            <div class="room-size">Large • 13.5m²</div>
                         </div>
                         <div class="room-price">
-                            <div class="price-amount">€750</div>
+                            <div class="price-amount">€669</div>
+                            <div class="price-period">/month</div>
+                        </div>
+                    </div>
+                    <div class="room-features">
+                        <span class="feature-tag">🛏️ Queen Bed</span>
+                        <span class="feature-tag">🪑 Work Desk</span>
+                        <span class="feature-tag">🌅 Natural Light</span>
+                        <span class="feature-tag">📦 Storage</span>
+                    </div>
+                    <a href="https://www.homelyo.eu/ke1" class="room-link">View Details & Book →</a>
+                </div>
+            </div>
+
+            <!-- Room KE2 -->
+            <div class="room-card">
+                <div class="carousel-container">
+                    <div class="room-badge">PREMIUM</div>
+                    <div class="carousel-track" id="carousel-ke2">
+                        <div class="carousel-slide"><img src="assests/home_photos/KE2/bedroom1.JPG" alt="KE2 Room" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE2/bedroom1.JPG'"></div>
+                        <div class="carousel-slide"><img src="assests/home_photos/KE2/bedroom1_2.JPG" alt="KE2 Room View" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE2/bedroom1_2.JPG'"></div>
+                        <div class="carousel-slide"><img src="assests/home_photos/KITCHEN/IMG_5847.jpg" alt="Kitchen" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KITCHEN/IMG_5847.jpg'"></div>
+                        <div class="carousel-slide"><img src="assests/home_photos/BAD/IMG_6621.jpg" alt="Bathroom" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/BAD/IMG_6621.jpg'"></div>
+                        <div class="carousel-slide"><img src="assests/home_photos/OVERVIEW/overview.JPG" alt="Overview" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/OVERVIEW/overview.JPG'"></div>
+                        <div class="carousel-slide"><img src="assests/home_photos/PLAY_GROUND/play_ground2.JPG" alt="Playground" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/PLAY_GROUND/play_ground2.JPG'"></div>
+                        <div class="carousel-slide"><img src="assests/home_photos/FLOOR_MAP/Floor_map.png" alt="Floor Map" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/FLOOR_MAP/Floor_map.png'"></div>
+                        <div class="carousel-slide"><img src="assests/home_photos/HALL/jpg/IMG_4370.jpg" alt="Hall" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/HALL/jpg/IMG_4370.jpg'"></div>
+                    </div>
+                    <button class="carousel-btn prev" onclick="moveCarousel('ke2', -1)">‹</button>
+                    <button class="carousel-btn next" onclick="moveCarousel('ke2', 1)">›</button>
+                    <div class="carousel-indicators" id="indicators-ke2"></div>
+                </div>
+                <div class="room-content">
+                    <div class="room-header">
+                        <div>
+                            <div class="room-name">Room KE2</div>
+                            <div class="room-size">Generous • 13m²</div>
+                        </div>
+                        <div class="room-price">
+                            <div class="price-amount">€649</div>
                             <div class="price-period">/month</div>
                         </div>
                     </div>
                     <div class="room-features">
                         <span class="feature-tag">🛏️ Double Bed</span>
-                        <span class="feature-tag">🪑 Work Space</span>
-                        <span class="feature-tag">🪟 Large Windows</span>
-                        <span class="feature-tag">🗄️ Storage</span>
+                        <span class="feature-tag">🪑 Study Area</span>
+                        <span class="feature-tag">🎨 Stylish Design</span>
+                        <span class="feature-tag">🌟 Premium Feel</span>
                     </div>
-                    <a href="https://www.homelyo.eu/ke1" class="room-cta">View Details & Book →</a>
+                    <a href="https://www.homelyo.eu/ke2" class="room-link">View Details & Book →</a>
                 </div>
             </div>
-            
+
+            <!-- Room KE3 -->
             <div class="room-card">
-                <div class="room-badge">MEDIUM</div>
-                <div class="room-image"></div>
+                <div class="carousel-container">
+                    <div class="room-badge">MEDIUM</div>
+                    <div class="carousel-track" id="carousel-ke3">
+                        <div class="carousel-slide"><img src="assests/home_photos/KE3/IMG_5797.jpg" alt="KE3 Room" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE3/IMG_5797.jpg'"></div>
+                        <div class="carousel-slide"><img src="assests/home_photos/KE3/IMG_5799.jpg" alt="KE3 Room View" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE3/IMG_5799.jpg'"></div>
+                        <div class="carousel-slide"><img src="assests/home_photos/KITCHEN/IMG_5847.jpg" alt="Kitchen" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KITCHEN/IMG_5847.jpg'"></div>
+                        <div class="carousel-slide"><img src="assests/home_photos/BAD/IMG_6614.jpg" alt="Bathroom" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/BAD/IMG_6614.jpg'"></div>
+                        <div class="carousel-slide"><img src="assests/home_photos/OVERVIEW/overview.JPG" alt="Overview" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/OVERVIEW/overview.JPG'"></div>
+                        <div class="carousel-slide"><img src="assests/home_photos/PLAY_GROUND/play_ground.JPG" alt="Playground" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/PLAY_GROUND/play_ground.JPG'"></div>
+                        <div class="carousel-slide"><img src="assests/home_photos/FLOOR_MAP/Floor_map.png" alt="Floor Map" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/FLOOR_MAP/Floor_map.png'"></div>
+                        <div class="carousel-slide"><img src="assests/home_photos/HALL/jpg/IMG_4371_2.jpg" alt="Hall" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/HALL/jpg/IMG_4371_2.jpg'"></div>
+                    </div>
+                    <button class="carousel-btn prev" onclick="moveCarousel('ke3', -1)">‹</button>
+                    <button class="carousel-btn next" onclick="moveCarousel('ke3', 1)">›</button>
+                    <div class="carousel-indicators" id="indicators-ke3"></div>
+                </div>
                 <div class="room-content">
                     <div class="room-header">
                         <div>
                             <div class="room-name">Room KE3</div>
-                            <div class="room-size">Medium • 18m²</div>
+                            <div class="room-size">Medium • 12m²</div>
                         </div>
                         <div class="room-price">
-                            <div class="price-amount">€700</div>
+                            <div class="price-amount">€619</div>
                             <div class="price-period">/month</div>
                         </div>
                     </div>
@@ -790,21 +1177,35 @@ body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #fff; overf
                         <span class="feature-tag">💡 Bright</span>
                         <span class="feature-tag">🛋️ Cozy</span>
                     </div>
-                    <a href="https://www.homelyo.eu/ke3" class="room-cta">View Details & Book →</a>
+                    <a href="https://www.homelyo.eu/ke3" class="room-link">View Details & Book →</a>
                 </div>
             </div>
-            
+
+            <!-- Room KE4 -->
             <div class="room-card">
-                <div class="room-badge">COZY VALUE</div>
-                <div class="room-image"></div>
+                <div class="carousel-container">
+                    <div class="room-badge">COZY VALUE</div>
+                    <div class="carousel-track" id="carousel-ke4">
+                        <div class="carousel-slide"><img src="assests/home_photos/KE4/IMG_4205.JPG" alt="KE4 Room" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE4/IMG_4205.JPG'"></div>
+                        <div class="carousel-slide"><img src="assests/home_photos/KITCHEN/IMG_5847.jpg" alt="Kitchen" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KITCHEN/IMG_5847.jpg'"></div>
+                        <div class="carousel-slide"><img src="assests/home_photos/BAD/IMG_6621.jpg" alt="Bathroom" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/BAD/IMG_6621.jpg'"></div>
+                        <div class="carousel-slide"><img src="assests/home_photos/OVERVIEW/overview.JPG" alt="Overview" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/OVERVIEW/overview.JPG'"></div>
+                        <div class="carousel-slide"><img src="assests/home_photos/PLAY_GROUND/play_ground2.JPG" alt="Playground" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/PLAY_GROUND/play_ground2.JPG'"></div>
+                        <div class="carousel-slide"><img src="assests/home_photos/FLOOR_MAP/Floor_map.png" alt="Floor Map" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/FLOOR_MAP/Floor_map.png'"></div>
+                        <div class="carousel-slide"><img src="assests/home_photos/HALL/jpg/IMG_4372.jpg" alt="Hall" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/HALL/jpg/IMG_4372.jpg'"></div>
+                    </div>
+                    <button class="carousel-btn prev" onclick="moveCarousel('ke4', -1)">‹</button>
+                    <button class="carousel-btn next" onclick="moveCarousel('ke4', 1)">›</button>
+                    <div class="carousel-indicators" id="indicators-ke4"></div>
+                </div>
                 <div class="room-content">
                     <div class="room-header">
                         <div>
                             <div class="room-name">Room KE4</div>
-                            <div class="room-size">Cozy • 15m²</div>
+                            <div class="room-size">Cozy • 11m²</div>
                         </div>
                         <div class="room-price">
-                            <div class="price-amount">€650</div>
+                            <div class="price-amount">€569</div>
                             <div class="price-period">/month</div>
                         </div>
                     </div>
@@ -814,90 +1215,37 @@ body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #fff; overf
                         <span class="feature-tag">🪑 Compact Desk</span>
                         <span class="feature-tag">✨ Modern</span>
                     </div>
-                    <a href="https://www.homelyo.eu/ke4" class="room-cta">View Details & Book →</a>
+                    <a href="https://www.homelyo.eu/ke4" class="room-link">View Details & Book →</a>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Features Section -->
-<section class="features">
-    <div class="container">
-        <div class="section-header">
-            <div class="section-tag">Why Choose Us</div>
-            <h2 class="section-title">Premium Amenities Included</h2>
-            <p class="section-subtitle">Everything you need for comfortable living</p>
-        </div>
-        <div class="features-grid">
-            <div class="feature-card">
-                <span class="feature-icon">🛏️</span>
-                <h3 class="feature-title">Fully Furnished</h3>
-                <p class="feature-desc">Move in ready with quality furniture, bedding, and essentials</p>
-            </div>
-            <div class="feature-card">
-                <span class="feature-icon">🥘</span>
-                <h3 class="feature-title">Functional Kitchen</h3>
-                <p class="feature-desc">Modern shared kitchen with all appliances and cookware</p>
-            </div>
-            <div class="feature-card">
-                <span class="feature-icon">🚿</span>
-                <h3 class="feature-title">Modern Bathrooms</h3>
-                <p class="feature-desc">Clean, well-maintained bathrooms with hot water 24/7</p>
-            </div>
-            <div class="feature-card">
-                <span class="feature-icon">🌳</span>
-                <h3 class="feature-title">Green Neighborhood</h3>
-                <p class="feature-desc">Peaceful area with parks and nature nearby</p>
-            </div>
-            <div class="feature-card">
-                <span class="feature-icon">🚇</span>
-                <h3 class="feature-title">Great Transport</h3>
-                <p class="feature-desc">Easy access to public transport and city center</p>
-            </div>
-            <div class="feature-card">
-                <span class="feature-icon">🔒</span>
-                <h3 class="feature-title">Safe & Secure</h3>
-                <p class="feature-desc">Secure building with modern safety features</p>
-            </div>
-            <div class="feature-card">
-                <span class="feature-icon">📶</span>
-                <h3 class="feature-title">High-Speed WiFi</h3>
-                <p class="feature-desc">Reliable internet connection throughout the property</p>
-            </div>
-            <div class="feature-card">
-                <span class="feature-icon">🧺</span>
-                <h3 class="feature-title">Laundry Facilities</h3>
-                <p class="feature-desc">On-site washing machine for your convenience</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Location Section -->
-<section class="location">
-    <div class="container">
+<!-- Map Section -->
+<section class="map-section" id="location">
+    <div class="map-container">
         <div class="section-header">
             <div class="section-tag">Location</div>
             <h2 class="section-title">Berlin Lichtenrade</h2>
             <p class="section-subtitle">Peaceful living with excellent connectivity</p>
         </div>
-        <div class="location-content">
-            <div class="location-info">
+        <div class="map-content">
+            <div class="map-info">
                 <h3>📍 Lichtenrader Damm, 12305 Berlin</h3>
                 <div class="location-details">
                     <div class="location-item">
                         <div class="location-icon">🚇</div>
                         <div class="location-text">
                             <h4>Public Transport</h4>
-                            <p>U-Bahn & S-Bahn stations within walking distance. 15 minutes to city center.</p>
+                            <p>Bus stops within 3-minute walk. S-Bahn a few stops away, offering convenient access to city center in about 20 minutes.</p>
                         </div>
                     </div>
                     <div class="location-item">
                         <div class="location-icon">🏪</div>
                         <div class="location-text">
                             <h4>Shopping & Dining</h4>
-                            <p>Supermarkets, restaurants, and cafes nearby for daily needs.</p>
+                            <p>Supermarkets, restaurants, and cafes nearby for all your daily needs.</p>
                         </div>
                     </div>
                     <div class="location-item">
@@ -907,197 +1255,97 @@ body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #fff; overf
                             <p>Beautiful green spaces and parks perfect for relaxation and exercise.</p>
                         </div>
                     </div>
-                    <div class="location-item">
-                        <div class="location-icon">🏥</div>
-                        <div class="location-text">
-                            <h4>Essential Services</h4>
-                            <p>Medical facilities, pharmacies, and banks within the neighborhood.</p>
-                        </div>
-                    </div>
                 </div>
             </div>
-            <div class="location-map">
-                🗺️
+            <div class="map-embed">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2434.8487682364546!2d13.407273!3d52.398033!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47a851e4c4c4c4c5%3A0x4c4c4c4c4c4c4c4!2sLichtenrader%20Damm%2C%2012305%20Berlin%2C%20Germany!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus" allowfullscreen="" loading="lazy"></iframe>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Process Section -->
-<section class="process">
-    <div class="container">
-        <div class="section-header">
-            <div class="section-tag">Simple Process</div>
-            <h2 class="section-title">Move In 3 Easy Steps</h2>
-            <p class="section-subtitle">From booking to moving in, we make it seamless</p>
-        </div>
-        <div class="process-steps">
-            <div class="process-step">
-                <div class="step-number">1</div>
-                <h3 class="step-title">Choose Your Room</h3>
-                <p class="step-desc">Browse available rooms and select the one that fits your needs and budget</p>
-            </div>
-            <div class="process-step">
-                <div class="step-number">2</div>
-                <h3 class="step-title">Submit Booking</h3>
-                <p class="step-desc">Fill out our simple booking form with your details and preferred move-in date</p>
-            </div>
-            <div class="process-step">
-                <div class="step-number">3</div>
-                <h3 class="step-title">Move In & Settle</h3>
-                <p class="step-desc">Receive your move-in package and keys, then start your new life in Berlin!</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Testimonials Section -->
-<section class="testimonials">
-    <div class="container">
-        <div class="section-header">
-            <div class="section-tag">Reviews</div>
-            <h2 class="section-title">What Our Residents Say</h2>
-            <p class="section-subtitle">Real experiences from real people</p>
-        </div>
-        <div class="testimonials-grid">
-            <div class="testimonial-card">
-                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-                <p class="testimonial-text">"Perfect location for work and life balance. The room was exactly as described and the apartment is very clean. Highly recommend!"</p>
-                <div class="testimonial-author">
-                    <div class="author-avatar">M</div>
-                    <div class="author-info">
-                        <h4>Maria S.</h4>
-                        <p>KE2 Resident</p>
-                    </div>
-                </div>
-            </div>
-            <div class="testimonial-card">
-                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-                <p class="testimonial-text">"Great value for money in Berlin! The neighborhood is peaceful and green, yet close to everything. Would definitely stay again."</p>
-                <div class="testimonial-author">
-                    <div class="author-avatar">J</div>
-                    <div class="author-info">
-                        <h4>John D.</h4>
-                        <p>KE1 Resident</p>
-                    </div>
-                </div>
-            </div>
-            <div class="testimonial-card">
-                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-                <p class="testimonial-text">"The booking process was smooth and the team was very responsive. Love the furnished room and modern amenities!"</p>
-                <div class="testimonial-author">
-                    <div class="author-avatar">A</div>
-                    <div class="author-info">
-                        <h4>Anna K.</h4>
-                        <p>KE3 Resident</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- CTA Section -->
-<section class="cta">
-    <div class="container">
-        <div class="cta-content">
-            <h2 class="cta-title">Ready to Call Homelyo Home?</h2>
-            <p class="cta-subtitle">Join our community of happy residents in Berlin Lichtenrade</p>
-            <div class="hero-cta">
-                <a href="https://www.homelyo.eu/book-your-stay" class="btn-primary">
-                    <span>Book Your Room Now</span>
-                    <span>→</span>
-                </a>
-                <a href="https://www.homelyo.eu/contact-us" class="btn-secondary">
-                    <span>Contact Us</span>
-                    <span>📧</span>
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
+<!-- Chatbot Button -->
+<div 
+    style="position: fixed; bottom: 35px; right: 35px; width: 110px; height: 110px; border-radius: 50%; overflow: hidden; border: 4px solid #FF5A5F; box-shadow: 0 8px 30px rgba(255,90,95,0.5); cursor: pointer; transition: all 0.3s ease; z-index: 9999;"
+    onmouseover="this.style.transform='scale(1.18) rotate(8deg)'; this.style.boxShadow='0 12px 40px rgba(255,90,95,0.7)'" 
+    onmouseout="this.style.transform='scale(1) rotate(0deg)'; this.style.boxShadow='0 8px 30px rgba(255,90,95,0.5)'"
+    onclick="window.open('https://assistant.homelyo.eu/', '_blank')"
+    title="Chat with Sara"
+>
+    <video 
+        src="https://raw.githubusercontent.com/kylasam/homelyo-chatbot/main/assets/welcome.mp4" 
+        autoplay muted loop playsinline 
+        style="width:100%; height:100%; object-fit: cover;"
+    ></video>
+</div>
 
 <!-- Footer -->
 <footer class="footer">
-    <div class="container">
-        <div class="footer-content">
-            <div class="footer-brand">
-                <h3>Homelyo</h3>
-                <p>Premium co-living spaces in Berlin Lichtenrade. Your comfort is our priority.</p>
-                <div class="footer-social">
-                    <a href="#" class="social-link">📧</a>
-                    <a href="#" class="social-link">📱</a>
-                    <a href="#" class="social-link">🌐</a>
-                </div>
-            </div>
-            <div class="footer-section">
-                <h4>Quick Links</h4>
-                <div class="footer-links">
-                    <a href="https://www.homelyo.eu/home" class="footer-link">Home</a>
-                    <a href="https://www.homelyo.eu/book-your-stay" class="footer-link">Book Your Stay</a>
-                    <a href="https://www.homelyo.eu/housing-rules" class="footer-link">Housing Rules</a>
-                    <a href="https://www.homelyo.eu/contact-us" class="footer-link">Contact Us</a>
-                </div>
-            </div>
-            <div class="footer-section">
-                <h4>Rooms</h4>
-                <div class="footer-links">
-                    <a href="https://www.homelyo.eu/ke1" class="footer-link">Room KE1</a>
-                    <a href="https://www.homelyo.eu/ke2" class="footer-link">Room KE2</a>
-                    <a href="https://www.homelyo.eu/ke3" class="footer-link">Room KE3</a>
-                    <a href="https://www.homelyo.eu/ke4" class="footer-link">Room KE4</a>
-                </div>
-            </div>
-            <div class="footer-section">
-                <h4>Contact</h4>
-                <div class="footer-links">
-                    <a href="mailto:support@homelyo.eu" class="footer-link">📧 support@homelyo.eu</a>
-                    <a href="#" class="footer-link">📍 Lichtenrader Damm<br>12305 Berlin</a>
-                </div>
+    <div class="footer-content">
+        <div class="footer-brand">
+            <h3>Homelyo</h3>
+            <p>Premium co-living spaces in Berlin Lichtenrade. Your comfort is our priority.</p>
+        </div>
+        <div class="footer-section">
+            <h4>Quick Links</h4>
+            <div class="footer-links">
+                <a href="https://www.homelyo.eu/home" class="footer-link">Home</a>
+                <a href="https://www.homelyo.eu/book-your-stay" class="footer-link">Book Your Stay</a>
+                <a href="https://www.homelyo.eu/housing-rules" class="footer-link">Housing Rules</a>
+                <a href="https://www.homelyo.eu/contact-us" class="footer-link">Contact Us</a>
             </div>
         </div>
-        <div class="footer-bottom">
-            <p>© 2026 Homelyo. All rights reserved. | Made with ❤️ in Berlin</p>
+        <div class="footer-section">
+            <h4>Rooms</h4>
+            <div class="footer-links">
+                <a href="https://www.homelyo.eu/ke1" class="footer-link">Room KE1</a>
+                <a href="https://www.homelyo.eu/ke2" class="footer-link">Room KE2</a>
+                <a href="https://www.homelyo.eu/ke3" class="footer-link">Room KE3</a>
+                <a href="https://www.homelyo.eu/ke4" class="footer-link">Room KE4</a>
+            </div>
         </div>
+        <div class="footer-section">
+            <h4>Contact</h4>
+            <div class="footer-links">
+                <a href="mailto:support@homelyo.eu" class="footer-link">📧 support@homelyo.eu</a>
+                <a href="#" class="footer-link">📍 Lichtenrader Damm<br>12305 Berlin</a>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2026 Homelyo. All rights reserved. | Made with ❤️ in Berlin</p>
     </div>
 </footer>
 
-<!-- Scroll to Top Button -->
+<!-- Scroll to Top -->
 <div class="scroll-top" id="scrollTop">↑</div>
 
 <script>
-// Scroll to top functionality
-const scrollTopBtn = document.getElementById('scrollTop');
-
+// Navigation
+const navbar = document.getElementById('navbar');
 window.addEventListener('scroll', () => {
-    if (window.pageYOffset > 300) {
-        scrollTopBtn.classList.add('visible');
-    } else {
-        scrollTopBtn.classList.remove('visible');
-    }
+    navbar.classList.toggle('scrolled', window.scrollY > 50);
 });
 
+// Scroll to top
+const scrollTopBtn = document.getElementById('scrollTop');
+window.addEventListener('scroll', () => {
+    scrollTopBtn.classList.toggle('visible', window.pageYOffset > 300);
+});
 scrollTopBtn.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
-// Smooth scroll for anchor links
+// Smooth scroll
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
         const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
     });
 });
 
-// Animate elements on scroll
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
-
+// Animations
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -1105,15 +1353,132 @@ const observer = new IntersectionObserver((entries) => {
             entry.target.style.transform = 'translateY(0)';
         }
     });
-}, observerOptions);
+}, { threshold: 0.1, rootMargin: '0px 0px -100px 0px' });
 
-// Observe all cards and sections
-document.querySelectorAll('.room-card, .feature-card, .testimonial-card, .process-step').forEach(el => {
+document.querySelectorAll('.room-card, .stat-item, .location-item').forEach(el => {
     el.style.opacity = '0';
     el.style.transform = 'translateY(30px)';
-    el.style.transition = 'all 0.6s ease';
+    el.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
     observer.observe(el);
 });
+
+// Availability System
+let selectedRoom = 'KE1';
+let roomAvailability = {};
+const CSV_URL = 'https://raw.githubusercontent.com/kylasam/homelyo/main/config/availability.csv';
+const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+async function loadAvailabilityData() {
+    try {
+        const response = await fetch(CSV_URL);
+        const csvText = await response.text();
+        const lines = csvText.trim().split('\n');
+        
+        for (let i = 1; i < lines.length; i++) {
+            const [room, freeFrom] = lines[i].split(',').map(s => s.trim());
+            if (room && freeFrom) {
+                roomAvailability[room] = new Date(freeFrom);
+            }
+        }
+        generateMonthBlocks();
+    } catch (error) {
+        console.error('Error loading availability:', error);
+        roomAvailability = {
+            'KE1': new Date('2026-05-01'),
+            'KE2': new Date('2026-05-01'),
+            'KE3': new Date('2026-05-01'),
+            'KE4': new Date('2026-07-01')
+        };
+        generateMonthBlocks();
+    }
+}
+
+function isMonthAvailable(year, month) {
+    if (!roomAvailability[selectedRoom]) return false;
+    const freeDate = new Date(roomAvailability[selectedRoom]);
+    const checkDate = new Date(year, month, 1);
+    return checkDate >= new Date(freeDate.getFullYear(), freeDate.getMonth(), 1);
+}
+
+function generateMonthBlocks() {
+    const monthsGrid = document.getElementById('monthsGrid');
+    monthsGrid.innerHTML = '';
+    const year = 2026;
+    
+    for (let month = 0; month < 12; month++) {
+        const isAvailable = isMonthAvailable(year, month);
+        const monthBlock = document.createElement('div');
+        monthBlock.className = `month-block ${isAvailable ? 'available' : 'booked'}`;
+        monthBlock.innerHTML = `
+            <div class="month-name">${monthNames[month]}</div>
+            <div class="month-status">${isAvailable ? '✓' : '✗'}</div>
+            <div class="month-label">${isAvailable ? 'FREE' : 'BOOKED'}</div>
+        `;
+        if (isAvailable) {
+            monthBlock.style.cursor = 'pointer';
+            monthBlock.addEventListener('click', () => {
+                window.location.href = 'https://www.homelyo.eu/contact-us';
+            });
+        }
+        monthsGrid.appendChild(monthBlock);
+    }
+}
+
+// Room selection
+document.querySelectorAll('.room-select-card').forEach(card => {
+    card.addEventListener('click', () => {
+        document.querySelectorAll('.room-select-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        selectedRoom = card.dataset.room;
+        generateMonthBlocks();
+    });
+});
+
+// Carousel
+const carousels = {};
+['ke1', 'ke2', 'ke3', 'ke4'].forEach(room => {
+    carousels[room] = { currentSlide: 0, totalSlides: 5 };
+    initCarousel(room);
+});
+
+function initCarousel(room) {
+    const indicators = document.getElementById(`indicators-${room}`);
+    for (let i = 0; i < carousels[room].totalSlides; i++) {
+        const indicator = document.createElement('div');
+        indicator.className = `carousel-indicator ${i === 0 ? 'active' : ''}`;
+        indicator.onclick = () => goToSlide(room, i);
+        indicators.appendChild(indicator);
+    }
+}
+
+function moveCarousel(room, direction) {
+    const carousel = carousels[room];
+    carousel.currentSlide = (carousel.currentSlide + direction + carousel.totalSlides) % carousel.totalSlides;
+    updateCarousel(room);
+}
+
+function goToSlide(room, index) {
+    carousels[room].currentSlide = index;
+    updateCarousel(room);
+}
+
+function updateCarousel(room) {
+    const track = document.getElementById(`carousel-${room}`);
+    const indicators = document.getElementById(`indicators-${room}`).children;
+    const offset = -carousels[room].currentSlide * 100;
+    track.style.transform = `translateX(${offset}%)`;
+    
+    Array.from(indicators).forEach((ind, i) => {
+        ind.classList.toggle('active', i === carousels[room].currentSlide);
+    });
+}
+
+// Auto-play carousels
+setInterval(() => {
+    Object.keys(carousels).forEach(room => moveCarousel(room, 1));
+}, 4000);
+
+loadAvailabilityData();
 </script>
 
 </body>
