@@ -944,20 +944,6 @@ body {
     font-size: 13px;
     border: 2px solid rgba(255,90,95,0.25);
 }
-.room-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--primary);
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 16px;
-    transition: all 0.3s ease;
-}
-.room-link:hover {
-    gap: 18px;
-}
-
 /* Map Section */
 .map-section {
     padding: 100px 20px;
@@ -1155,25 +1141,13 @@ body {
 <!-- Navigation -->
 <nav class="nav" id="navbar">
     <div class="nav-container">
-        <a href="https://www.homelyo.eu" class="logo-container">
+        <a href="index.html" class="logo-container">
             <div class="logo">
                 <img src="https://raw.githubusercontent.com/kylasam/homelyo/main/assests/Homelyo-logo-new.jpg" alt="Homelyo Logo">
             </div>
             <div class="brand-name">Homelyo</div>
         </a>
-                <div class="nav-links">
-            <a href="index.html" class="nav-link">Home</a>
-            <a href="https://www.homelyo.eu/ke1" class="nav-link">KE1</a>
-            <a href="https://www.homelyo.eu/ke2" class="nav-link">KE2</a>
-            <a href="https://www.homelyo.eu/ke3" class="nav-link">KE3</a>
-            <a href="https://www.homelyo.eu/ke4" class="nav-link">KE4</a>
-            <a href="amenities.html" class="nav-link">Amenities 🧺</a>
-            <a href="move-in-package.html" class="nav-link">Move-In Package 🏠📦</a>
-            <a href="house-rules.html" class="nav-link">Community Guidelines 🌱🤝🤍</a>
-            <a href="book.html" class="nav-link">Book Your Stay ✨</a>
-            <a href="contact.html" class="nav-link">Contact Us</a>
-        </div>
-    </div>
+</div>
 </nav>
 
 <!-- Hero Section -->
@@ -1195,14 +1169,14 @@ body {
         <h1 class="hero-title">Your Perfect Home Awaits</h1>
         <p class="hero-subtitle">Experience modern living in the heart of Berlin Lichtenrade with fully furnished rooms and premium amenities</p>
         <div class="hero-cta">
-            <a href="#availability" class="btn-primary">
+            <div class="btn-primary">
                 <span>📅</span>
                 <span>Check Availability</span>
-            </a>
-            <a href="#rooms" class="btn-secondary">
+            </div>
+            <div class="btn-secondary">
                 <span>🏠</span>
                 <span>Explore Rooms</span>
-            </a>
+            </div>
         </div>
     </div>
 </section>
@@ -1406,48 +1380,7 @@ body {
 <!-- Rooms Section -->
 <section class="rooms-section" id="rooms">
     <div class="rooms-container">
-        <div class="section-header">
-            <div class="section-tag">Our Rooms</div>
-            <h2 class="section-title">Choose Your Space</h2>
-            <p class="section-subtitle">Each room is thoughtfully designed with your comfort in mind</p>
-        </div>
-
-        <table class="rent-table" aria-label="Room rent details">
-            <thead>
-                <tr>
-                    <th>Room Name</th>
-                    <th>Type</th>
-                    <th>Size in m²</th>
-                    <th>Rent (€)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>KE1</td>
-                    <td>—</td>
-                    <td>21</td>
-                    <td>646</td>
-                </tr>
-                <tr>
-                    <td>KE2</td>
-                    <td>With balcony</td>
-                    <td>24</td>
-                    <td>656</td>
-                </tr>
-                <tr>
-                    <td>KE3</td>
-                    <td>—</td>
-                    <td>12</td>
-                    <td>619</td>
-                </tr>
-                <tr>
-                    <td>KE4</td>
-                    <td>—</td>
-                    <td>11</td>
-                    <td>569</td>
-                </tr>
-            </tbody>
-        </table>
+        
         
         <div class="rooms-grid">
             <!-- Room KE1 -->
@@ -1485,7 +1418,7 @@ body {
                         <span class="feature-tag">🌅 Natural Light</span>
                         <span class="feature-tag">📦 Storage</span>
                     </div>
-                    <a href="https://www.homelyo.eu/ke1" class="room-link">View Details & Book →</a>
+                    
                 </div>
             </div>
 
@@ -1524,7 +1457,7 @@ body {
                         <span class="feature-tag">🎨 Stylish Design</span>
                         <span class="feature-tag">🌟 Premium Feel</span>
                     </div>
-                    <a href="https://www.homelyo.eu/ke2" class="room-link">View Details & Book →</a>
+                    
                 </div>
             </div>
 
@@ -1563,7 +1496,7 @@ body {
                         <span class="feature-tag">💡 Bright</span>
                         <span class="feature-tag">🛋️ Cozy</span>
                     </div>
-                    <a href="https://www.homelyo.eu/ke3" class="room-link">View Details & Book →</a>
+                    
                 </div>
             </div>
 
@@ -1601,7 +1534,7 @@ body {
                         <span class="feature-tag">🪑 Compact Desk</span>
                         <span class="feature-tag">✨ Modern</span>
                     </div>
-                    <a href="https://www.homelyo.eu/ke4" class="room-link">View Details & Book →</a>
+                    
                 </div>
             </div>
         </div>
@@ -1671,14 +1604,14 @@ body {
         <h2 class="cta-title">Ready to Call Homelyo Home?</h2>
         <p class="cta-subtitle">Join our community of happy residents in Berlin Lichtenrade</p>
         <div class="cta-actions">
-            <a href="book.html" class="btn-primary">
+            <div class="btn-primary">
                 <span>Book Your Room Now</span>
                 <span>→</span>
-            </a>
-            <a href="mailto:support@homelyo.eu" class="btn-secondary">
+            </div>
+            <div class="btn-secondary">
                 <span>Contact Us</span>
                 <span>📧</span>
-            </a>
+            </div>
         </div>
     </div>
 </section>
@@ -1693,26 +1626,26 @@ body {
         <div class="footer-section">
             <h4>Quick Links</h4>
             <div class="footer-links">
-                <a href="https://www.homelyo.eu/home" class="footer-link">Home</a>
-                <a href="https://www.homelyo.eu/book-your-stay" class="footer-link">Book Your Stay</a>
-                <a href="https://www.homelyo.eu/housing-rules" class="footer-link">Housing Rules</a>
-                <a href="https://www.homelyo.eu/contact-us" class="footer-link">Contact Us</a>
+                <div class="footer-link">Home</div>
+                <div class="footer-link">Book Your Stay</div>
+                <div class="footer-link">Housing Rules</div>
+                <div class="footer-link">Contact Us</div>
             </div>
         </div>
         <div class="footer-section">
             <h4>Rooms</h4>
             <div class="footer-links">
-                <a href="https://www.homelyo.eu/ke1" class="footer-link">Room KE1</a>
-                <a href="https://www.homelyo.eu/ke2" class="footer-link">Room KE2</a>
-                <a href="https://www.homelyo.eu/ke3" class="footer-link">Room KE3</a>
-                <a href="https://www.homelyo.eu/ke4" class="footer-link">Room KE4</a>
+                <div class="footer-link">Room KE1</div>
+                <div class="footer-link">Room KE2</div>
+                <div class="footer-link">Room KE3</div>
+                <div class="footer-link">Room KE4</div>
             </div>
         </div>
         <div class="footer-section">
             <h4>Contact</h4>
             <div class="footer-links">
-                <a href="mailto:support@homelyo.eu" class="footer-link">📧 support@homelyo.eu</a>
-                <a href="#" class="footer-link">📍 Lichtenrader Damm<br>12305 Berlin</a>
+                <div class="footer-link">📧 support@homelyo.eu</div>
+                <div class="footer-link">📍 Lichtenrader Damm<br>12305 Berlin</div>
             </div>
         </div>
     </div>
