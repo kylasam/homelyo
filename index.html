@@ -1767,7 +1767,12 @@ function generateMonthBlocks() {
         if (isAvailable) {
             monthBlock.style.cursor = 'pointer';
             monthBlock.addEventListener('click', () => {
-                window.location.href = 'https://www.homelyo.eu/bookings';
+                const bookingUrl = 'https://www.homelyo.eu/bookings';
+                if (window.top) {
+                    window.top.location.href = bookingUrl;
+                } else {
+                    window.location.href = bookingUrl;
+                }
             });
         }
         monthsGrid.appendChild(monthBlock);
