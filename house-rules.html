@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>House Rules | Homelyo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+    --primary: #FF5A5F;
+    --primary-dark: #E74C3C;
+    --accent: #FFB400;
+    --teal: #00A699;
+    --bg-dark: #1A1A2E;
+    --bg-card: #232337;
+    --text-light: #ffffff;
+    --text-gray: #B8B8D1;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-light);
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Navigation */
+.nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: rgba(26, 26, 46, 0.95);
+    backdrop-filter: blur(15px);
+    z-index: 1000;
+    border-bottom: 2px solid rgba(255, 90, 95, 0.2);
+}
+.nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-decoration: none;
+}
+.logo {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--primary);
+    box-shadow: 0 4px 15px rgba(255, 90, 95, 0.4);
+}
+.logo img { width: 100%; height: 100%; object-fit: cover; }
+.brand-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.nav-links {
+    display: flex;
+    gap: 28px;
+    align-items: center;
+}
+.nav-link {
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+}
+.btn-book {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    padding: 12px 28px;
+    border-radius: 30px;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    box-shadow: 0 5px 20px rgba(255, 90, 95, 0.4);
+}
+
+/* Hero */
+.hero {
+    min-height: 80vh;
+    padding-top: 120px;
+    position: relative;
+    overflow: hidden;
+}
+.hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 12% 12%, rgba(255,90,95,0.22), transparent 42%),
+        radial-gradient(circle at 90% 18%, rgba(255,180,0,0.2), transparent 48%),
+        radial-gradient(circle at 65% 90%, rgba(0,166,153,0.16), transparent 52%);
+    z-index: 0;
+}
+.hero-orbit {
+    position: absolute;
+    width: 520px;
+    height: 520px;
+    border-radius: 50%;
+    border: 2px dashed rgba(255,255,255,0.08);
+    top: -160px;
+    right: -120px;
+    animation: spin 24s linear infinite;
+}
+.hero-orbit::after {
+    content: '';
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    top: 22px;
+    left: 130px;
+    box-shadow: 0 0 25px rgba(255,90,95,0.6);
+}
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.hero-content {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(280px, 1.3fr) minmax(280px, 1fr);
+    gap: 40px;
+    align-items: stretch;
+}
+.hero-card {
+    background: rgba(35, 35, 55, 0.78);
+    border: 2px solid rgba(255, 90, 95, 0.3);
+    border-radius: 28px;
+    padding: 36px;
+    box-shadow: 12px 12px 0px rgba(255, 90, 95, 0.2);
+    animation: floatIn 0.9s ease;
+}
+@keyframes floatIn {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(38px, 4.5vw, 60px);
+    margin-bottom: 16px;
+}
+.hero-subtitle {
+    color: var(--text-gray);
+    font-size: 18px;
+    margin-bottom: 22px;
+}
+.hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+.hero-tag {
+    background: rgba(255,90,95,0.18);
+    border: 1px solid rgba(255,90,95,0.4);
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+}
+
+/* Section */
+.section {
+    padding: 90px 0 110px;
+}
+.section-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+.section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 48px);
+    margin-bottom: 12px;
+}
+.section-subtitle {
+    color: var(--text-gray);
+    font-size: 18px;
+}
+
+/* Rule layout: magazine board */
+.rule-board {
+    display: grid;
+    grid-template-columns: minmax(260px, 0.9fr) minmax(300px, 1.1fr);
+    gap: 28px;
+    align-items: start;
+}
+.rule-rail {
+    background: rgba(35,35,55,0.9);
+    border: 2px solid rgba(255,90,95,0.25);
+    border-radius: 24px;
+    padding: 24px;
+    position: sticky;
+    top: 110px;
+}
+.rail-title {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+.rail-text {
+    color: var(--text-gray);
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+.rail-badges {
+    display: grid;
+    gap: 10px;
+}
+.rail-badge {
+    background: rgba(255,90,95,0.14);
+    border: 1px solid rgba(255,90,95,0.3);
+    border-radius: 14px;
+    padding: 10px 12px;
+    font-size: 13px;
+}
+.rules-flow {
+    display: grid;
+    gap: 18px;
+}
+.rule-panel {
+    background: rgba(35,35,55,0.92);
+    border: 2px solid rgba(255,90,95,0.2);
+    border-radius: 22px;
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.rule-panel::after {
+    content: '';
+    position: absolute;
+    inset: auto -25% -35% auto;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(255,180,0,0.16), transparent 70%);
+}
+.rule-panel:hover {
+    transform: translateY(-6px);
+    border-color: rgba(255,180,0,0.5);
+    box-shadow: 0 16px 40px rgba(255, 90, 95, 0.18);
+}
+.rule-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+.rule-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    background: rgba(255,90,95,0.2);
+    font-size: 18px;
+}
+.rule-title {
+    font-size: 18px;
+    font-weight: 700;
+}
+.rule-body {
+    color: var(--text-gray);
+    font-size: 14px;
+    display: grid;
+    gap: 8px;
+}
+
+/* Monitoring strip */
+.monitor-strip {
+    margin-top: 50px;
+    background: rgba(255,90,95,0.12);
+    border: 1px solid rgba(255,90,95,0.35);
+    border-radius: 18px;
+    padding: 18px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+}
+.monitor-pill {
+    background: rgba(0,0,0,0.2);
+    border: 1px dashed rgba(255,255,255,0.18);
+    border-radius: 999px;
+    padding: 10px 14px;
+    font-size: 14px;
+    animation: drift 5s ease-in-out infinite;
+}
+.monitor-pill:nth-child(2) { animation-delay: 0.7s; }
+.monitor-pill:nth-child(3) { animation-delay: 1.4s; }
+.monitor-pill:nth-child(4) { animation-delay: 2.1s; }
+@keyframes drift {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+.footer {
+    padding: 60px 20px 40px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    color: var(--text-gray);
+    text-align: center;
+}
+
+@media (max-width: 860px) {
+    .nav-links { display: none; }
+    .rule-board { grid-template-columns: 1fr; }
+    .rule-rail { position: relative; top: 0; }
+    .hero-content { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<nav class="nav">
+    <div class="nav-container">
+        <a href="index.html" class="logo-container">
+            <div class="logo">
+                <img src="https://raw.githubusercontent.com/kylasam/homelyo/main/assests/Homelyo-logo-new.jpg" alt="Homelyo Logo">
+            </div>
+            <div class="brand-name">Homelyo</div>
+        </a>
+        <div class="nav-links">
+            <a href="index.html#rooms" class="nav-link">Rooms</a>
+            <a href="book.html" class="btn-book">Book Now</a>
+        </div>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-orbit"></div>
+    <div class="container hero-content">
+        <div class="hero-card">
+            <div class="hero-tags">
+                <span class="hero-tag">🏠 Tenant Guidelines</span>
+                <span class="hero-tag">Respectful living</span>
+                <span class="hero-tag">Clean & safe community</span>
+            </div>
+            <h1 class="hero-title">House Rules</h1>
+            <p class="hero-subtitle">To ensure a safe, clean, and respectful living environment for everyone, please follow these guidelines.</p>
+        </div>
+        <div class="hero-card">
+            <div class="section-title" style="font-size: 26px; margin-bottom: 12px;">Lichtenrader Damm 80</div>
+            <div class="section-subtitle">These rules help keep the home calm, tidy, and welcoming for all residents.</div>
+            <div class="monitor-strip">
+                <div class="monitor-pill">✅ Respect quiet hours</div>
+                <div class="monitor-pill">🧼 Keep shared spaces clean</div>
+                <div class="monitor-pill">🔐 Safety first</div>
+                <div class="monitor-pill">♻️ Separate waste properly</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">House Rules Overview</h2>
+            <p class="section-subtitle">Please follow these rules to keep the shared living experience peaceful and enjoyable.</p>
+        </div>
+
+        <div class="rule-board">
+            <div class="rule-rail">
+                <div class="rail-title">Living Together, Smoothly</div>
+                <div class="rail-text">These guidelines keep the home calm, clean, and respectful for everyone.</div>
+                <div class="rail-badges">
+                    <div class="rail-badge">✅ Be supportive with other tenants</div>
+                    <div class="rail-badge">🧼 Follow the cleaning schedule</div>
+                    <div class="rail-badge">🔐 Safety first, always</div>
+                    <div class="rail-badge">♻️ Separate waste properly</div>
+                </div>
+            </div>
+            <div class="rules-flow">
+                <div class="rule-panel">
+                    <div class="rule-header">
+                        <div class="rule-icon">🚫</div>
+                        <div class="rule-title">Overnight Guests</div>
+                    </div>
+                    <div class="rule-body">
+                        <div>No overnight guests are permitted without prior approval from the landlord/management.</div>
+                    </div>
+                </div>
+                <div class="rule-panel">
+                    <div class="rule-header">
+                        <div class="rule-icon">🔇</div>
+                        <div class="rule-title">Noise Policy</div>
+                    </div>
+                    <div class="rule-body">
+                        <div>No loud noises between 08:00 PM and 07:00 AM.</div>
+                        <div>Quiet hours are strictly observed from 10:00 PM to 07:00 AM.</div>
+                        <div>Please keep music, TV, and conversations at a reasonable volume at all times.</div>
+                        <div>Doors should not be slammed or closed violently.</div>
+                    </div>
+                </div>
+                <div class="rule-panel">
+                    <div class="rule-header">
+                        <div class="rule-icon">🫧</div>
+                        <div class="rule-title">Shared/Common Areas</div>
+                    </div>
+                    <div class="rule-body">
+                        <div>Keep kitchens, bathrooms, and living spaces clean after use.</div>
+                        <div>Dispose of trash properly and follow the cleaning schedule provided.</div>
+                        <div>Proper ventilation of your room and common areas must be maintained at all times.</div>
+                    </div>
+                </div>
+                <div class="rule-panel">
+                    <div class="rule-header">
+                        <div class="rule-icon">👥</div>
+                        <div class="rule-title">Respect for Neighbors</div>
+                    </div>
+                    <div class="rule-body">
+                        <div>Be considerate of others’ privacy and comfort.</div>
+                        <div>No disruptive behavior in hallways or shared areas.</div>
+                        <div>Be supportive and cooperative with fellow tenants.</div>
+                    </div>
+                </div>
+                <div class="rule-panel">
+                    <div class="rule-header">
+                        <div class="rule-icon">🔐</div>
+                        <div class="rule-title">Safety, Security & Insurance</div>
+                    </div>
+                    <div class="rule-body">
+                        <div>Always lock doors and windows when leaving.</div>
+                        <div>Tenants must have necessary insurance to cover damages or incidents.</div>
+                    </div>
+                </div>
+                <div class="rule-panel">
+                    <div class="rule-header">
+                        <div class="rule-icon">🚫</div>
+                        <div class="rule-title">Strictly Prohibited</div>
+                    </div>
+                    <div class="rule-body">
+                        <div>No smoking, illegal activities, or drugs.</div>
+                        <div>No pets are permitted.</div>
+                        <div>No partying inside the apartment.</div>
+                        <div>No barbecue or grilling in common areas or the balcony.</div>
+                    </div>
+                </div>
+                <div class="rule-panel">
+                    <div class="rule-header">
+                        <div class="rule-icon">♻️</div>
+                        <div class="rule-title">Common House Rules</div>
+                    </div>
+                    <div class="rule-body">
+                        <div>Waste must be separated properly (recycling, paper, glass, bio, residual).</div>
+                        <div>Hallways and staircases must be kept clear (no shoes, bikes, or trash).</div>
+                        <div>Laundry should only be done during permitted hours (no late‑night washing).</div>
+                        <div>Respect community quiet hours and avoid disturbing neighbors.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="monitor-strip" style="margin-top: 34px;">
+            <div class="monitor-pill">⚠️ Failure to follow rules may result in warnings, fines, or lease termination.</div>
+            <div class="monitor-pill">📍 Lichtenrader Damm 80</div>
+        </div>
+    </div>
+</section>
+
+<!-- Chatbot Button -->
+<div 
+    style="position: fixed; bottom: 35px; right: 35px; width: 110px; height: 110px; border-radius: 50%; overflow: hidden; border: 4px solid #FF5A5F; box-shadow: 0 8px 30px rgba(255,90,95,0.5); cursor: pointer; transition: all 0.3s ease; z-index: 9999;"
+    onmouseover="this.style.transform='scale(1.18) rotate(8deg)'; this.style.boxShadow='0 12px 40px rgba(255,90,95,0.7)'" 
+    onmouseout="this.style.transform='scale(1) rotate(0deg)'; this.style.boxShadow='0 8px 30px rgba(255,90,95,0.5)'"
+    onclick="window.open('https://assistant.homelyo.eu/', '_blank')"
+    title="Chat with Sara"
+>
+    <video 
+        src="https://raw.githubusercontent.com/kylasam/homelyo-chatbot/main/assets/welcome.mp4" 
+        autoplay muted loop playsinline 
+        style="width:100%; height:100%; object-fit: cover;"
+    ></video>
+</div>
+
+<footer class="footer">
+    <div>Questions? Email support@homelyo.eu</div>
+    <div style="margin-top:10px;">© 2026 Homelyo. All rights reserved.</div>
+</footer>
+</body>
+</html>
