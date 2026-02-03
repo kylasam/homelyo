@@ -842,6 +842,34 @@ body {
     gap: 40px;
     margin-top: 65px;
 }
+.rent-table {
+    margin: 30px auto 10px;
+    max-width: 900px;
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(35, 35, 55, 0.85);
+    border: 2px solid rgba(255, 90, 95, 0.25);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 10px 10px 0px rgba(255, 90, 95, 0.18);
+}
+.rent-table th,
+.rent-table td {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 14px;
+}
+.rent-table th {
+    background: rgba(255, 90, 95, 0.15);
+    color: #fff;
+    font-weight: 700;
+}
+.rent-table tr {
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.rent-table tr:last-child {
+    border-bottom: none;
+}
 .room-card {
     background: var(--bg-card);
     border: 3px solid var(--border-color);
@@ -1377,6 +1405,43 @@ body {
             <h2 class="section-title">Choose Your Space</h2>
             <p class="section-subtitle">Each room is thoughtfully designed with your comfort in mind</p>
         </div>
+
+        <table class="rent-table" aria-label="Room rent details">
+            <thead>
+                <tr>
+                    <th>Room Name</th>
+                    <th>Type</th>
+                    <th>Size in m²</th>
+                    <th>Rent (€)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>KE1</td>
+                    <td>—</td>
+                    <td>21</td>
+                    <td>646</td>
+                </tr>
+                <tr>
+                    <td>KE2</td>
+                    <td>With balcony</td>
+                    <td>24</td>
+                    <td>656</td>
+                </tr>
+                <tr>
+                    <td>KE3</td>
+                    <td>—</td>
+                    <td>12</td>
+                    <td>619</td>
+                </tr>
+                <tr>
+                    <td>KE4</td>
+                    <td>—</td>
+                    <td>11</td>
+                    <td>569</td>
+                </tr>
+            </tbody>
+        </table>
         
         <div class="rooms-grid">
             <!-- Room KE1 -->

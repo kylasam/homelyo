@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amenities | Homelyo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+    --primary: #FF5A5F;
+    --primary-dark: #E74C3C;
+    --accent: #FFB400;
+    --teal: #00A699;
+    --bg-dark: #1A1A2E;
+    --bg-card: #232337;
+    --text-light: #ffffff;
+    --text-gray: #B8B8D1;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-light);
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Navigation */
+.nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: rgba(26, 26, 46, 0.95);
+    backdrop-filter: blur(15px);
+    z-index: 1000;
+    border-bottom: 2px solid rgba(255, 90, 95, 0.2);
+}
+.nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-decoration: none;
+}
+.logo {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--primary);
+    box-shadow: 0 4px 15px rgba(255, 90, 95, 0.4);
+}
+.logo img { width: 100%; height: 100%; object-fit: cover; }
+.brand-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.nav-links {
+    display: flex;
+    gap: 28px;
+    align-items: center;
+}
+.nav-link {
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+}
+.btn-book {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    padding: 12px 28px;
+    border-radius: 30px;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    box-shadow: 0 5px 20px rgba(255, 90, 95, 0.4);
+}
+
+/* Hero */
+.hero {
+    min-height: 100vh;
+    padding-top: 120px;
+    position: relative;
+    overflow: hidden;
+}
+.hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 12% 12%, rgba(255,90,95,0.22), transparent 42%),
+        radial-gradient(circle at 90% 18%, rgba(255,180,0,0.2), transparent 48%),
+        radial-gradient(circle at 65% 90%, rgba(0,166,153,0.16), transparent 52%);
+    z-index: 0;
+}
+.hero-content {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 40px;
+    align-items: center;
+}
+.hero-card {
+    background: rgba(35, 35, 55, 0.78);
+    border: 2px solid rgba(255, 90, 95, 0.3);
+    border-radius: 28px;
+    padding: 36px;
+    box-shadow: 12px 12px 0px rgba(255, 90, 95, 0.2);
+    animation: floatIn 0.9s ease;
+}
+@keyframes floatIn {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(38px, 4.5vw, 60px);
+    margin-bottom: 16px;
+}
+.hero-subtitle {
+    color: var(--text-gray);
+    font-size: 18px;
+    margin-bottom: 22px;
+}
+.hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+.hero-tag {
+    background: rgba(255,90,95,0.18);
+    border: 1px solid rgba(255,90,95,0.4);
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+}
+
+/* Section */
+.section {
+    padding: 90px 0 110px;
+}
+.section-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+.section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 48px);
+    margin-bottom: 12px;
+}
+.section-subtitle {
+    color: var(--text-gray);
+    font-size: 18px;
+}
+
+/* Feature panels */
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 22px;
+}
+.feature-card {
+    background: rgba(35,35,55,0.9);
+    border: 2px solid rgba(255,90,95,0.25);
+    border-radius: 24px;
+    padding: 24px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.feature-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(255,180,0,0.5);
+    box-shadow: 0 16px 40px rgba(255, 90, 95, 0.2);
+}
+.feature-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+.feature-desc {
+    color: var(--text-gray);
+    font-size: 15px;
+}
+
+/* Lists */
+.list-block {
+    margin-top: 18px;
+    display: grid;
+    gap: 16px;
+}
+.list-title {
+    font-size: 16px;
+    font-weight: 700;
+}
+.list-badges {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+}
+.badge {
+    background: rgba(255,90,95,0.14);
+    border: 1px solid rgba(255,90,95,0.3);
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-size: 14px;
+}
+
+/* Animated tiles */
+.tile-wall {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+}
+.tile {
+    background: rgba(255,255,255,0.03);
+    border: 1px dashed rgba(255,255,255,0.18);
+    border-radius: 16px;
+    padding: 14px;
+    font-size: 14px;
+    animation: bob 4s ease-in-out infinite;
+}
+.tile:nth-child(2n) { animation-delay: 0.6s; }
+.tile:nth-child(3n) { animation-delay: 1.2s; }
+@keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+/* Bathroom spotlight */
+.spotlight {
+    position: relative;
+    overflow: hidden;
+}
+.spotlight::before {
+    content: '';
+    position: absolute;
+    inset: -40% -20% auto auto;
+    height: 220px;
+    width: 220px;
+    background: radial-gradient(circle, rgba(255,180,0,0.2), transparent 70%);
+}
+
+/* Floating icons */
+.float-icons {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+.float-icon {
+    position: absolute;
+    font-size: 22px;
+    opacity: 0.18;
+    animation: drift 16s linear infinite;
+}
+.float-icon:nth-child(2) { left: 10%; top: 20%; animation-duration: 18s; }
+.float-icon:nth-child(3) { left: 70%; top: 35%; animation-duration: 14s; }
+.float-icon:nth-child(4) { left: 35%; top: 65%; animation-duration: 20s; }
+.float-icon:nth-child(5) { left: 85%; top: 75%; animation-duration: 22s; }
+@keyframes drift {
+    0% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(8deg); }
+    100% { transform: translateY(0) rotate(0deg); }
+}
+
+.footer {
+    padding: 60px 20px 40px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    color: var(--text-gray);
+    text-align: center;
+}
+
+@media (max-width: 860px) {
+    .nav-links { display: none; }
+}
+</style>
+</head>
+<body>
+<nav class="nav">
+    <div class="nav-container">
+        <a href="index.html" class="logo-container">
+            <div class="logo">
+                <img src="https://raw.githubusercontent.com/kylasam/homelyo/main/assests/Homelyo-logo-new.jpg" alt="Homelyo Logo">
+            </div>
+            <div class="brand-name">Homelyo</div>
+        </a>
+        <div class="nav-links">
+            <a href="index.html#rooms" class="nav-link">Rooms</a>
+            <a href="book.html" class="btn-book">Book Now</a>
+        </div>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="hero-bg"></div>
+    <div class="float-icons">
+        <div class="float-icon" style="left: 6%; top: 18%;">🍳</div>
+        <div class="float-icon">🧼</div>
+        <div class="float-icon">🧻</div>
+        <div class="float-icon">🔪</div>
+        <div class="float-icon">🫧</div>
+    </div>
+    <div class="container hero-content">
+        <div class="hero-card">
+            <div class="hero-tags">
+                <span class="hero-tag">Common‑use essentials</span>
+                <span class="hero-tag">Kitchen + Bathroom</span>
+                <span class="hero-tag">Comfort, ready to use</span>
+            </div>
+            <h1 class="hero-title">Apartment Amenities</h1>
+            <p class="hero-subtitle">A curated look at what’s available in shared areas — thoughtfully stocked so you can cook, clean, and unwind from day one.</p>
+        </div>
+        <div class="hero-card">
+            <div class="feature-title">What this page covers</div>
+            <p class="feature-desc">Two focus zones: a cozy, fully equipped kitchen and a stylish, fully renovated bathroom — both designed for daily comfort and ease.</p>
+            <div class="tile-wall">
+                <div class="tile">🍽️ Ready‑to‑cook setup</div>
+                <div class="tile">🧴 Clean, modern finishes</div>
+                <div class="tile">✅ Common‑use essentials</div>
+                <div class="tile">✨ Highlighted upgrades</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="kitchen">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Cozy Kitchen Nook 🏡🍽️</h2>
+            <p class="section-subtitle">Cook, share, and feel at home — everything is placed for easy daily use.</p>
+        </div>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-title">Appliances</div>
+                <div class="list-badges">
+                    <div class="badge">❄️ Refrigerator — brand‑new Samsung double‑door, cozy & high‑efficiency</div>
+                    <div class="badge">♨️ Microwave — brand new</div>
+                    <div class="badge">🔥🎛️ Oven / Stove</div>
+                    <div class="badge">🫖 Kettle — brand new</div>
+                    <div class="badge">🍞 Toaster / Sandwich maker</div>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-title">Cookware & Utensils 🍴</div>
+                <div class="list-badges">
+                    <div class="badge">🍳 Pots & pans</div>
+                    <div class="badge">🥧 Baking trays / ovenware</div>
+                    <div class="badge">🥄 Cooking utensils (spatula, ladle, whisk, tongs)</div>
+                    <div class="badge">🔪 Knives (chef’s knife, paring knife)</div>
+                    <div class="badge">🪵 Cutting boards</div>
+                    <div class="badge">🥫 Can opener / bottle opener</div>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-title">Dishes & Dining 🍽️</div>
+                <div class="list-badges">
+                    <div class="badge">🍽️ Plates (dinner, salad)</div>
+                    <div class="badge">🥣 Bowls (cereal, soup)</div>
+                    <div class="badge">🥂 Glasses & cups</div>
+                    <div class="badge">☕ Mugs</div>
+                    <div class="badge">🍴 Cutlery (forks, knives, spoons)</div>
+                    <div class="badge">🥗 Serving utensils / salad servers</div>
+                    <div class="badge">🧤 Kitchen towels / oven mitts</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="bathroom">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Bathroom 🛁</h2>
+            <p class="section-subtitle">Stylish & Fully Renovated Bathroom Experience</p>
+        </div>
+
+        <div class="feature-grid">
+            <div class="feature-card spotlight">
+                <div class="feature-title">A spa‑like, modern refresh</div>
+                <p class="feature-desc">Step into a brand‑new, fully renovated bathroom designed to combine modern elegance, comfort, and functionality. Every detail has been carefully upgraded to create a clean, luxurious, and relaxing space.</p>
+                <p class="feature-desc" style="margin-top: 12px;">The bathroom features new premium wall and floor tiles for a fresh, contemporary look and easy maintenance. A modern standing shower with 4 adjustable water‑flow modes lets you choose a refreshing, relaxing, or energizing experience.</p>
+                <p class="feature-desc" style="margin-top: 12px;">Modern lighting, refined wall design elements, and upgraded plumbing deliver reliability, great water pressure, and long‑term peace of mind.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-title">Bathroom Highlights</div>
+                <div class="list-badges">
+                    <div class="badge">✔ Fully renovated with brand‑new tiles</div>
+                    <div class="badge">✔ Modern standing shower with 4 water flow modes</div>
+                    <div class="badge">✔ New plumbing and pipes for reliability</div>
+                    <div class="badge">✔ Stylish modern lighting</div>
+                    <div class="badge">✔ Elegant wall design for a premium look</div>
+                </div>
+                <div class="tile-wall" style="margin-top: 18px;">
+                    <div class="tile">🫧 Clean, bright, calming</div>
+                    <div class="tile">🚿 Energizing shower options</div>
+                    <div class="tile">✨ Premium finishes</div>
+                    <div class="tile">🔧 Built for reliability</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Chatbot Button -->
+<div 
+    style="position: fixed; bottom: 35px; right: 35px; width: 110px; height: 110px; border-radius: 50%; overflow: hidden; border: 4px solid #FF5A5F; box-shadow: 0 8px 30px rgba(255,90,95,0.5); cursor: pointer; transition: all 0.3s ease; z-index: 9999;"
+    onmouseover="this.style.transform='scale(1.18) rotate(8deg)'; this.style.boxShadow='0 12px 40px rgba(255,90,95,0.7)'" 
+    onmouseout="this.style.transform='scale(1) rotate(0deg)'; this.style.boxShadow='0 8px 30px rgba(255,90,95,0.5)'"
+    onclick="window.open('https://assistant.homelyo.eu/', '_blank')"
+    title="Chat with Sara"
+>
+    <video 
+        src="https://raw.githubusercontent.com/kylasam/homelyo-chatbot/main/assets/welcome.mp4" 
+        autoplay muted loop playsinline 
+        style="width:100%; height:100%; object-fit: cover;"
+    ></video>
+</div>
+
+<footer class="footer">
+    <div>Questions? Email support@homelyo.eu</div>
+    <div style="margin-top:10px;">© 2026 Homelyo. All rights reserved.</div>
+</footer>
+</body>
+</html>

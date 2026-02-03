@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your First Day Made Easy | Homelyo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+    --primary: #FF5A5F;
+    --primary-dark: #E74C3C;
+    --accent: #FFB400;
+    --teal: #00A699;
+    --bg-dark: #1A1A2E;
+    --bg-card: #232337;
+    --text-light: #ffffff;
+    --text-gray: #B8B8D1;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-light);
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Navigation */
+.nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: rgba(26, 26, 46, 0.95);
+    backdrop-filter: blur(15px);
+    z-index: 1000;
+    border-bottom: 2px solid rgba(255, 90, 95, 0.2);
+}
+.nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-decoration: none;
+}
+.logo {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--primary);
+    box-shadow: 0 4px 15px rgba(255, 90, 95, 0.4);
+}
+.logo img { width: 100%; height: 100%; object-fit: cover; }
+.brand-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.nav-links {
+    display: flex;
+    gap: 28px;
+    align-items: center;
+}
+.nav-link {
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+}
+.btn-book {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    padding: 12px 28px;
+    border-radius: 30px;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    box-shadow: 0 5px 20px rgba(255, 90, 95, 0.4);
+}
+
+/* Hero */
+.hero {
+    min-height: 100vh;
+    padding-top: 120px;
+    position: relative;
+    overflow: hidden;
+}
+.hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 10% 10%, rgba(255,90,95,0.22), transparent 40%),
+        radial-gradient(circle at 90% 20%, rgba(255,180,0,0.2), transparent 45%),
+        radial-gradient(circle at 60% 90%, rgba(0,166,153,0.18), transparent 50%);
+    z-index: 0;
+}
+.hero-orbit {
+    position: absolute;
+    width: 520px;
+    height: 520px;
+    border-radius: 50%;
+    border: 2px dashed rgba(255,255,255,0.08);
+    top: -160px;
+    right: -120px;
+    animation: spin 22s linear infinite;
+}
+.hero-orbit::after {
+    content: '';
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    top: 22px;
+    left: 130px;
+    box-shadow: 0 0 25px rgba(255,90,95,0.6);
+}
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.hero-drift {
+    position: absolute;
+    left: -140px;
+    top: 180px;
+    font-size: 44px;
+    animation: driftPath 22s ease-in-out infinite;
+    filter: drop-shadow(0 8px 14px rgba(0,0,0,0.35));
+}
+@keyframes driftPath {
+    0%   { transform: translateX(-10vw) translateY(10px) rotate(-6deg); opacity: 0; }
+    10%  { opacity: 1; }
+    25%  { transform: translateX(20vw) translateY(-20px) rotate(4deg); }
+    40%  { transform: translateX(45vw) translateY(15px) rotate(-3deg); }
+    55%  { transform: translateX(65vw) translateY(-35px) rotate(6deg); }
+    70%  { transform: translateX(85vw) translateY(5px) rotate(-2deg); }
+    85%  { transform: translateX(105vw) translateY(-18px) rotate(5deg); opacity: 1; }
+    100% { transform: translateX(125vw) translateY(10px) rotate(8deg); opacity: 0; }
+}
+.hero-content {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 40px;
+    align-items: center;
+}
+.hero-card {
+    background: rgba(35, 35, 55, 0.75);
+    border: 2px solid rgba(255, 90, 95, 0.3);
+    border-radius: 28px;
+    padding: 36px;
+    box-shadow: 12px 12px 0px rgba(255, 90, 95, 0.2);
+    animation: floatIn 0.9s ease;
+}
+@keyframes floatIn {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(38px, 4.5vw, 60px);
+    margin-bottom: 16px;
+}
+.hero-subtitle {
+    color: var(--text-gray);
+    font-size: 18px;
+    margin-bottom: 22px;
+}
+.hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+.hero-tag {
+    background: rgba(255,90,95,0.18);
+    border: 1px solid rgba(255,90,95,0.4);
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+}
+
+.tenant-strip {
+    margin-top: 18px;
+    padding: 16px 18px;
+    border-radius: 18px;
+    background: rgba(255,90,95,0.12);
+    border: 1px solid rgba(255,90,95,0.3);
+    font-size: 14px;
+    color: var(--text-gray);
+}
+.tenant-strip strong {
+    color: #fff;
+}
+
+/* Accordion */
+.section {
+    padding: 90px 0 110px;
+}
+.section-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+.section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 48px);
+    margin-bottom: 12px;
+}
+.section-subtitle {
+    color: var(--text-gray);
+    font-size: 18px;
+}
+
+.accordion {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    gap: 18px;
+}
+.accordion-item {
+    background: rgba(35,35,55,0.9);
+    border: 2px solid rgba(255,90,95,0.25);
+    border-radius: 24px;
+    padding: 0;
+    overflow: hidden;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.accordion-item:hover {
+    border-color: rgba(255,180,0,0.5);
+    box-shadow: 0 16px 40px rgba(255, 90, 95, 0.18);
+}
+.accordion-header {
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--text-light);
+    text-align: left;
+    padding: 22px 26px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 700;
+}
+.accordion-header span {
+    display: inline-flex;
+    gap: 10px;
+    align-items: center;
+}
+.accordion-chevron {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: rgba(255,90,95,0.2);
+    transition: transform 0.3s ease;
+}
+.accordion-item.open .accordion-chevron {
+    transform: rotate(180deg);
+}
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+}
+.accordion-item.open .accordion-content {
+    max-height: 600px;
+}
+.accordion-body {
+    padding: 0 26px 26px;
+    color: var(--text-gray);
+    display: grid;
+    gap: 12px;
+    font-size: 15px;
+}
+.list-badges {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+}
+.badge {
+    background: rgba(255,90,95,0.14);
+    border: 1px solid rgba(255,90,95,0.3);
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-size: 14px;
+}
+
+/* Highlight strip */
+.highlight-strip {
+    margin-top: 50px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+}
+.highlight-card {
+    background: rgba(255,90,95,0.12);
+    border: 1px solid rgba(255,90,95,0.35);
+    border-radius: 18px;
+    padding: 18px;
+    font-size: 14px;
+    color: var(--text-gray);
+}
+.highlight-card span {
+    display: block;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+}
+
+.footer {
+    padding: 60px 20px 40px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    color: var(--text-gray);
+    text-align: center;
+}
+
+@media (max-width: 860px) {
+    .nav-links { display: none; }
+}
+</style>
+</head>
+<body>
+<nav class="nav">
+    <div class="nav-container">
+        <a href="index.html" class="logo-container">
+            <div class="logo">
+                <img src="https://raw.githubusercontent.com/kylasam/homelyo/main/assests/Homelyo-logo-new.jpg" alt="Homelyo Logo">
+            </div>
+            <div class="brand-name">Homelyo</div>
+        </a>
+        <div class="nav-links">
+            <a href="index.html#rooms" class="nav-link">Rooms</a>
+            <a href="index.html#availability" class="nav-link">Availability</a>
+            <a href="book.html" class="btn-book">Book Now</a>
+        </div>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-orbit"></div>
+    <div class="hero-drift">🚚🏠</div>
+    <div class="container hero-content">
+        <div class="hero-card">
+            <div class="hero-tags">
+                <span class="hero-tag">YOUR FIRST DAY MADE EASY! 🗝️✨</span>
+                <span class="hero-tag">Everything ready from minute one</span>
+                <span class="hero-tag">Make your apartment feel like home 👋</span>
+            </div>
+            <h1 class="hero-title">Your Move‑In Package</h1>
+            <p class="hero-subtitle">A guided, feel‑good onboarding with essentials and the small comforts that turn a new room into home — keys, documents, Wi‑Fi, and a clear walkthrough.</p>
+            <div class="tenant-strip">
+                <strong>From tenants:</strong> “Move‑in felt smooth and thoughtful. Everything we needed was ready, and the welcome kit made the first day easy.”
+            </div>
+        </div>
+        <div class="hero-card">
+            <div class="section-title" style="font-size: 26px; margin-bottom: 12px;">Why Day 1 feels different</div>
+            <div class="section-subtitle">We remove the guesswork so you can settle in fast and feel confident.</div>
+            <div class="highlight-strip" style="margin-top: 18px;">
+                <div class="highlight-card"><span>✅ Ready on arrival</span>Keys, docs, Wi‑Fi, and essentials prepared.</div>
+                <div class="highlight-card"><span>📸 Visual cues</span>Quick photos of key items for clarity.</div>
+                <div class="highlight-card"><span>🌿 Peace‑of‑mind</span>Know exactly where everything is from day one.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Your First Day, Unpacked</h2>
+            <p class="section-subtitle">Each section expands, so you can skim fast or read the details.</p>
+        </div>
+
+        <div class="accordion" id="moveInAccordion">
+            <div class="accordion-item open">
+                <button class="accordion-header" type="button">
+                    <span>Visual Tour 🏇</span>
+                    <div class="accordion-chevron">⌄</div>
+                </button>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <p>Right after you get your keys, we guide you through the apartment so you know where everything is:</p>
+                        <div class="list-badges">
+                            <div class="badge">🚮 Garbage disposal area</div>
+                            <div class="badge">🚪 Your room</div>
+                            <div class="badge">🍳 Kitchen</div>
+                            <div class="badge">🛁 Bathroom</div>
+                            <div class="badge">🏡 Other important spots to feel at home</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <button class="accordion-header" type="button">
+                    <span>Keys You’ll Receive 🗝️</span>
+                    <div class="accordion-chevron">⌄</div>
+                </button>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <div class="list-badges">
+                            <div class="badge">🛏️ Personal Room Key</div>
+                            <div class="badge">🏢 Apartment Entrance Key</div>
+                            <div class="badge">🚪 Main Entrance / Trash Key</div>
+                            <div class="badge">📬 Postbox Key</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <button class="accordion-header" type="button">
+                    <span>Welcome Kit 📦</span>
+                    <div class="accordion-chevron">⌄</div>
+                </button>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <p>Your Day 1 Welcome Kit includes everything you need to get settled:</p>
+                        <div class="list-badges">
+                            <div class="badge">📝 Printed handover documents</div>
+                            <div class="badge">📄 Personalized QR codes for contracts</div>
+                            <div class="badge">🖊️ Contract copy</div>
+                            <div class="badge">🏠 Wohnungsgeberbestätigung doc for Anmeldung</div>
+                            <div class="badge">☎️ Emergency contact details</div>
+                            <div class="badge">🧹 Pre‑occupancy cleaning info</div>
+                            <div class="badge">🚆 S+U Bahn maps</div>
+                            <div class="badge">✏️ A few A4 sheets for work/study/sketching</div>
+                            <div class="badge">📶 Wi‑Fi QR codes</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <button class="accordion-header" type="button">
+                    <span>Optional Extras / Highlights 🎉</span>
+                    <div class="accordion-chevron">⌄</div>
+                </button>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <div class="list-badges">
+                            <div class="badge">✅ “Everything ready for you on Day 1”</div>
+                            <div class="badge">📸 Small photos of key items (keys, docs, Wi‑Fi QR)</div>
+                            <div class="badge">🌿 Peace‑of‑mind built in</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Chatbot Button -->
+<div 
+    style="position: fixed; bottom: 35px; right: 35px; width: 110px; height: 110px; border-radius: 50%; overflow: hidden; border: 4px solid #FF5A5F; box-shadow: 0 8px 30px rgba(255,90,95,0.5); cursor: pointer; transition: all 0.3s ease; z-index: 9999;"
+    onmouseover="this.style.transform='scale(1.18) rotate(8deg)'; this.style.boxShadow='0 12px 40px rgba(255,90,95,0.7)'" 
+    onmouseout="this.style.transform='scale(1) rotate(0deg)'; this.style.boxShadow='0 8px 30px rgba(255,90,95,0.5)'"
+    onclick="window.open('https://assistant.homelyo.eu/', '_blank')"
+    title="Chat with Sara"
+>
+    <video 
+        src="https://raw.githubusercontent.com/kylasam/homelyo-chatbot/main/assets/welcome.mp4" 
+        autoplay muted loop playsinline 
+        style="width:100%; height:100%; object-fit: cover;"
+    ></video>
+</div>
+
+<footer class="footer">
+    <div>Questions? Email support@homelyo.eu</div>
+    <div style="margin-top:10px;">© 2026 Homelyo. All rights reserved.</div>
+</footer>
+
+<script>
+const items = document.querySelectorAll('.accordion-item');
+items.forEach(item => {
+    const header = item.querySelector('.accordion-header');
+    header.addEventListener('click', () => {
+        item.classList.toggle('open');
+    });
+});
+</script>
+</body>
+</html>
