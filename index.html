@@ -944,6 +944,19 @@ body {
     font-size: 13px;
     border: 2px solid rgba(255,90,95,0.25);
 }
+.room-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+.room-link:hover {
+    gap: 18px;
+}
 /* Map Section */
 .map-section {
     padding: 100px 20px;
@@ -1169,14 +1182,14 @@ body {
         <h1 class="hero-title">Your Perfect Home Awaits</h1>
         <p class="hero-subtitle">Experience modern living in the heart of Berlin Lichtenrade with fully furnished rooms and premium amenities</p>
         <div class="hero-cta">
-            <div class="btn-primary">
+            <a href="#availability" class="btn-primary">
                 <span>📅</span>
                 <span>Check Availability</span>
-            </div>
-            <div class="btn-secondary">
+            </a>
+            <a href="#rooms" class="btn-secondary">
                 <span>🏠</span>
                 <span>Explore Rooms</span>
-            </div>
+            </a>
         </div>
     </div>
 </section>
@@ -1418,8 +1431,8 @@ body {
                         <span class="feature-tag">🌅 Natural Light</span>
                         <span class="feature-tag">📦 Storage</span>
                     </div>
-                    
-                </div>
+                    <a href="https://www.homelyo.eu/ke1" class="room-link">View Details & Book →</a>
+</div>
             </div>
 
             <!-- Room KE2 -->
@@ -1457,8 +1470,8 @@ body {
                         <span class="feature-tag">🎨 Stylish Design</span>
                         <span class="feature-tag">🌟 Premium Feel</span>
                     </div>
-                    
-                </div>
+                    <a href="https://www.homelyo.eu/ke2" class="room-link">View Details & Book →</a>
+</div>
             </div>
 
             <!-- Room KE3 -->
@@ -1496,8 +1509,8 @@ body {
                         <span class="feature-tag">💡 Bright</span>
                         <span class="feature-tag">🛋️ Cozy</span>
                     </div>
-                    
-                </div>
+                    <a href="https://www.homelyo.eu/ke3" class="room-link">View Details & Book →</a>
+</div>
             </div>
 
             <!-- Room KE4 -->
@@ -1534,8 +1547,8 @@ body {
                         <span class="feature-tag">🪑 Compact Desk</span>
                         <span class="feature-tag">✨ Modern</span>
                     </div>
-                    
-                </div>
+                    <a href="https://www.homelyo.eu/ke4" class="room-link">View Details & Book →</a>
+</div>
             </div>
         </div>
     </div>
@@ -1604,14 +1617,14 @@ body {
         <h2 class="cta-title">Ready to Call Homelyo Home?</h2>
         <p class="cta-subtitle">Join our community of happy residents in Berlin Lichtenrade</p>
         <div class="cta-actions">
-            <div class="btn-primary">
+            <a href="book.html" class="btn-primary">
                 <span>Book Your Room Now</span>
                 <span>→</span>
-            </div>
-            <div class="btn-secondary">
+            </a>
+            <a href="mailto:support@homelyo.eu" class="btn-secondary">
                 <span>Contact Us</span>
                 <span>📧</span>
-            </div>
+            </a>
         </div>
     </div>
 </section>
