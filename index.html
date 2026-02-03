@@ -1768,9 +1768,9 @@ function generateMonthBlocks() {
             monthBlock.style.cursor = 'pointer';
             monthBlock.addEventListener('click', () => {
                 const bookingUrl = 'https://www.homelyo.eu/bookings';
-                if (window.top) {
-                    window.top.location.href = bookingUrl;
-                } else {
+                try {
+                    window.open(bookingUrl, '_top');
+                } catch (e) {
                     window.location.href = bookingUrl;
                 }
             });
