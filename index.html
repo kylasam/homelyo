@@ -944,6 +944,47 @@ body {
     font-size: 13px;
     border: 2px solid rgba(255,90,95,0.25);
 }
+.extras-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 18px;
+    border: 2px solid rgba(255,90,95,0.35);
+    background: rgba(255,90,95,0.12);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 14px;
+}
+.extras-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(255,90,95,0.25);
+}
+.extras-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transform: translateY(-6px);
+    transition: all 0.4s ease;
+}
+.extras-grid.open {
+    max-height: 500px;
+    opacity: 1;
+    transform: translateY(0);
+    margin-bottom: 18px;
+}
+.extras-grid img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 14px;
+    border: 2px solid rgba(255,255,255,0.08);
+}
 .room-link {
     display: inline-flex;
     align-items: center;
@@ -1404,11 +1445,6 @@ body {
                         <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/KE1/IMG_4349.jpg" alt="KE1 Room" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE1/IMG_4349.jpg'"></div>
                         <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/KE1/IMG_4350.jpg" alt="KE1 Room View" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE1/IMG_4350.jpg'"></div>
                         <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/KITCHEN/IMG_5847.jpg" alt="Kitchen" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KITCHEN/IMG_5847.jpg'"></div>
-                        <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/BAD/IMG_6614.jpg" alt="Bathroom" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/BAD/IMG_6614.jpg'"></div>
-                        <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/OVERVIEW/overview.JPG" alt="Overview" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/OVERVIEW/overview.JPG'"></div>
-                        <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/PLAY_GROUND/play_ground.JPG" alt="Playground" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/PLAY_GROUND/play_ground.JPG'"></div>
-                        <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/FLOOR_MAP/Floor_map.png" alt="Floor Map" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/FLOOR_MAP/Floor_map.png'"></div>
-                        <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/HALL/jpg/IMG_4369.jpg" alt="Hall" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/HALL/jpg/IMG_4369.jpg'"></div>
                     </div>
                     <button class="carousel-btn prev" onclick="moveCarousel('ke1', -1)">‹</button>
                     <button class="carousel-btn next" onclick="moveCarousel('ke1', 1)">›</button>
@@ -1431,6 +1467,14 @@ body {
                         <span class="feature-tag">🌅 Natural Light</span>
                         <span class="feature-tag">📦 Storage</span>
                     </div>
+                    <button class="extras-toggle" type="button" onclick="toggleExtras('ke1')">See more photos</button>
+                    <div class="extras-grid" id="extras-ke1">
+                        <img loading="lazy" decoding="async" src="assests/home_photos/BAD/IMG_6614.jpg" alt="Bathroom" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/BAD/IMG_6614.jpg'">
+                        <img loading="lazy" decoding="async" src="assests/home_photos/OVERVIEW/overview.JPG" alt="Overview" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/OVERVIEW/overview.JPG'">
+                        <img loading="lazy" decoding="async" src="assests/home_photos/PLAY_GROUND/play_ground.JPG" alt="Playground" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/PLAY_GROUND/play_ground.JPG'">
+                        <img loading="lazy" decoding="async" src="assests/home_photos/FLOOR_MAP/Floor_map.png" alt="Floor Map" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/FLOOR_MAP/Floor_map.png'">
+                        <img loading="lazy" decoding="async" src="assests/home_photos/HALL/jpg/IMG_4369.jpg" alt="Hall" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/HALL/jpg/IMG_4369.jpg'">
+                    </div>
                     <a href="https://www.homelyo.eu/bookings" class="room-link" target="_blank" rel="noopener noreferrer">View Details & Book →</a>
 </div>
             </div>
@@ -1441,13 +1485,8 @@ body {
                     <div class="room-badge">PREMIUM</div>
                     <div class="carousel-track" id="carousel-ke2">
                         <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/KE2/bedroom1.JPG" alt="KE2 Room" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE2/bedroom1.JPG'"></div>
+                        <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/KE2/balcony.JPG" alt="KE2 Balcony" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE2/balcony.JPG'"></div>
                         <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/KE2/bedroom1_2.JPG" alt="KE2 Room View" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE2/bedroom1_2.JPG'"></div>
-                        <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/KITCHEN/IMG_5847.jpg" alt="Kitchen" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KITCHEN/IMG_5847.jpg'"></div>
-                        <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/BAD/IMG_6621.jpg" alt="Bathroom" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/BAD/IMG_6621.jpg'"></div>
-                        <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/OVERVIEW/overview.JPG" alt="Overview" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/OVERVIEW/overview.JPG'"></div>
-                        <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/PLAY_GROUND/play_ground2.JPG" alt="Playground" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/PLAY_GROUND/play_ground2.JPG'"></div>
-                        <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/FLOOR_MAP/Floor_map.png" alt="Floor Map" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/FLOOR_MAP/Floor_map.png'"></div>
-                        <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/HALL/jpg/IMG_4370.jpg" alt="Hall" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/HALL/jpg/IMG_4370.jpg'"></div>
                     </div>
                     <button class="carousel-btn prev" onclick="moveCarousel('ke2', -1)">‹</button>
                     <button class="carousel-btn next" onclick="moveCarousel('ke2', 1)">›</button>
@@ -1471,6 +1510,16 @@ body {
                         <span class="feature-tag">🎨 Stylish Design</span>
                         <span class="feature-tag">🌟 Premium Feel</span>
                     </div>
+                    <button class="extras-toggle" type="button" onclick="toggleExtras('ke2')">See more photos</button>
+                    <div class="extras-grid" id="extras-ke2">
+                        <img loading="lazy" decoding="async" src="assests/home_photos/KE2/bedroom1_3.JPG" alt="KE2 Room View" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE2/bedroom1_3.JPG'">
+                        <img loading="lazy" decoding="async" src="assests/home_photos/KITCHEN/IMG_5847.jpg" alt="Kitchen" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KITCHEN/IMG_5847.jpg'">
+                        <img loading="lazy" decoding="async" src="assests/home_photos/BAD/IMG_6621.jpg" alt="Bathroom" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/BAD/IMG_6621.jpg'">
+                        <img loading="lazy" decoding="async" src="assests/home_photos/OVERVIEW/overview.JPG" alt="Overview" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/OVERVIEW/overview.JPG'">
+                        <img loading="lazy" decoding="async" src="assests/home_photos/PLAY_GROUND/play_ground2.JPG" alt="Playground" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/PLAY_GROUND/play_ground2.JPG'">
+                        <img loading="lazy" decoding="async" src="assests/home_photos/FLOOR_MAP/Floor_map.png" alt="Floor Map" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/FLOOR_MAP/Floor_map.png'">
+                        <img loading="lazy" decoding="async" src="assests/home_photos/HALL/jpg/IMG_4370.jpg" alt="Hall" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/HALL/jpg/IMG_4370.jpg'">
+                    </div>
                     <a href="https://www.homelyo.eu/bookings" class="room-link" target="_blank" rel="noopener noreferrer">View Details & Book →</a>
 </div>
             </div>
@@ -1482,12 +1531,7 @@ body {
                     <div class="carousel-track" id="carousel-ke3">
                         <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/KE3/IMG_5797.jpg" alt="KE3 Room" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE3/IMG_5797.jpg'"></div>
                         <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/KE3/IMG_5799.jpg" alt="KE3 Room View" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE3/IMG_5799.jpg'"></div>
-                        <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/KITCHEN/IMG_5847.jpg" alt="Kitchen" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KITCHEN/IMG_5847.jpg'"></div>
-                        <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/BAD/IMG_6614.jpg" alt="Bathroom" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/BAD/IMG_6614.jpg'"></div>
-                        <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/OVERVIEW/overview.JPG" alt="Overview" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/OVERVIEW/overview.JPG'"></div>
-                        <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/PLAY_GROUND/play_ground.JPG" alt="Playground" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/PLAY_GROUND/play_ground.JPG'"></div>
-                        <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/FLOOR_MAP/Floor_map.png" alt="Floor Map" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/FLOOR_MAP/Floor_map.png'"></div>
-                        <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/HALL/jpg/IMG_4371_2.jpg" alt="Hall" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/HALL/jpg/IMG_4371_2.jpg'"></div>
+                        <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/KE3/IMG_5800.jpg" alt="KE3 Room Detail" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE3/IMG_5800.jpg'"></div>
                     </div>
                     <button class="carousel-btn prev" onclick="moveCarousel('ke3', -1)">‹</button>
                     <button class="carousel-btn next" onclick="moveCarousel('ke3', 1)">›</button>
@@ -1510,6 +1554,17 @@ body {
                         <span class="feature-tag">💡 Bright</span>
                         <span class="feature-tag">🛋️ Cozy</span>
                     </div>
+                    <button class="extras-toggle" type="button" onclick="toggleExtras('ke3')">See more photos</button>
+                    <div class="extras-grid" id="extras-ke3">
+                        <img loading="lazy" decoding="async" src="assests/home_photos/KE3/IMG_5802.jpg" alt="KE3 Room View" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE3/IMG_5802.jpg'">
+                        <img loading="lazy" decoding="async" src="assests/home_photos/KE3/IMG_5805.jpg" alt="KE3 Room Detail" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE3/IMG_5805.jpg'">
+                        <img loading="lazy" decoding="async" src="assests/home_photos/KITCHEN/IMG_5847.jpg" alt="Kitchen" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KITCHEN/IMG_5847.jpg'">
+                        <img loading="lazy" decoding="async" src="assests/home_photos/BAD/IMG_6614.jpg" alt="Bathroom" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/BAD/IMG_6614.jpg'">
+                        <img loading="lazy" decoding="async" src="assests/home_photos/OVERVIEW/overview.JPG" alt="Overview" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/OVERVIEW/overview.JPG'">
+                        <img loading="lazy" decoding="async" src="assests/home_photos/PLAY_GROUND/play_ground.JPG" alt="Playground" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/PLAY_GROUND/play_ground.JPG'">
+                        <img loading="lazy" decoding="async" src="assests/home_photos/FLOOR_MAP/Floor_map.png" alt="Floor Map" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/FLOOR_MAP/Floor_map.png'">
+                        <img loading="lazy" decoding="async" src="assests/home_photos/HALL/jpg/IMG_4371_2.jpg" alt="Hall" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/HALL/jpg/IMG_4371_2.jpg'">
+                    </div>
                     <a href="https://www.homelyo.eu/bookings" class="room-link" target="_blank" rel="noopener noreferrer">View Details & Book →</a>
 </div>
             </div>
@@ -1520,12 +1575,8 @@ body {
                     <div class="room-badge">COZY VALUE</div>
                     <div class="carousel-track" id="carousel-ke4">
                         <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/KE4/IMG_4205.JPG" alt="KE4 Room" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE4/IMG_4205.JPG'"></div>
-                        <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/KITCHEN/IMG_5847.jpg" alt="Kitchen" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KITCHEN/IMG_5847.jpg'"></div>
-                        <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/BAD/IMG_6621.jpg" alt="Bathroom" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/BAD/IMG_6621.jpg'"></div>
                         <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/OVERVIEW/overview.JPG" alt="Overview" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/OVERVIEW/overview.JPG'"></div>
-                        <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/PLAY_GROUND/play_ground2.JPG" alt="Playground" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/PLAY_GROUND/play_ground2.JPG'"></div>
-                        <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/FLOOR_MAP/Floor_map.png" alt="Floor Map" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/FLOOR_MAP/Floor_map.png'"></div>
-                        <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/HALL/jpg/IMG_4372.jpg" alt="Hall" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/HALL/jpg/IMG_4372.jpg'"></div>
+                        <div class="carousel-slide"><img loading="lazy" decoding="async" src="assests/home_photos/BAD/IMG_6621.jpg" alt="Bathroom" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/BAD/IMG_6621.jpg'"></div>
                     </div>
                     <button class="carousel-btn prev" onclick="moveCarousel('ke4', -1)">‹</button>
                     <button class="carousel-btn next" onclick="moveCarousel('ke4', 1)">›</button>
@@ -1547,6 +1598,13 @@ body {
                         <span class="feature-tag">🛏️ Single Bed</span>
                         <span class="feature-tag">🪑 Compact Desk</span>
                         <span class="feature-tag">✨ Modern</span>
+                    </div>
+                    <button class="extras-toggle" type="button" onclick="toggleExtras('ke4')">See more photos</button>
+                    <div class="extras-grid" id="extras-ke4">
+                        <img loading="lazy" decoding="async" src="assests/home_photos/KITCHEN/IMG_5847.jpg" alt="Kitchen" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KITCHEN/IMG_5847.jpg'">
+                        <img loading="lazy" decoding="async" src="assests/home_photos/PLAY_GROUND/play_ground2.JPG" alt="Playground" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/PLAY_GROUND/play_ground2.JPG'">
+                        <img loading="lazy" decoding="async" src="assests/home_photos/FLOOR_MAP/Floor_map.png" alt="Floor Map" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/FLOOR_MAP/Floor_map.png'">
+                        <img loading="lazy" decoding="async" src="assests/home_photos/HALL/jpg/IMG_4372.jpg" alt="Hall" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/HALL/jpg/IMG_4372.jpg'">
                     </div>
                     <a href="https://www.homelyo.eu/bookings" class="room-link" target="_blank" rel="noopener noreferrer">View Details & Book →</a>
 </div>
@@ -1788,7 +1846,8 @@ document.querySelectorAll('.room-select-card').forEach(card => {
 // Carousel
 const carousels = {};
 ['ke1', 'ke2', 'ke3', 'ke4'].forEach(room => {
-    carousels[room] = { currentSlide: 0, totalSlides: 5 };
+    const totalSlides = document.querySelectorAll(`#carousel-${room} .carousel-slide`).length;
+    carousels[room] = { currentSlide: 0, totalSlides };
     initCarousel(room);
 });
 
@@ -1822,6 +1881,12 @@ function updateCarousel(room) {
     Array.from(indicators).forEach((ind, i) => {
         ind.classList.toggle('active', i === carousels[room].currentSlide);
     });
+}
+
+function toggleExtras(room) {
+    const grid = document.getElementById(`extras-${room}`);
+    if (!grid) return;
+    grid.classList.toggle('open');
 }
 
 // Auto-play carousels
