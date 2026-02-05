@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KE3 | Homelyo Mood‑Light Room</title>
+<title>KE3 | Homelyo Private Room</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
@@ -18,18 +18,26 @@
     --text-light: #ffffff;
     --text-gray: #B8B8D1;
 }
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
+
 body {
     font-family: 'Inter', sans-serif;
-    background: radial-gradient(circle at 18% 12%, rgba(255,90,95,0.14), transparent 45%),
-                radial-gradient(circle at 78% 18%, rgba(255,180,0,0.12), transparent 50%),
+    background: radial-gradient(circle at 20% 10%, rgba(255,90,95,0.15), transparent 45%),
+                radial-gradient(circle at 80% 20%, rgba(255,180,0,0.12), transparent 50%),
                 var(--bg-dark);
     color: var(--text-light);
     overflow-x: hidden;
     line-height: 1.6;
 }
-.container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
 
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Hero */
 .hero {
     min-height: 100vh;
     padding: 120px 0 80px;
@@ -42,7 +50,7 @@ body {
     width: 520px;
     height: 520px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,90,95,0.22), transparent 70%);
+    background: radial-gradient(circle, rgba(255,90,95,0.25), transparent 70%);
     animation: pulse 6s ease-in-out infinite;
 }
 .hero-orbit {
@@ -66,8 +74,14 @@ body {
     left: 150px;
     box-shadow: 0 0 25px rgba(255,90,95,0.6);
 }
-@keyframes pulse { 0%,100%{transform:scale(1);opacity:.6;} 50%{transform:scale(1.05);opacity:1;} }
-@keyframes spin { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.05); opacity: 1; }
+}
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
 
 .hero-grid {
     position: relative;
@@ -78,21 +92,33 @@ body {
     align-items: center;
 }
 .hero-card {
-    background: rgba(31,31,51,0.9);
-    border: 2px solid rgba(255,90,95,0.25);
+    background: rgba(31, 31, 51, 0.9);
+    border: 2px solid rgba(255, 90, 95, 0.25);
     border-radius: 28px;
     padding: 34px;
-    box-shadow: 12px 12px 0 rgba(255,90,95,0.2);
+    box-shadow: 12px 12px 0 rgba(255, 90, 95, 0.2);
     animation: rise 0.8s ease;
 }
-@keyframes rise { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
+@keyframes rise {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 .hero-title {
     font-family: 'Playfair Display', serif;
     font-size: clamp(38px, 4.8vw, 64px);
     margin-bottom: 16px;
 }
-.hero-subtitle { color: var(--text-gray); font-size: 18px; margin-bottom: 18px; }
-.hero-tags { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 22px; }
+.hero-subtitle {
+    color: var(--text-gray);
+    font-size: 18px;
+    margin-bottom: 18px;
+}
+.hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 22px;
+}
 .hero-tag {
     background: rgba(255,90,95,0.18);
     border: 1px solid rgba(255,90,95,0.4);
@@ -100,60 +126,168 @@ body {
     border-radius: 999px;
     font-size: 13px;
 }
-.cta { display: inline-flex; gap: 12px; flex-wrap: wrap; }
+.cta {
+    display: inline-flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
 .btn-primary {
-    padding: 14px 28px; border-radius: 999px; font-weight: 700; text-decoration: none; color: #fff;
+    padding: 14px 28px;
+    border-radius: 999px;
+    font-weight: 700;
+    text-decoration: none;
+    color: #fff;
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
     box-shadow: 0 10px 26px rgba(255,90,95,0.4);
 }
 .btn-secondary {
-    padding: 14px 28px; border-radius: 999px; font-weight: 600; text-decoration: none; color: #fff;
+    padding: 14px 28px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-decoration: none;
+    color: #fff;
     border: 2px solid rgba(255,255,255,0.2);
 }
 
-.gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
-.photo-card {
-    position: relative; border-radius: 18px; overflow: hidden;
-    border: 2px solid rgba(255,90,95,0.2); background: rgba(31,31,51,0.9);
+/* Photo Gallery (KE2 style) */
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
 }
-.photo-card img { width: 100%; height: 220px; object-fit: cover; display: block; transition: transform 0.3s ease; }
+.photo-card {
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 2px solid rgba(255,90,95,0.2);
+    background: rgba(31,31,51,0.9);
+}
+.photo-card img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+}
 .photo-card:hover img { transform: scale(1.05); }
 .photo-card span {
-    position: absolute; bottom: 10px; left: 10px; padding: 6px 10px; border-radius: 999px;
-    background: rgba(0,0,0,0.6); font-size: 12px;
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.6);
+    font-size: 12px;
 }
 
-.section { padding: 90px 0; }
+/* Sections */
+.section {
+    padding: 90px 0;
+}
 .section-title {
-    font-family: 'Playfair Display', serif; font-size: clamp(30px, 4vw, 46px);
-    text-align: center; margin-bottom: 12px;
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(30px, 4vw, 46px);
+    text-align: center;
+    margin-bottom: 12px;
 }
-.section-subtitle { color: var(--text-gray); text-align: center; margin-bottom: 36px; }
+.section-subtitle {
+    color: var(--text-gray);
+    text-align: center;
+    margin-bottom: 36px;
+}
 
-.highlight-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+.highlight-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+}
 .highlight-card {
-    background: rgba(31,31,51,0.92); border: 2px solid rgba(255,90,95,0.22);
-    border-radius: 22px; padding: 22px; position: relative; overflow: hidden;
+    background: rgba(31,31,51,0.92);
+    border: 2px solid rgba(255,90,95,0.22);
+    border-radius: 22px;
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-.highlight-card::after { content: ''; position: absolute; inset: auto -20% -30% auto; width: 170px; height: 170px; background: radial-gradient(circle, rgba(255,180,0,0.18), transparent 70%); }
-.highlight-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(255,90,95,0.2); }
+.highlight-card::after {
+    content: '';
+    position: absolute;
+    inset: auto -20% -30% auto;
+    width: 170px;
+    height: 170px;
+    background: radial-gradient(circle, rgba(255,180,0,0.18), transparent 70%);
+}
+.highlight-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(255,90,95,0.2);
+}
 
-.list-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+.list-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+}
 .list-card {
     background: rgba(31,31,51,0.92);
     border: 2px solid rgba(255,90,95,0.2);
     border-radius: 22px;
     padding: 22px;
 }
-.list-card h3 { font-size: 18px; margin-bottom: 10px; }
-.list-card ul { list-style: none; display: grid; gap: 8px; color: var(--text-gray); font-size: 14px; }
+.list-card h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+.list-card ul {
+    list-style: none;
+    display: grid;
+    gap: 8px;
+    color: var(--text-gray);
+    font-size: 14px;
+}
 
-.table-wrap { overflow-x: auto; background: rgba(31,31,51,0.92); border: 2px solid rgba(255,90,95,0.2); border-radius: 18px; padding: 10px; }
-.table { width: 100%; border-collapse: collapse; min-width: 700px; }
-.table th, .table td { text-align: left; padding: 12px 14px; font-size: 14px; }
-.table th { background: rgba(255,90,95,0.12); font-weight: 700; }
-.table tr + tr { border-top: 1px solid rgba(255,255,255,0.08); }
+/* Tables */
+.table-wrap {
+    overflow-x: auto;
+    background: rgba(31,31,51,0.92);
+    border: 2px solid rgba(255,90,95,0.2);
+    border-radius: 18px;
+    padding: 10px;
+}
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+}
+.table th, .table td {
+    text-align: left;
+    padding: 12px 14px;
+    font-size: 14px;
+}
+.table th {
+    background: rgba(255,90,95,0.12);
+    font-weight: 700;
+}
+.table tr + tr {
+    border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Collapsible details */
+.details {
+    background: rgba(31,31,51,0.92);
+    border: 2px solid rgba(255,90,95,0.2);
+    border-radius: 20px;
+    padding: 16px 20px;
+}
+.details summary {
+    cursor: pointer;
+    font-weight: 700;
+}
+.details p, .details ul {
+    color: var(--text-gray);
+    font-size: 14px;
+    margin-top: 10px;
+}
 
 .notice {
     background: rgba(255,90,95,0.15);
@@ -165,7 +299,17 @@ body {
     margin-top: 12px;
 }
 
-.footer { padding: 60px 20px 40px; border-top: 1px solid rgba(255,255,255,0.12); color: var(--text-gray); text-align: center; }
+.footer {
+    padding: 60px 20px 40px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    color: var(--text-gray);
+    text-align: center;
+}
+
+@media (max-width: 900px) {
+    .mosaic { grid-template-columns: repeat(3, 1fr); }
+    .mosaic .tile-large, .mosaic .tile-wide { grid-column: span 3; }
+}
 </style>
 </head>
 <body>
@@ -175,12 +319,12 @@ body {
     <div class="container hero-grid">
         <div class="hero-card">
             <div class="hero-tags">
-                <span class="hero-tag">KE3 – Mood‑Light Room</span>
-                <span class="hero-tag">€619 / month incl. bills</span>
-                <span class="hero-tag">Garden view • All brand new</span>
-            </div>
-            <h1 class="hero-title">A Room That Dances With Your Mood</h1>
-            <p class="hero-subtitle">Fresh, calm, and completely brand new — KE3 lets you set the vibe. Connect your phone and let the bedding lights dance to your music.</p>
+    <span class="hero-tag">KE3 – Private Room</span>
+    <span class="hero-tag">€619 / month incl. bills</span>
+    <span class="hero-tag">Garden view • Furnished</span>
+</div>
+            <h1 class="hero-title">Soft Light, Calm Focus</h1>
+            <p class="hero-subtitle">Everything is brand new in KE3 — from the bed to the wardrobe. A calm room with mood lighting that can dance with your music, perfect for relaxed evenings and focused mornings.</p>
             <div class="cta">
                 <a class="btn-primary" href="https://www.homelyo.eu/bookings" target="_blank" rel="noopener noreferrer">Book KE3</a>
                 <a class="btn-secondary" href="mailto:support@homelyo.eu">Ask a question</a>
@@ -188,14 +332,63 @@ body {
         </div>
         <div class="hero-card">
             <div class="gallery">
-                <div class="photo-card"><img src="assests/home_photos/KE3/IMG_5797.jpg" alt="KE3" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE3/IMG_5797.jpg'"><span>KE3</span></div>
-                <div class="photo-card"><img src="assests/home_photos/KE3/IMG_5799.jpg" alt="KE3" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE3/IMG_5799.jpg'"><span>KE3</span></div>
-                <div class="photo-card"><img src="assests/home_photos/KE3/IMG_5800.jpg" alt="KE3" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE3/IMG_5800.jpg'"><span>KE3</span></div>
-                <div class="photo-card"><img src="assests/home_photos/KE3/IMG_5802.jpg" alt="KE3" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE3/IMG_5802.jpg'"><span>KE3</span></div>
-                <div class="photo-card"><img src="assests/home_photos/OVERVIEW/overview.JPG" alt="OVERVIEW" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/OVERVIEW/overview.JPG'"><span>OVERVIEW</span></div>
-                <div class="photo-card"><img src="assests/home_photos/BAD/IMG_6614.jpg" alt="BAD" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/BAD/IMG_6614.jpg'"><span>BAD</span></div>
-                <div class="photo-card"><img src="assests/home_photos/FLOOR_MAP/Floor_map.png" alt="FLOOR_MAP" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/FLOOR_MAP/Floor_map.png'"><span>FLOOR_MAP</span></div>
-                <div class="photo-card"><img src="assests/home_photos/HALL/1000067787.jpg" alt="HALL" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/HALL/1000067787.jpg'"><span>HALL</span></div>
+<div class="photo-card"><img src="assests/home_photos/KE3/IMG_5797.jpg" alt="KE3" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE3/IMG_5797.jpg'"><span>KE3</span></div>
+<div class="photo-card"><img src="assests/home_photos/KE3/IMG_5799.jpg" alt="KE3" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE3/IMG_5799.jpg'"><span>KE3</span></div>
+<div class="photo-card"><img src="assests/home_photos/KE3/IMG_5800.jpg" alt="KE3" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE3/IMG_5800.jpg'"><span>KE3</span></div>
+<div class="photo-card"><img src="assests/home_photos/KE3/IMG_5802.jpg" alt="KE3" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE3/IMG_5802.jpg'"><span>KE3</span></div>
+<div class="photo-card"><img src="assests/home_photos/KE3/IMG_5805.jpg" alt="KE3" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE3/IMG_5805.jpg'"><span>KE3</span></div>
+<div class="photo-card"><img src="assests/home_photos/OVERVIEW/overview.JPG" alt="OVERVIEW" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/OVERVIEW/overview.JPG'"><span>OVERVIEW</span></div>
+<div class="photo-card"><img src="assests/home_photos/BAD/IMG_6614.jpg" alt="BAD" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/BAD/IMG_6614.jpg'"><span>BAD</span></div>
+<div class="photo-card"><img src="assests/home_photos/FLOOR_MAP/Floor_map.png" alt="FLOOR_MAP" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/FLOOR_MAP/Floor_map.png'"><span>FLOOR_MAP</span></div>
+<div class="photo-card"><img src="assests/home_photos/HALL/1000067787.jpg" alt="HALL" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/HALL/1000067787.jpg'"><span>HALL</span></div>
+</div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">Quick Facts</h2>
+        <p class="section-subtitle">Everything at a glance.</p>
+        <div class="highlight-grid">
+            <div class="highlight-card">📍 Lichtenrader Damm • Berlin‑Lichtenrade</div>
+            <div class="highlight-card">🏠 Private room in shared apartment</div>
+            <div class="highlight-card">🏡 Property size 96 m² • 3 housemates (mixed)</div>
+            <div class="highlight-card">✅ Anmeldung possible</div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">Room, Apartment, Location</h2>
+        <p class="section-subtitle">Comfort inside, convenience outside.</p>
+        <div class="list-grid">
+            <div class="list-card">
+                <h3>🛏️ Room</h3>
+                <ul>
+                    <li>Brand‑new bed, mattress, pillow, wardrobe, and floor mats</li>
+                    <li>Mood lighting that syncs with your music (dancing light)</li>
+                    <li>Overhead plugs + overhead storage area</li>
+                    <li>Comfortable office desk setup for focus</li>
+                    <li>Bed with storage underneath + bedside lamp</li>
+                    <li>Private room lock — your privacy respected</li>
+                    <li>Garden view for fresh evening air</li>
+                </ul>
+            </div>
+            <div class="list-card">
+                <h3>🏢 Apartment</h3>
+                <ul>
+                    <li>🍳 Fully equipped shared kitchen (cookware, cutlery, appliances)</li>
+                    <li>🛁 Brand‑new standing shower (shared)</li>
+                </ul>
+            </div>
+            <div class="list-card">
+                <h3>📍 Location</h3>
+                <ul>
+                    <li>Quiet, well‑connected neighborhood</li>
+                    <li>Shopping, food & transport nearby</li>
+                </ul>
             </div>
         </div>
     </div>
@@ -203,13 +396,68 @@ body {
 
 <section class="section">
     <div class="container">
-        <h2 class="section-title">KE3 Highlights</h2>
-        <p class="section-subtitle">Brand‑new essentials and a mood‑tunable setup.</p>
-        <div class="highlight-grid">
-            <div class="highlight-card">✨ Bedding lights you can adjust by mood or music</div>
-            <div class="highlight-card">🔌 Overhead plugs + overhead storage area</div>
-            <div class="highlight-card">🛏️ Brand‑new bed, mattress, pillow, wardrobe, floor mats</div>
-            <div class="highlight-card">🌿 Garden view — perfect for evening coffee and fresh air</div>
+        <h2 class="section-title">Nearby Essentials</h2>
+        <p class="section-subtitle">Plenty of options within a short walk.</p>
+        <div class="list-grid">
+            <div class="list-card">
+                <h3>🛍️ Shopping</h3>
+                <ul>
+                    <li>🥦 Bio Company just opposite the building</li>
+                    <li>🛒 Eurogida — 5 mins walk</li>
+                    <li>🛍️ Penny — 5 mins walk</li>
+                    <li>🛒 Lidl, Edeka, and Kik nearby</li>
+                    <li>🛍️ Shopping malls in Mariendorf (short ride)</li>
+                    <li>🧃 Spätis and Getränke shops around the area</li>
+                </ul>
+            </div>
+            <div class="list-card">
+                <h3>🍲 Food</h3>
+                <ul>
+                    <li>🍕 Multiple Italian spots nearby</li>
+                    <li>🌮 Mexican options in walking distance</li>
+                    <li>🇬🇷 Greek restaurants close by</li>
+                    <li>🍗 KFC and quick bites in the area</li>
+                    <li>🍺 Bars and sports spots nearby</li>
+                </ul>
+            </div>
+            <div class="list-card">
+                <h3>🚍 Transport</h3>
+                <ul>
+                    <li>🚏 Bus stop — 3 mins walk</li>
+                    <li>🚌 X76 to U‑Alt Mariendorf in 3 stops</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">More Around You</h2>
+        <p class="section-subtitle">Daily essentials and convenience, close to home.</p>
+        <div class="list-grid">
+            <div class="list-card">
+                <h3>💊 Pharmacies</h3>
+                <ul>
+                    <li>Several pharmacies in walking distance</li>
+                    <li>Easy access for prescriptions and essentials</li>
+                </ul>
+            </div>
+            <div class="list-card">
+                <h3>🏧 ATMs</h3>
+                <ul>
+                    <li>Multiple bank ATMs nearby</li>
+                    <li>Quick cash access within a short walk</li>
+                </ul>
+            </div>
+            <div class="list-card">
+                <h3>🎯 Things to do</h3>
+                <ul>
+                    <li>Parks and green spaces nearby</li>
+                    <li>Sports spots and casual hangouts</li>
+                    <li>Local cafés and community corners</li>
+                </ul>
+            </div>
         </div>
     </div>
 </section>
@@ -224,24 +472,87 @@ body {
                 <ul>
                     <li>Heating, electricity, water</li>
                     <li>High‑speed internet (250 Mbps)</li>
-                    <li>Shared kitchen & bathroom</li>
+                    <li>Kitchenware & appliances</li>
+                    <li>Washing machine, dishwasher</li>
                 </ul>
             </div>
             <div class="list-card">
                 <h3>❌ Not covered</h3>
                 <ul>
-                    <li>ARD broadcasting fee (tenants coordinate together)</li>
+                    <li>ARD broadcasting fee (paid by tenants, coordinated together)</li>
                 </ul>
                 <div class="notice">Friendly reminder: ARD fee is handled by tenants collectively.</div>
             </div>
             <div class="list-card">
-                <h3>✅ In the bedroom</h3>
+                <h3>✅ Included in bedroom</h3>
                 <ul>
-                    <li>Office desk setup</li>
                     <li>Wardrobe</li>
-                    <li>Bed with storage underneath</li>
-                    <li>Bedside lamp</li>
-                    <li>Private room lock</li>
+                    <li>Desk + chair + lamp</li>
+                    <li>Bed (90x200) + premium mattress (brand new)</li>
+                    <li>New mattress cover, blanket, pillow</li>
+                    <li>Mood lighting with music sync</li>
+                    <li>Overhead plugs + storage area</li>
+                    <li>Windows with curtains for privacy and restful sleep</li>
+                    <li>Bedroom key</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">We Provide</h2>
+        <p class="section-subtitle">Move‑in made easy.</p>
+        <div class="list-grid">
+            <div class="list-card">
+                <h3>✨ Services</h3>
+                <ul>
+                    <li>Registration (Anmeldung)</li>
+                    <li>Rental contract in German & English</li>
+                    <li>Welcome Kit included</li>
+                    <li>Cleaning before check‑in</li>
+                </ul>
+            </div>
+            <div class="list-card">
+                <h3>🎥 Visual tour</h3>
+                <ul>
+                    <li>Garbage disposal area</li>
+                    <li>Your room</li>
+                    <li>Kitchen</li>
+                    <li>Bathroom</li>
+                    <li>Other key spots</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">Documents & Check‑In</h2>
+        <p class="section-subtitle">Clear steps and simple requirements.</p>
+        <div class="list-grid">
+            <div class="list-card">
+                <h3>📋 Required documents</h3>
+                <ul>
+                    <li>Passport / government ID</li>
+                    <li>Proof of enrollment or occupation</li>
+                    <li>Proof of income (or guarantor)</li>
+                </ul>
+            </div>
+            <div class="list-card">
+                <h3>🛎️ Check‑in/out</h3>
+                <ul>
+                    <li>Check‑in arranged between 08:00 – 15:00</li>
+                    <li>Key handover: in front of the apartment</li>
+                </ul>
+            </div>
+            <div class="list-card">
+                <h3>📝 Registration</h3>
+                <ul>
+                    <li>Anmeldung possible at this address</li>
+                    <li>Required for longer stays in Germany</li>
                 </ul>
             </div>
         </div>
@@ -282,7 +593,53 @@ body {
                 </div>
             </div>
             <div class="list-card">
-                <h3>Move‑out cleaning fee</h3>
+                <h3>Utilities</h3>
+                <div class="table-wrap">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Included in rent?</th>
+                                <th>How often?</th>
+                                <th>Estimate or exact?</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Electricity</td>
+                                <td>Yes</td>
+                                <td>Monthly</td>
+                                <td>Exact</td>
+                                <td>EUR 0</td>
+                            </tr>
+                            <tr>
+                                <td>Water</td>
+                                <td>Yes</td>
+                                <td>Monthly</td>
+                                <td>Exact</td>
+                                <td>EUR 0</td>
+                            </tr>
+                            <tr>
+                                <td>Gas</td>
+                                <td>Yes</td>
+                                <td>Monthly</td>
+                                <td>Exact</td>
+                                <td>EUR 0</td>
+                            </tr>
+                            <tr>
+                                <td>Internet</td>
+                                <td>Yes</td>
+                                <td>Monthly</td>
+                                <td>Exact</td>
+                                <td>EUR 0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="list-card">
+                <h3>Move‑out Cleaning Fee</h3>
                 <div class="table-wrap">
                     <table class="table">
                         <thead>
@@ -295,7 +652,7 @@ body {
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Cleaning</td>
+                                <td>Move‑out cleaning</td>
                                 <td>No</td>
                                 <td>Paid at move‑out</td>
                                 <td>EUR 60</td>
@@ -306,6 +663,64 @@ body {
                 <div class="notice">This fee is required and must be paid at the time of tenant move‑out.</div>
             </div>
         </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">Facilities & Amenities</h2>
+        <p class="section-subtitle">Shared comforts and key features.</p>
+        <div class="list-grid">
+            <div class="list-card">
+                <h3>Shared facilities</h3>
+                <ul>
+                    <li>Unisex bathroom</li>
+                    <li>Shared toilet, shared kitchen</li>
+                    <li>Shared garden</li>
+                    <li>Laminate flooring, gas heating</li>
+                </ul>
+            </div>
+            <div class="list-card">
+                <h3>Amenities</h3>
+                <ul>
+                    <li>Wi‑Fi</li>
+                    <li>Shared kitchenware</li>
+                    <li>Washing machine, dishwasher</li>
+                </ul>
+            </div>
+            <div class="list-card">
+                <h3>Housemate profile</h3>
+                <ul>
+                    <li>3 housemates (mixed)</li>
+                    <li>International students & working professionals</li>
+                    <li>Suitable for 1 person</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">House Rules & Preferences</h2>
+        <p class="section-subtitle">Friendly, clear guidance.</p>
+        <details class="details">
+            <summary>Tenant preferences</summary>
+            <ul>
+                <li>Age: Max. 40</li>
+                <li>Tenant type: Students, working professionals</li>
+                <li>Couples allowed: No</li>
+            </ul>
+        </details>
+        <details class="details" style="margin-top: 12px;">
+            <summary>Rules</summary>
+            <ul>
+                <li>Pets allowed: No</li>
+                <li>Musical instruments: No</li>
+                <li>Smoking: No</li>
+            </ul>
+            <p>For full rules, please refer to the <a href="house-rules.html" style="color:#fff; text-decoration: underline;">House Rules page</a>.</p>
+        </details>
     </div>
 </section>
 
@@ -326,7 +741,7 @@ body {
 
 <footer class="footer">
     <div>Questions? Email support@homelyo.eu</div>
-    <div style="margin-top:10px;">© 2026 Homelyo (Berlin Lichtenrade co-living)<br><em>All content is provided by the Homelyo (Berlin Lichtenrade co-living) team and is not affiliated with other entities using similar names.</em></div>
+    <div style="margin-top:10px;">© 2026 Homelyo (Berlin Lichtenrade co-living)<br><em><em>All content is provided by the Homelyo (Berlin Lichtenrade co-living) team and is not affiliated with other entities using similar names.</em></em></div>
 </footer>
 </body>
 </html>
