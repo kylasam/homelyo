@@ -149,29 +149,36 @@ body {
     border: 2px solid rgba(255,255,255,0.2);
 }
 
-/* Photo Mosaic */
-.mosaic {
+/* Photo Gallery (KE2 style) */
+.gallery {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
 }
-.mosaic img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 16px;
+.photo-card {
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
     border: 2px solid rgba(255,90,95,0.2);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: rgba(31,31,51,0.9);
 }
-.mosaic img:hover {
-    transform: translateY(-6px) scale(1.02);
-    box-shadow: 0 12px 28px rgba(255,90,95,0.25);
+.photo-card img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
 }
-.mosaic .tile-large { grid-column: span 3; grid-row: span 2; }
-.mosaic .tile-tall { grid-column: span 2; grid-row: span 2; }
-.mosaic .tile-wide { grid-column: span 3; grid-row: span 1; }
-.mosaic .tile { position: relative; }
-.mosaic .tile span {\n    position: absolute;\n    bottom: 10px;\n    left: 10px;\n    padding: 6px 10px;\n    border-radius: 999px;\n    background: rgba(0,0,0,0.6);\n    font-size: 12px;\n    opacity: 0;\n    transform: translateY(6px);\n    transition: all 0.2s ease;\n}\n+.mosaic .tile:hover span { opacity: 1; transform: translateY(0); }
+.photo-card:hover img { transform: scale(1.05); }
+.photo-card span {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.6);
+    font-size: 12px;
+}
 
 /* Sections */
 .section {
@@ -324,13 +331,13 @@ body {
             </div>
         </div>
         <div class="hero-card">
-            <div class="mosaic">
-                <div class="tile tile-large"><img src="assests/home_photos/KE1/IMG_4349.jpg" alt="KE1 room" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE1/IMG_4349.jpg'"><span>KE1 room</span></div>
-                <div class="tile tile-tall"><img src="assests/home_photos/KE1/IMG_4350.jpg" alt="KE1 room view" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE1/IMG_4350.jpg'"><span>Room view</span></div>
-                <div class="tile tile-wide"><img src="assests/home_photos/KE1/IMG_4351.jpg" alt="KE1 details" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE1/IMG_4351.jpg'"><span>Room details</span></div>
-                <div class="tile"><img src="assests/home_photos/KITCHEN/IMG_5847.jpg" alt="KITCHEN" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KITCHEN/IMG_5847.jpg'"><span>KITCHEN</span></div>
-                <div class="tile"><img src="assests/home_photos/BAD/IMG_6614.jpg" alt="BAD" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/BAD/IMG_6614.jpg'"><span>BAD</span></div>
-                <div class="tile"><img src="assests/home_photos/HALL/1000067787.jpg" alt="HALL" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/HALL/1000067787.jpg'"><span>HALL</span></div>
+            <div class="gallery">
+                <div class="photo-card"><img src="assests/home_photos/KE1/IMG_4349.jpg" alt="KE1" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE1/IMG_4349.jpg'"><span>KE1</span></div>
+                <div class="photo-card"><img src="assests/home_photos/KE1/IMG_4350.jpg" alt="KE1" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE1/IMG_4350.jpg'"><span>KE1</span></div>
+                <div class="photo-card"><img src="assests/home_photos/KE1/IMG_4351.jpg" alt="KE1" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE1/IMG_4351.jpg'"><span>KE1</span></div>
+                <div class="photo-card"><img src="assests/home_photos/KITCHEN/IMG_5847.jpg" alt="KITCHEN" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KITCHEN/IMG_5847.jpg'"><span>KITCHEN</span></div>
+                <div class="photo-card"><img src="assests/home_photos/BAD/IMG_6614.jpg" alt="BAD" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/BAD/IMG_6614.jpg'"><span>BAD</span></div>
+                <div class="photo-card"><img src="assests/home_photos/HALL/1000067787.jpg" alt="HALL" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/HALL/1000067787.jpg'"><span>HALL</span></div>
             </div>
         </div>
     </div>
@@ -727,7 +734,7 @@ body {
 
 <footer class="footer">
     <div>Questions? Email support@homelyo.eu</div>
-    <div style="margin-top:10px;">© 2026 Homelyo (Berlin Lichtenrade co-living)<br>All content is provided by the Homelyo (Berlin Lichtenrade co-living) team and is not affiliated with other entities using similar names.</div>
+    <div style="margin-top:10px;">© 2026 Homelyo (Berlin Lichtenrade co-living)<br><em>All content is provided by the Homelyo (Berlin Lichtenrade co-living) team and is not affiliated with other entities using similar names.</em></div>
 </footer>
 </body>
 </html>
