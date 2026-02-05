@@ -1431,7 +1431,7 @@ body {
                         <span class="feature-tag">🌅 Natural Light</span>
                         <span class="feature-tag">📦 Storage</span>
                     </div>
-                    <a href="https://www.homelyo.eu/bookings" class="room-link" target="_blank" rel="noreferrer">View Details & Book →</a>
+                    <a href="https://www.homelyo.eu/bookings" class="room-link">View Details & Book →</a>
 </div>
             </div>
 
@@ -1470,7 +1470,7 @@ body {
                         <span class="feature-tag">🎨 Stylish Design</span>
                         <span class="feature-tag">🌟 Premium Feel</span>
                     </div>
-                    <a href="https://www.homelyo.eu/bookings" class="room-link" target="_blank" rel="noreferrer">View Details & Book →</a>
+                    <a href="https://www.homelyo.eu/bookings" class="room-link">View Details & Book →</a>
 </div>
             </div>
 
@@ -1509,7 +1509,7 @@ body {
                         <span class="feature-tag">💡 Bright</span>
                         <span class="feature-tag">🛋️ Cozy</span>
                     </div>
-                    <a href="https://www.homelyo.eu/bookings" class="room-link" target="_blank" rel="noreferrer">View Details & Book →</a>
+                    <a href="https://www.homelyo.eu/bookings" class="room-link">View Details & Book →</a>
 </div>
             </div>
 
@@ -1547,7 +1547,7 @@ body {
                         <span class="feature-tag">🪑 Compact Desk</span>
                         <span class="feature-tag">✨ Modern</span>
                     </div>
-                    <a href="https://www.homelyo.eu/bookings" class="room-link" target="_blank" rel="noreferrer">View Details & Book →</a>
+                    <a href="https://www.homelyo.eu/bookings" class="room-link">View Details & Book →</a>
 </div>
             </div>
         </div>
@@ -1617,7 +1617,7 @@ body {
         <h2 class="cta-title">Ready to Call Homelyo Home?</h2>
         <p class="cta-subtitle">Join our community of happy residents in Berlin Lichtenrade</p>
         <div class="cta-actions">
-            <a href="https://www.homelyo.eu/bookings" class="btn-primary" target="_blank" rel="noreferrer">
+            <a href="https://www.homelyo.eu/bookings" class="btn-primary">
                 <span>Book Your Room Now</span>
                 <span>→</span>
             </a>
@@ -1767,8 +1767,7 @@ function generateMonthBlocks() {
         if (isAvailable) {
             monthBlock.style.cursor = 'pointer';
             monthBlock.addEventListener('click', () => {
-                const bookingUrl = 'https://www.homelyo.eu/bookings';
-                window.open(bookingUrl, '_blank', 'noopener');
+                window.location.href = 'https://www.homelyo.eu/bookings';
             });
         }
         monthsGrid.appendChild(monthBlock);
