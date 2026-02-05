@@ -170,6 +170,8 @@ body {
 .mosaic .tile-large { grid-column: span 3; grid-row: span 2; }
 .mosaic .tile-tall { grid-column: span 2; grid-row: span 2; }
 .mosaic .tile-wide { grid-column: span 3; grid-row: span 1; }
+.mosaic .tile { position: relative; }
+.mosaic .tile span {\n    position: absolute;\n    bottom: 10px;\n    left: 10px;\n    padding: 6px 10px;\n    border-radius: 999px;\n    background: rgba(0,0,0,0.6);\n    font-size: 12px;\n    opacity: 0;\n    transform: translateY(6px);\n    transition: all 0.2s ease;\n}\n+.mosaic .tile:hover span { opacity: 1; transform: translateY(0); }
 
 /* Sections */
 .section {
@@ -323,12 +325,12 @@ body {
         </div>
         <div class="hero-card">
             <div class="mosaic">
-                <img class="tile-large" src="assests/home_photos/KE1/IMG_4349.jpg" alt="KE1 room" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE1/IMG_4349.jpg'">
-                <img class="tile-tall" src="assests/home_photos/KE1/IMG_4350.jpg" alt="KE1 room view" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE1/IMG_4350.jpg'">
-                <img class="tile-wide" src="assests/home_photos/KE1/IMG_4351.jpg" alt="KE1 details" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE1/IMG_4351.jpg'">
-                <img src="assests/home_photos/KITCHEN/IMG_5847.jpg" alt="Kitchen" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KITCHEN/IMG_5847.jpg'">
-                <img src="assests/home_photos/BAD/IMG_6614.jpg" alt="Bathroom" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/BAD/IMG_6614.jpg'">
-                <img src="assests/home_photos/HALL/jpg/IMG_4369.jpg" alt="Hall" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/HALL/jpg/IMG_4369.jpg'">
+                <div class="tile tile-large"><img src="assests/home_photos/KE1/IMG_4349.jpg" alt="KE1 room" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE1/IMG_4349.jpg'"><span>KE1 room</span></div>
+                <div class="tile tile-tall"><img src="assests/home_photos/KE1/IMG_4350.jpg" alt="KE1 room view" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE1/IMG_4350.jpg'"><span>Room view</span></div>
+                <div class="tile tile-wide"><img src="assests/home_photos/KE1/IMG_4351.jpg" alt="KE1 details" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KE1/IMG_4351.jpg'"><span>Room details</span></div>
+                <div class="tile"><img src="assests/home_photos/KITCHEN/IMG_5847.jpg" alt="Kitchen" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/KITCHEN/IMG_5847.jpg'"><span>Kitchen</span></div>
+                <div class="tile"><img src="assests/home_photos/BAD/IMG_6614.jpg" alt="Bathroom" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/BAD/IMG_6614.jpg'"><span>Bathroom</span></div>
+                <div class="tile"><img src="assests/home_photos/HALL/jpg/IMG_4369.jpg" alt="Hall" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/kylasam/homelyo/main/assests/home_photos/HALL/jpg/IMG_4369.jpg'"><span>Shared hall</span></div>
             </div>
         </div>
     </div>
