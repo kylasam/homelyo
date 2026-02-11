@@ -4,9 +4,9 @@
      =============================== */
   const BRAND = {
     name: "Homelyo Assistant",
-    primary: "#4f46e5",
-    bubbleIcon: "💬",
-    iframeUrl: "https://assistant.homelyo.eu/"
+    primary: "#FF5A5F",
+    bubbleIcon: "🤍",
+    iframeUrl: "https://kylasam.github.io/homelyo-chatbot/"
   };
 
   /* ===============================

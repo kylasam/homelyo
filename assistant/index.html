@@ -28,7 +28,7 @@ body {
                 var(--bg-dark);
     color: var(--text-light);
     min-height: 100vh;
-    padding: 28px;
+    padding: 20px;
 }
 
 .container {
@@ -42,9 +42,9 @@ body {
 .panel {
     background: rgba(31, 31, 51, 0.92);
     border: 2px solid rgba(255, 90, 95, 0.22);
-    border-radius: 28px;
-    padding: 26px;
-    box-shadow: 18px 18px 0 rgba(255, 90, 95, 0.12);
+    border-radius: 24px;
+    padding: 22px;
+    box-shadow: 14px 14px 0 rgba(255, 90, 95, 0.12);
     position: relative;
     overflow: hidden;
 }
@@ -96,16 +96,17 @@ body {
 .room-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    margin: 18px 0;
+    gap: 10px;
+    margin: 16px 0 10px;
 }
 .room-card {
-    padding: 14px;
-    border-radius: 18px;
+    padding: 12px 14px;
+    border-radius: 16px;
     border: 2px solid rgba(255,255,255,0.08);
     background: linear-gradient(140deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-    display: grid;
-    gap: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
     transition: transform 0.3s ease, border-color 0.3s ease;
 }
 .room-card:hover {
@@ -113,17 +114,18 @@ body {
     border-color: rgba(255,90,95,0.5);
 }
 .room-icon {
-    font-size: 26px;
+    font-size: 24px;
 }
 .room-name {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 700;
 }
 .room-meta {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     align-items: center;
-    font-size: 12px;
+    font-size: 11px;
+    flex-wrap: wrap;
     color: var(--text-gray);
 }
 .room-badge {
@@ -136,9 +138,9 @@ body {
 }
 
 .booking-panel {
-    margin-top: 18px;
-    padding: 16px;
-    border-radius: 18px;
+    margin-top: 12px;
+    padding: 14px;
+    border-radius: 16px;
     border: 2px dashed rgba(255,90,95,0.35);
     background: rgba(255,90,95,0.08);
 }
@@ -155,7 +157,7 @@ body {
 .chat-panel {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 12px;
     min-height: 560px;
 }
 
@@ -167,7 +169,7 @@ body {
 .chat-avatar {
     width: 64px;
     height: 64px;
-    border-radius: 20px;
+    border-radius: 18px;
     overflow: hidden;
     border: 2px solid rgba(255,255,255,0.2);
 }
@@ -177,7 +179,7 @@ body {
 
 .chat-frame {
     flex: 1;
-    border-radius: 20px;
+    border-radius: 18px;
     overflow: hidden;
     border: 2px solid rgba(255,255,255,0.08);
     background: rgba(0,0,0,0.2);
@@ -259,7 +261,7 @@ body {
             </div>
         </div>
         <div class="chat-frame">
-            <iframe src="https://assistant.homelyo.eu/" title="Homelyo Assistant"></iframe>
+            <iframe src="https://kylasam.github.io/homelyo-chatbot/" title="Homelyo Assistant"></iframe>
         </div>
     </section>
 </div>
