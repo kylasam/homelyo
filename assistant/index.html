@@ -3,269 +3,415 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Homelyo Assistant | Smart Support</title>
+<title>Homelyo Assistant</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
-:root {
-    --primary: #FF5A5F;
-    --primary-dark: #E74C3C;
-    --accent: #FFB400;
-    --teal: #00A699;
-    --bg-dark: #121222;
-    --bg-card: #1f1f33;
-    --text-light: #ffffff;
-    --text-gray: #B8B8D1;
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Inter', sans-serif; background:#0a0a0a; color:white; min-height:100vh; display:flex; justify-content:center; align-items:center; padding:15px; }
+.main-container { display:grid; grid-template-columns:350px 1fr; gap:15px; max-width:1100px; width:100%; max-height:900px; height:95vh; }
+
+/* Sidebar */
+.property-sidebar { background: #1a1a1a; border:1px solid #2a2a2a; border-radius:16px; padding:25px; display:flex; flex-direction:column; gap:20px; overflow-y:auto; }
+.property-sidebar::-webkit-scrollbar { width:6px; }
+.property-sidebar::-webkit-scrollbar-thumb { background:#ff6b9d; border-radius:3px; }
+
+/* Logo Section */
+.logo-section { text-align:center; padding-bottom:15px; border-bottom:1px solid #2a2a2a; }
+.logo-wrapper { width:140px; height:140px; border-radius:50%; overflow:hidden; margin:0 auto 10px; display:flex; align-items:center; justify-content:center; border:2px solid #ff6b9d; background:white; }
+.logo-wrapper img { width:90%; height:auto; object-fit:contain; }
+.location { font-size:12px; color:#ccc; display:flex; justify-content:center; align-items:center; gap:6px; }
+
+/* Sidebar sections */
+.sidebar-section h3 { font-size:14px; font-weight:600; color:#ff6b9d; margin-bottom:12px; }
+.sidebar-section p, .sidebar-section li { font-size:13px; line-height:1.6; color:white; }
+.sidebar-section ul { padding-left:18px; margin-top:6px; }
+
+/* Features - Compact Tag Style */
+.features-compact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.feature-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px;
+    background: linear-gradient(135deg, rgba(255,107,157,0.12) 0%, rgba(196,69,105,0.12) 100%);
+    border: 1px solid rgba(255,107,157,0.25);
+    border-radius: 16px;
+    font-size: 11px;
+    font-weight: 500;
+    color: white;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+.feature-tag:hover {
+    background: linear-gradient(135deg, rgba(255,107,157,0.2) 0%, rgba(196,69,105,0.2) 100%);
+    border-color: rgba(255,107,157,0.4);
+    transform: translateY(-2px);
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-    font-family: 'Inter', sans-serif;
-    background: radial-gradient(circle at 10% 10%, rgba(255,90,95,0.16), transparent 45%),
-                radial-gradient(circle at 90% 15%, rgba(255,180,0,0.12), transparent 50%),
-                var(--bg-dark);
-    color: var(--text-light);
-    min-height: 100vh;
-    padding: 20px;
+/* Booking Button Panel */
+.booking-section { display:flex; flex-direction:column; gap: 8px; }
+.booking-btn {
+    background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+    border: 2px solid #ff6b9d;
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(255,107,157,0.4);
+}
+.booking-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255,107,157,0.6);
+    border-color: white;
+}
+.booking-btn:active {
+    transform: translateY(0);
 }
 
-.container {
-    max-width: 1400px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1.05fr 1fr;
-    gap: 26px;
+.available-rooms { 
+    display: grid; 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 8px; 
 }
-
-.panel {
-    background: rgba(31, 31, 51, 0.92);
-    border: 2px solid rgba(255, 90, 95, 0.22);
-    border-radius: 24px;
-    padding: 22px;
-    box-shadow: 14px 14px 0 rgba(255, 90, 95, 0.12);
+.available-rooms a { 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 8px; 
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%); 
+    color: #fff; 
+    border-radius: 12px; 
+    font-size: 13px; 
+    font-weight: 500;
+    text-decoration: none; 
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    border: 2px solid #2a2a2a;
+    gap: 8px;
     position: relative;
     overflow: hidden;
 }
-
-.panel::after {
-    content: '';
-    position: absolute;
-    inset: auto -30% -50% auto;
-    width: 220px;
-    height: 220px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,180,0,0.18), transparent 70%);
-    opacity: 0.8;
+.available-rooms a:hover { 
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(255,107,157,0.4);
+    border-color: #ff6b9d;
+    background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
 }
 
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 18px;
-}
-.brand img {
-    width: 56px;
-    height: 56px;
-    border-radius: 16px;
-    object-fit: cover;
-    border: 2px solid rgba(255,255,255,0.2);
-}
-.brand h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: 30px;
-}
-.brand p {
-    font-size: 13px;
-    color: var(--text-gray);
+/* Room icon at top */
+.room-icon {
+    font-size: 26px;
+    margin-bottom: 4px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
 }
 
-.hero-title {
-    font-size: 28px;
-    font-weight: 700;
-    margin-bottom: 12px;
-}
-.hero-subtitle {
-    color: var(--text-gray);
-    font-size: 15px;
-    margin-bottom: 18px;
-}
-
-.room-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-    margin: 16px 0 10px;
-}
-.room-card {
-    padding: 12px 14px;
-    border-radius: 16px;
-    border: 2px solid rgba(255,255,255,0.08);
-    background: linear-gradient(140deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+/* Room info section */
+.room-info {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+}
+
+/* Room header with name and size badge */
+.room-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     gap: 6px;
-    transition: transform 0.3s ease, border-color 0.3s ease;
-}
-.room-card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(255,90,95,0.5);
-}
-.room-icon {
-    font-size: 24px;
+    width: 100%;
 }
 .room-name {
-    font-size: 15px;
-    font-weight: 700;
-}
-.room-meta {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-    font-size: 11px;
-    flex-wrap: wrap;
-    color: var(--text-gray);
-}
-.room-badge {
-    padding: 2px 8px;
-    border-radius: 999px;
-    border: 1px solid rgba(255,255,255,0.25);
-    background: rgba(255,255,255,0.08);
-    font-weight: 700;
-    font-size: 10px;
-}
-
-.booking-panel {
-    margin-top: 12px;
-    padding: 14px;
-    border-radius: 16px;
-    border: 2px dashed rgba(255,90,95,0.35);
-    background: rgba(255,90,95,0.08);
-}
-.booking-panel h3 {
     font-size: 16px;
-    margin-bottom: 6px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: white;
 }
-.booking-panel p {
-    font-size: 13px;
-    color: var(--text-gray);
-    margin-bottom: 10px;
-}
-
-.chat-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    min-height: 560px;
+.room-feature {
+    font-size: 10px;
+    opacity: 0.8;
+    font-weight: 400;
+    text-align: center;
 }
 
-.chat-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-.chat-avatar {
-    width: 64px;
-    height: 64px;
-    border-radius: 18px;
-    overflow: hidden;
-    border: 2px solid rgba(255,255,255,0.2);
-}
-.chat-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.chat-title h2 { font-size: 20px; }
-.chat-title p { font-size: 13px; color: var(--text-gray); }
-
-.chat-frame {
-    flex: 1;
-    border-radius: 18px;
-    overflow: hidden;
-    border: 2px solid rgba(255,255,255,0.08);
-    background: rgba(0,0,0,0.2);
+/* Size badges - compact design */
+.room-size-badge {
+    padding: 2px 7px;
+    border-radius: 8px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    min-width: 24px;
+    text-align: center;
 }
 
-.chat-frame iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-}
+/* Special styling for XL room (KE2) */
+.room-xl { border-color: rgba(255,215,0,0.3); }
+.room-xl .room-size-badge { background: rgba(255,215,0,0.25); border-color: rgba(255,215,0,0.6); color: #ffd700; box-shadow: 0 0 8px rgba(255,215,0,0.2); }
+.room-xl:hover { border-color: #ffd700; }
 
-@media (max-width: 980px) {
-    .container { grid-template-columns: 1fr; }
+/* L badge slightly prominent */
+.room-lg .room-size-badge { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.4); }
+
+/* Standard M and S badges */
+.room-md .room-size-badge { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3); }
+.room-sm .room-size-badge { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.25); }
+
+/* Chat Container */
+.chat-container { background:#1a1a1a; border:1px solid #2a2a2a; border-radius:16px; display:flex; flex-direction:column; height:100%; position:relative; }
+.chat-header { background:linear-gradient(135deg,#ff6b9d 0%,#c44569 100%); padding:18px 20px; display:flex; align-items:center; gap:12px; border-bottom:1px solid rgba(255,255,255,0.1); border-radius:16px 16px 0 0; }
+.chat-header-avatar { width:70px; height:70px; border-radius:50%; overflow:hidden; border:2px solid white; }
+.chat-header-avatar img { width:100%; height:100%; object-fit:cover; }
+.chat-header-text h2 { font-size:18px; margin:0; }
+.chat-header-text p { font-size:12px; margin-top:3px; opacity:0.9; }
+
+.chat-messages { flex:1; overflow-y:auto; padding:20px; background:#0f0f0f; }
+.chat-messages::-webkit-scrollbar { width:6px; }
+.chat-messages::-webkit-scrollbar-thumb { background:#ff6b9d; border-radius:3px; }
+
+.chat-input-container { display:flex; gap:10px; padding:15px 20px; border-top:1px solid #2a2a2a; }
+.chat-input-container input { flex:1; background:#1a1a1a; border:1px solid #2a2a2a; border-radius:10px; padding:10px; color:white; }
+.chat-input-container button { background:#ff6b9d; border:none; border-radius:10px; padding:10px 14px; color:white; cursor:pointer; font-weight:600; }
+
+.intro-message { background:#151515; border-radius:16px; padding:16px; border:1px solid #2a2a2a; }
+.intro-content { display:grid; grid-template-columns:140px 1fr; gap:16px; align-items:center; }
+.intro-video .video-wrapper { width:140px; height:140px; border-radius:16px; overflow:hidden; position:relative; background:#0a0a0a; border:1px solid #2a2a2a; }
+.intro-video video { width:100%; height:100%; object-fit:cover; }
+.video-play-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.4); opacity:0; transition:0.3s ease; }
+.video-wrapper:hover .video-play-overlay { opacity:1; }
+.play-btn { width:46px; height:46px; border-radius:50%; background:#ff6b9d; display:flex; align-items:center; justify-content:center; font-size:18px; }
+
+.typing-indicator-wrapper { display:flex; align-items:center; gap:10px; padding:12px 20px; border-top:1px dashed #2a2a2a; }
+.typing-indicator { display:flex; gap:4px; }
+.typing-indicator span { width:6px; height:6px; border-radius:50%; background:#ff6b9d; animation:bounce 1.2s infinite; }
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce { 0%, 80%, 100% { transform: translateY(0);} 40% { transform: translateY(-5px);} }
+
+@media(max-width: 980px){
+  .main-container { grid-template-columns: 1fr; height:auto; max-height:none; }
 }
 </style>
 </head>
 <body>
-<div class="container">
-    <section class="panel">
-        <div class="brand">
-            <img src="assets/Homelyo-logo-new.jpg" alt="Homelyo">
-            <div>
-                <h1>Homelyo Assistant</h1>
-                <p>Berlin Lichtenrade · Warm, smart support</p>
+<div class="main-container">
+    <div class="property-sidebar">
+        <div class="logo-section">
+            <div class="logo-wrapper">
+                <img src="assets/Homelyo-logo-new.jpg" alt="Homelyo Logo">
+            </div>
+            <h2>Homelyo Assistant</h2>
+            <p class="location">Berlin Lichtenrade • Smart support</p>
+        </div>
+
+        <div class="sidebar-section">
+            <h3>Available Rooms</h3>
+            <div class="available-rooms">
+                <a href="https://www.homelyo.eu/ke2" target="_blank" class="room-btn room-xl">
+                    <div class="room-icon">🏠</div>
+                    <div class="room-info">
+                        <div class="room-header">
+                            <span class="room-name">KE2</span>
+                            <span class="room-size-badge xl">XL</span>
+                        </div>
+                        <span class="room-feature">🪴 Balcony</span>
+                    </div>
+                </a>
+                
+                <a href="https://www.homelyo.eu/ke1" target="_blank" class="room-btn room-lg">
+                    <div class="room-icon">🏠</div>
+                    <div class="room-info">
+                        <div class="room-header">
+                            <span class="room-name">KE1</span>
+                            <span class="room-size-badge lg">L</span>
+                        </div>
+                        <span class="room-feature">Spacious</span>
+                    </div>
+                </a>
+                
+                <a href="https://www.homelyo.eu/ke3" target="_blank" class="room-btn room-md">
+                    <div class="room-icon">🛋️</div>
+                    <div class="room-info">
+                        <div class="room-header">
+                            <span class="room-name">KE3</span>
+                            <span class="room-size-badge md">M</span>
+                        </div>
+                        <span class="room-feature">Comfortable</span>
+                    </div>
+                </a>
+                
+                <a href="https://www.homelyo.eu/ke4" target="_blank" class="room-btn room-sm">
+                    <div class="room-icon">💎</div>
+                    <div class="room-info">
+                        <div class="room-header">
+                            <span class="room-name">KE4</span>
+                            <span class="room-size-badge sm">S</span>
+                        </div>
+                        <span class="room-feature">Affordable</span>
+                    </div>
+                </a>
             </div>
         </div>
 
-        <div class="hero-title">Available Rooms</div>
-        <div class="hero-subtitle">Fast glance at what fits your vibe — balcony, space, or comfort.</div>
-
-        <div class="room-grid">
-            <div class="room-card">
-                <div class="room-icon">🏠</div>
-                <div class="room-name">KE2</div>
-                <div class="room-meta">
-                    <span class="room-badge">XL</span>
-                    <span>🪴 Balcony</span>
-                </div>
-            </div>
-            <div class="room-card">
-                <div class="room-icon">🏠</div>
-                <div class="room-name">KE1</div>
-                <div class="room-meta">
-                    <span class="room-badge">L</span>
-                    <span>Spacious</span>
-                </div>
-            </div>
-            <div class="room-card">
-                <div class="room-icon">🛋️</div>
-                <div class="room-name">KE3</div>
-                <div class="room-meta">
-                    <span class="room-badge">M</span>
-                    <span>Comfortable</span>
-                </div>
-            </div>
-            <div class="room-card">
-                <div class="room-icon">💎</div>
-                <div class="room-name">KE4</div>
-                <div class="room-meta">
-                    <span class="room-badge">S</span>
-                    <span>Affordable</span>
-                </div>
+        <div class="sidebar-section">
+            <h3>Booking</h3>
+            <div class="booking-section">
+                <div data-fillout-id="gq1XFEqEWJus" data-fillout-embed-type="slider" data-fillout-button-text="📅 Submit a booking request" data-fillout-button-color="#FF5A5F" data-fillout-button-size="large" data-fillout-button-float="false" data-fillout-slider-direction="right" data-fillout-inherit-parameters data-fillout-popup-size="medium"></div>
             </div>
         </div>
 
-        <div class="booking-panel">
-            <h3>Booking 📅</h3>
-            <p>Submit a booking request in seconds. We’ll confirm quickly.</p>
-            <div data-fillout-id="gq1XFEqEWJus" data-fillout-embed-type="slider" data-fillout-button-text="Submit a booking request" data-fillout-button-color="#FF5A5F" data-fillout-button-size="large" data-fillout-button-float="false" data-fillout-slider-direction="right" data-fillout-inherit-parameters data-fillout-popup-size="medium"></div>
+        <div class="sidebar-section">
+            <h3>Highlights</h3>
+            <div class="features-compact">
+                <span class="feature-tag">Fast replies</span>
+                <span class="feature-tag">Move‑in clarity</span>
+                <span class="feature-tag">Real photos</span>
+                <span class="feature-tag">Berlin Lichtenrade</span>
+            </div>
         </div>
-    </section>
+    </div>
 
-    <section class="panel chat-panel">
+    <div class="chat-container">
         <div class="chat-header">
-            <div class="chat-avatar"><img src="assets/chat-bot-image.png" alt="Sara"></div>
-            <div class="chat-title">
-                <h2>Chat with Sara</h2>
-                <p>Ask anything about rooms, availability, or move‑in.</p>
+            <div class="chat-header-avatar"><img src="assets/chat-bot-image.png" alt="Sara"></div>
+            <div class="chat-header-text">
+                <h2>Sara from Homelyo</h2>
+                <p>🟢 Online • Ready to assist you</p>
             </div>
         </div>
-        <div class="chat-frame">
-            <iframe src="https://www.homelyo.eu/assistant/" title="Homelyo Assistant"></iframe>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="intro-message">
+                <div class="intro-content">
+                    <div class="intro-video">
+                        <div class="video-wrapper" id="videoWrapper">
+                            <video id="welcomeVideo" muted preload="metadata">
+                                <source src="assets/welcome.mp4" type="video/mp4">
+                            </video>
+                            <div class="video-play-overlay" id="playOverlay">
+                                <div class="play-btn">▶</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="intro-text">
+                        <h3>👋 Hello! I'm Sara</h3>
+                        <p>Your personal assistant at Homelyo.</p>
+                        <p>I can help you with:</p>
+                        <ul>
+                            <li>✓ Room availability (KE1–KE4)</li>
+                            <li>✓ Amenities & facilities</li>
+                            <li>✓ Booking & pricing</li>
+                            <li>✓ Location & transport</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
-    </section>
+
+        <div class="typing-indicator-wrapper">
+            <div class="avatar"><img src="assets/chat-bot-image.png" alt="Sara"></div>
+            <div class="typing-indicator" id="typingIndicator"><span></span><span></span><span></span></div>
+        </div>
+
+        <div class="chat-input-container">
+            <input type="text" id="messageInput" placeholder="Type your message..." autocomplete="off">
+            <button id="sendButton">➤</button>
+        </div>
+    </div>
 </div>
 
 <script src="https://server.fillout.com/embed/v1/"></script>
+<script>
+const WEBHOOK_URL = 'https://assistant-proxy.kylashpriya.workers.dev/';
+
+const chatMessages = document.getElementById('chatMessages');
+const messageInput = document.getElementById('messageInput');
+const sendButton = document.getElementById('sendButton');
+const typingIndicator = document.getElementById('typingIndicator');
+const welcomeVideo = document.getElementById('welcomeVideo');
+const playOverlay = document.getElementById('playOverlay');
+
+playOverlay.addEventListener('click', () => {
+    welcomeVideo.play();
+    playOverlay.style.display = 'none';
+});
+
+sendButton.addEventListener('click', sendMessage);
+messageInput.addEventListener('keypress', e => {
+    if(e.key === 'Enter') sendMessage();
+});
+
+function sendMessage(){
+    const text = messageInput.value.trim();
+    if(!text) return;
+    
+    addMessage(text, 'user');
+    messageInput.value = '';
+    showTyping();
+    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    
+    fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text }),
+        signal: controller.signal
+    })
+    .then(response => {
+        clearTimeout(timeoutId);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        return response.json();
+    })
+    .then(data => {
+        hideTyping();
+        const reply = data.reply || data.response || data.message || 'I received your message. How else can I help you?';
+        addMessage(reply, 'bot');
+    })
+    .catch(err => {
+        clearTimeout(timeoutId);
+        hideTyping();
+        let errorMsg = 'Thanks for your message! '; 
+        if (text.toLowerCase().includes('room') || text.toLowerCase().includes('ke')) {
+            errorMsg += 'Please check our available rooms (KE1–KE4) in the sidebar and submit a booking request directly.';
+        } else {
+            errorMsg += 'Please send your request and we will get back to you soon.';
+        }
+        addMessage(errorMsg, 'bot');
+    });
+}
+
+function addMessage(text, sender){
+    const div = document.createElement('div');
+    div.className = `message ${sender}`;
+    div.textContent = text;
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function showTyping(){
+    typingIndicator.style.display = 'flex';
+}
+function hideTyping(){
+    typingIndicator.style.display = 'none';
+}
+
+hideTyping();
+</script>
 </body>
 </html>
