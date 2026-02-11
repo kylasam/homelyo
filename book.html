@@ -316,7 +316,7 @@ body {
                 <h1 class="hero-title">Book Your Homelyo Room</h1>
                 <p class="hero-subtitle">A modern booking experience with clear steps, a smooth form, and instant follow-up. Submit your request and we’ll confirm within 24 hours.</p>
                 <div style="display:flex; gap:12px; flex-wrap:wrap;">
-                    <div class="btn-secondary"><span>Contact Support</span><span>📧</span></div>
+                    <a class="btn-secondary" href="mailto:support@homelyo.eu"><span>Contact Support</span><span>📧</span></a>
                 </div>
             </div>
         </div>
@@ -390,5 +390,15 @@ body {
     <div>For priority booking support, email <a href="mailto:support@homelyo.eu" style="color:#fff; text-decoration: underline;">support@homelyo.eu</a></div>
     <div style="margin-top:10px;">© 2026 Homelyo (Berlin Lichtenrade co-living)<br><em>All content is provided by the Homelyo (Berlin Lichtenrade co-living) team and is not affiliated with other entities using similar names.</em></div>
 </footer>
+
+<script>
+// Disable right-click on images to reduce direct source access
+window.addEventListener('contextmenu', function (e) {
+    if (e.target && e.target.tagName === 'IMG') {
+        e.preventDefault();
+    }
+});
+</script>
+
 </body>
 </html>
