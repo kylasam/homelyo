@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Homeit - Premium Living in Berlin Lichtenrade</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Inter', sans-serif; background:#0a0a0a; color:white; min-height:100vh; display:flex; justify-content:center; align-items:center; padding:15px; }
+.main-container { display:grid; grid-template-columns:350px 1fr; gap:15px; max-width:1000px; width:100%; max-height:850px; height:95vh; }
+
+/* Sidebar */
+.property-sidebar { background: #1a1a1a; border:1px solid #2a2a2a; border-radius:16px; padding:25px; display:flex; flex-direction:column; gap:20px; overflow-y:auto; }
+.property-sidebar::-webkit-scrollbar { width:6px; }
+.property-sidebar::-webkit-scrollbar-thumb { background:#ff6b9d; border-radius:3px; }
+
+/* Logo Section */
+.logo-section { text-align:center; padding-bottom:15px; border-bottom:1px solid #2a2a2a; }
+.logo-wrapper { width:140px; height:140px; border-radius:50%; overflow:hidden; margin:0 auto 10px; display:flex; align-items:center; justify-content:center; border:2px solid #ff6b9d; background:white; }
+.logo-wrapper img { width:90%; height:auto; object-fit:contain; }
+.location { font-size:12px; color:#ccc; display:flex; justify-content:center; align-items:center; gap:6px; }
+
+/* Sidebar sections */
+.sidebar-section h3 { font-size:14px; font-weight:600; color:#ff6b9d; margin-bottom:12px; }
+.sidebar-section p, .sidebar-section li { font-size:13px; line-height:1.6; color:white; }
+.sidebar-section ul { padding-left:18px; margin-top:6px; }
+
+/* Features - Compact Tag Style */
+.features-compact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.feature-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px;
+    background: linear-gradient(135deg, rgba(255,107,157,0.12) 0%, rgba(196,69,105,0.12) 100%);
+    border: 1px solid rgba(255,107,157,0.25);
+    border-radius: 16px;
+    font-size: 11px;
+    font-weight: 500;
+    color: white;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+.feature-tag:hover {
+    background: linear-gradient(135deg, rgba(255,107,157,0.2) 0%, rgba(196,69,105,0.2) 100%);
+    border-color: rgba(255,107,157,0.4);
+    transform: translateY(-2px);
+}
+
+/* Booking Button Panel */
+.booking-section { display:flex; flex-direction:column; }
+.booking-btn {
+    background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+    border: 2px solid #ff6b9d;
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(255,107,157,0.4);
+}
+.booking-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255,107,157,0.6);
+    border-color: white;
+}
+.booking-btn:active {
+    transform: translateY(0);
+}
+
+
+.available-rooms { 
+    display: grid; 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 8px; 
+}
+.available-rooms a { 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 8px; 
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%); 
+    color: #fff; 
+    border-radius: 12px; 
+    font-size: 13px; 
+    font-weight: 500;
+    text-decoration: none; 
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    border: 2px solid #2a2a2a;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+}
+.available-rooms a:hover { 
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(255,107,157,0.4);
+    border-color: #ff6b9d;
+    background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
+}
+
+/* Room icon at top */
+.room-icon {
+    font-size: 28px;
+    margin-bottom: 4px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+/* Room info section */
+.room-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+}
+
+/* Room header with name and size badge */
+.room-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+}
+.room-name {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: white;
+}
+.room-feature {
+    font-size: 10px;
+    opacity: 0.8;
+    font-weight: 400;
+    text-align: center;
+}
+
+/* Size badges - compact design */
+.room-size-badge {
+    padding: 2px 7px;
+    border-radius: 8px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    min-width: 24px;
+    text-align: center;
+}
+
+/* Special styling for XL room (KE2) */
+.room-xl {
+    border-color: rgba(255,215,0,0.3);
+}
+.room-xl .room-size-badge {
+    background: rgba(255,215,0,0.25);
+    border-color: rgba(255,215,0,0.6);
+    color: #ffd700;
+    box-shadow: 0 0 8px rgba(255,215,0,0.2);
+}
+.room-xl:hover {
+    border-color: #ffd700;
+}
+
+/* L badge slightly prominent */
+.room-lg .room-size-badge {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.4);
+}
+
+/* Standard M and S badges */
+.room-md .room-size-badge {
+    background: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.3);
+}
+.room-sm .room-size-badge {
+    background: rgba(255,255,255,0.12);
+    border-color: rgba(255,255,255,0.25);
+}
+
+/* Chat Container */
+.chat-container { background:#1a1a1a; border:1px solid #2a2a2a; border-radius:16px; display:flex; flex-direction:column; height:100%; position:relative; }
+.chat-header { background:linear-gradient(135deg,#ff6b9d 0%,#c44569 100%); padding:18px 20px; display:flex; align-items:center; gap:12px; border-bottom:1px solid rgba(255,255,255,0.1); border-radius:16px 16px 0 0; }
+.chat-header-avatar { width:70px; height:70px; border-radius:50%; overflow:hidden; border:2px solid white; }
+.chat-header-avatar img { width:100%; height:100%; object-fit:cover; }
+.chat-header-text h2 { font-size:18px; margin:0; }
+.chat-header-text p { font-size:12px; margin-top:3px; opacity:0.9; }
+
+/* Chat messages */
+.chat-messages { flex:1; overflow-y:auto; padding:20px; background:#0f0f0f; }
+.chat-messages::-webkit-scrollbar { width:6px; }
+.chat-messages::-webkit-scrollbar-thumb { background:#ff6b9d; border-radius:3px; }
+
+.message { margin-bottom:16px; display:flex; gap:10px; align-items:flex-start; animation:slideIn 0.3s ease; }
+@keyframes slideIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+.message.user { justify-content:flex-end; }
+.message.user .avatar { order:2; }
+.avatar { width:32px; height:32px; border-radius:50%; overflow:hidden; flex-shrink:0; background:#2a2a2a; }
+.avatar img { width:100%; height:100%; object-fit:cover; }
+.message-content { max-width:70%; padding:12px 16px; border-radius:16px; word-wrap:break-word; line-height:1.5; font-size:13px; }
+.message.bot .message-content { background:#1a1a1a; border:1px solid #2a2a2a; }
+.message.user .message-content { background:linear-gradient(135deg,#ff6b9d 0%,#c44569 100%); color:white; }
+
+/* Chat input */
+.chat-input-container { display:flex; gap:10px; padding:15px 20px; border-top:1px solid #2a2a2a; }
+#messageInput { flex:1; padding:12px 16px; border-radius:24px; border:1px solid #2a2a2a; background:#0f0f0f; color:white; font-size:13px; outline:none; transition:border-color 0.3s; }
+#messageInput:focus { border-color:#ff6b9d; }
+#messageInput::placeholder { color:#666; }
+#sendButton { width:40px; height:40px; border-radius:50%; border:none; background:linear-gradient(135deg,#ff6b9d 0%,#c44569 100%); color:white; cursor:pointer; display:flex; justify-content:center; align-items:center; font-size:18px; transition:transform 0.2s; }
+#sendButton:hover { transform:scale(1.05); }
+#sendButton:active { transform:scale(0.95); }
+
+/* Typing indicator */
+.typing-indicator-wrapper { display:flex; gap:10px; align-items:flex-start; padding:0 20px 10px 20px; }
+.typing-indicator { display:none; padding:12px 16px; background:#1a1a1a; border:1px solid #2a2a2a; border-radius:16px; max-width:60px; }
+.typing-indicator.active { display:flex; gap:4px; }
+.typing-indicator span { width:7px; height:7px; background:#ff6b9d; border-radius:50%; animation:bounce 1.4s infinite; }
+.typing-indicator span:nth-child(2){animation-delay:0.2s;}
+.typing-indicator span:nth-child(3){animation-delay:0.4s;}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-6px);}}
+
+/* Intro message with inline video */
+.intro-message { 
+    background: rgba(255,107,157,0.08); 
+    border: 1px solid rgba(255,107,157,0.2); 
+    border-radius: 10px; 
+    padding: 14px; 
+    margin-bottom: 16px; 
+}
+.intro-content {
+    display: flex;
+    gap: 48px;
+    align-items: center;
+}
+.intro-text {
+    flex: 1;
+    min-width: 0;
+}
+.intro-text h3 { 
+    color: #ff6b9d; 
+    margin-bottom: 20px; 
+    font-size: 16px; 
+    line-height: 1.3;
+}
+.intro-text p { 
+    font-size: 13px; 
+    line-height: 1.4; 
+    color: white;
+    margin-bottom: 4px;
+}
+.intro-text p:last-of-type {
+    margin-bottom: 6px;
+}
+.intro-text li { 
+    font-size: 12px; 
+    line-height: 1.5; 
+    color: white; 
+}
+.intro-text ul { 
+    padding-left: 16px; 
+    margin: 0;
+}
+
+/* Compact video player */
+.intro-video {
+    flex-shrink: 0;
+}
+.video-wrapper {
+    width: 200px;
+    height: 200px;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    background: #0a0a0a;
+    border: 2px solid rgba(255,107,157,0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.video-wrapper:hover {
+    border-color: rgba(255,107,157,0.6);
+    transform: scale(1.05);
+}
+.video-wrapper video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.video-play-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.4);
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+.video-wrapper:hover .video-play-overlay {
+    background: rgba(0,0,0,0.5);
+}
+.play-btn {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+    padding-left: 3px;
+    box-shadow: 0 4px 12px rgba(255,107,157,0.5);
+    transition: all 0.3s ease;
+}
+.video-wrapper:hover .play-btn {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(255,107,157,0.7);
+}
+.video-play-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .intro-content {
+        flex-direction: column;
+        gap: 12px;
+    }
+    .intro-text {
+        width: 100%;
+    }
+    .video-wrapper {
+        width: 100%;
+        height: 180px;
+    }
+}
+
+/* Welcome Video Panel - REMOVED OLD STYLES */
+
+@media (max-width:768px){ 
+    .main-container{grid-template-columns:1fr;} 
+    .property-sidebar{display:none;} 
+    .message-content{max-width:80%;} 
+}
+</style>
+</head>
+<body>
+<div class="main-container">
+
+<!-- Sidebar -->
+<div class="property-sidebar">
+    <div class="logo-section">
+        <div class="logo-wrapper">
+            <img src="assets/Homelyo-logo-new.jpg" alt="Homeit Logo">
+        </div>
+        <div class="location">
+            <span>📍</span><span>Lichtenrader Damm, 12305 Berlin</span>
+        </div>
+    </div>
+
+    <div class="sidebar-section">
+        <h3>About</h3>
+        <p>Premium co-living in Berlin's peaceful Lichtenrade district with modern amenities and excellent transport connections.</p>
+    </div>
+
+    <div class="sidebar-section">
+        <h3>Features</h3>
+        <div class="features-compact">
+            <div class="feature-tag">🛏️ Furnished</div>
+            <div class="feature-tag">🌳 Green area</div>
+            <div class="feature-tag">✨ Modern</div>
+            <div class="feature-tag">🚭 No smoking</div>
+            <div class="feature-tag">🐕 Pet-free</div>
+        </div>
+    </div>
+
+    <div class="sidebar-section">
+        <h3>Available Rooms</h3>
+        <div class="available-rooms">
+            <a href="https://www.homelyo.eu/ke2" target="_blank" class="room-btn room-xl">
+                <div class="room-icon">🏠</div>
+                <div class="room-info">
+                    <div class="room-header">
+                        <span class="room-name">KE2</span>
+                        <span class="room-size-badge xl">XL</span>
+                    </div>
+                    <span class="room-feature">🪴 Balcony</span>
+                </div>
+            </a>
+            
+            <a href="https://www.homelyo.eu/ke1" target="_blank" class="room-btn room-lg">
+                <div class="room-icon">🏠</div>
+                <div class="room-info">
+                    <div class="room-header">
+                        <span class="room-name">KE1</span>
+                        <span class="room-size-badge lg">L</span>
+                    </div>
+                    <span class="room-feature">Spacious</span>
+                </div>
+            </a>
+            
+            <a href="https://www.homelyo.eu/ke3" target="_blank" class="room-btn room-md">
+                <div class="room-icon">🛋️</div>
+                <div class="room-info">
+                    <div class="room-header">
+                        <span class="room-name">KE3</span>
+                        <span class="room-size-badge md">M</span>
+                    </div>
+                    <span class="room-feature">Comfortable</span>
+                </div>
+            </a>
+            
+            <a href="https://www.homelyo.eu/ke4" target="_blank" class="room-btn room-sm">
+                <div class="room-icon">💎</div>
+                <div class="room-info">
+                    <div class="room-header">
+                        <span class="room-name">KE4</span>
+                        <span class="room-size-badge sm">S</span>
+                    </div>
+                    <span class="room-feature">Affordable</span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="sidebar-section">
+        <h3>Booking</h3>
+        <div class="booking-section">
+            <a href="https://www.homelyo.eu/contact-us" target="_blank" class="booking-btn">
+                <span>📅</span> Submit a booking request
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Chat -->
+<div class="chat-container">
+    <div class="chat-header">
+        <div class="chat-header-avatar"><img src="assets/chat-bot-image.png" alt="Sara"></div>
+        <div class="chat-header-text">
+            <h2>Sara from Homelyo</h2>
+            <p>🟢 Online • Ready to assist you</p>
+        </div>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+        <div class="intro-message">
+            <div class="intro-content">
+                <div class="intro-video">
+                    <div class="video-wrapper" id="videoWrapper">
+                        <video id="welcomeVideo" muted preload="metadata">
+                            <source src="assets/welcome.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-play-overlay" id="playOverlay">
+                            <div class="play-btn">▶</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="intro-text">
+                    <h3>👋 Hello! I'm Sara</h3>
+                    <p>Your personal assistant at Homelyo.</p>
+                    <p>I can help you with:</p>
+                    <ul>
+                        <li>✓ Room availability (KE1-KE4)</li>
+                        <li>✓ Amenities & facilities</li>
+                        <li>✓ Booking & pricing</li>
+                        <li>✓ Location & transport</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="typing-indicator-wrapper">
+        <div class="avatar"><img src="assets/chat-bot-image.png" alt="Sara"></div>
+        <div class="typing-indicator" id="typingIndicator"><span></span><span></span><span></span></div>
+    </div>
+
+    <div class="chat-input-container">
+        <input type="text" id="messageInput" placeholder="Type your message..." autocomplete="off">
+        <button id="sendButton">➤</button>
+    </div>
+</div>
+
+</div>
+
+<script>
+// N8N webhook (FIXED)
+const WEBHOOK_URL = 'https://assistant-proxy.kylashpriya.workers.dev/';
+
+const chatMessages = document.getElementById('chatMessages');
+const messageInput = document.getElementById('messageInput');
+const sendButton = document.getElementById('sendButton');
+const typingIndicator = document.getElementById('typingIndicator');
+
+sendButton.addEventListener('click', sendMessage);
+messageInput.addEventListener('keypress', e => {
+    if(e.key === 'Enter') sendMessage();
+});
+
+function sendMessage(){
+    const text = messageInput.value.trim();
+    if(!text) return;
+    
+    addMessage(text, 'user');
+    messageInput.value = '';
+    showTyping();
+    
+    // Improved fetch with better error handling and timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    
+    fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: text }),
+        signal: controller.signal
+    })
+    .then(response => {
+        clearTimeout(timeoutId);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        hideTyping();
+        // Check for different possible response formats
+        const reply = data.reply || data.response || data.message || 'I received your message. How else can I help you?';
+        addMessage(reply, 'bot');
+    })
+    .catch(err => {
+        clearTimeout(timeoutId);
+        hideTyping();
+        console.error('Chatbot error:', err);
+        
+        // Provide a helpful fallback response
+        let errorMsg = 'Thanks for your message! ';
+        if (text.toLowerCase().includes('room') || text.toLowerCase().includes('ke')) {
+            errorMsg += 'Please check our available rooms (KE1-KE4) in the sidebar and submit a booking request directly.';
+        } else if (text.toLowerCase().includes('book') || text.toLowerCase().includes('contact')) {
+            errorMsg += 'You can submit a booking request using the link in the sidebar.';
+        } else {
+            errorMsg += 'For immediate assistance, please use the booking link in the sidebar or check our room details above.';
+        }
+        
+        addMessage(errorMsg, 'bot');
+    });
+}
+
+function addMessage(text, sender){
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'message ' + sender;
+    
+    const avatarImg = sender === 'bot' 
+        ? 'assets/chat-bot-image.png'
+        : '';
+    
+    msgDiv.innerHTML = `
+        <div class="avatar"><img src="${avatarImg}" alt="${sender}"></div>
+        <div class="message-content">${text}</div>
+    `;
+    
+    chatMessages.appendChild(msgDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function showTyping(){
+    typingIndicator.classList.add('active');
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function hideTyping(){
+    typingIndicator.classList.remove('active');
+}
+
+// Welcome Video Inline Player
+const videoWrapper = document.getElementById('videoWrapper');
+const welcomeVideo = document.getElementById('welcomeVideo');
+const playOverlay = document.getElementById('playOverlay');
+
+let isPlaying = false;
+
+videoWrapper.addEventListener('click', () => {
+    if (!isPlaying) {
+        welcomeVideo.muted = false;
+        welcomeVideo.play();
+        playOverlay.classList.add('hidden');
+        isPlaying = true;
+    } else {
+        welcomeVideo.pause();
+        playOverlay.classList.remove('hidden');
+        isPlaying = false;
+    }
+});
+
+welcomeVideo.addEventListener('ended', () => {
+    isPlaying = false;
+    playOverlay.classList.remove('hidden');
+    welcomeVideo.currentTime = 0;
+});
+
+// Pause video if user scrolls away
+chatMessages.addEventListener('scroll', () => {
+    if (isPlaying && chatMessages.scrollTop > 100) {
+        welcomeVideo.pause();
+        playOverlay.classList.remove('hidden');
+        isPlaying = false;
+    }
+});
+
+</script>
+</body>
+</html>
