@@ -6,7 +6,7 @@
     name: "Homelyo Assistant",
     primary: "#FF5A5F",
     bubbleIcon: "🤍",
-    iframeUrl: "https://kylasam.github.io/homelyo-chatbot/"
+    iframeUrl: "https://www.homelyo.eu/assistant/"
   };
 
   /* ===============================
