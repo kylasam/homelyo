@@ -608,6 +608,7 @@ body { font-family: 'Inter', sans-serif; background:#0a0a0a; color:white; min-he
 
         <div class="typing-indicator-wrapper">
             <div class="typing-indicator" id="typingIndicator"><span></span><span></span><span></span></div>
+            <span id="typingLabel" style="font-size:12px; color:#aaa; margin-left:8px; display:none;"></span>
         </div>
 
         <div class="chat-input-container">
@@ -628,18 +629,27 @@ const messageInput = document.getElementById('messageInput');
 const typingIndicator = document.getElementById('typingIndicator');
 const welcomeVideo = document.getElementById('welcomeVideo');
 const videoWrapper = document.getElementById('videoWrapper');
+let warmTimer = null;
 
-function addMessage(text, sender){
+function addMessage(text, sender, buttons = []){
     const div = document.createElement('div');
     div.className = `message ${sender}`;
     const userIcon = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%2300A699'/><stop offset='1' stop-color='%23FF5A5F'/></linearGradient></defs><rect width='80' height='80' rx='20' fill='%231a1a1a'/><circle cx='40' cy='40' r='26' fill='url(%23g)'/><text x='40' y='48' font-family='Inter, Arial' font-size='28' font-weight='700' text-anchor='middle' fill='%230a0a0a'>U</text></svg>";
     const avatar = sender === 'bot' ? 'assets/chat-bot-image.png' : userIcon;
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const safeText = sender === 'user' ? text.replace(/\\s+/g, ' ').trim() : text;
+    const safeText = sender === 'user' ? text.replace(/\s+/g, ' ').trim() : text;
+
+    let buttonsHtml = '';
+    if (Array.isArray(buttons) && buttons.length > 0) {
+        buttonsHtml = `<div class="message-buttons" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;">` +
+            buttons.map(b => `<a href="${b.url || '#'}" target="_blank" style="display:inline-block; font-size:12px; font-weight:600; padding:6px 12px; border-radius:8px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; text-decoration:none;">${b.label || 'Learn More'}</a>`).join('') +
+            `</div>`;
+    }
+
     div.innerHTML = `
         <div class="avatar"><img src="${avatar}" alt="${sender}"></div>
         <div>
-            <div class="bubble">${safeText}</div>
+            <div class="bubble">${safeText}${buttonsHtml}</div>
             <div class="meta">${sender === 'bot' ? 'Sara' : 'You'} · ${time}</div>
         </div>
     `;
@@ -647,11 +657,27 @@ function addMessage(text, sender){
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-function showTyping(){
+function showTyping(isWarming = false){
     if (typingIndicator) typingIndicator.style.display = 'flex';
+    const label = document.getElementById('typingLabel');
+    if (label) {
+        if (isWarming) {
+            label.textContent = 'Sara is waking up & preparing your answer...';
+            label.style.display = 'inline';
+        } else {
+            label.textContent = '';
+            label.style.display = 'none';
+        }
+    }
 }
 function hideTyping(){
+    if (warmTimer) { clearTimeout(warmTimer); warmTimer = null; }
     if (typingIndicator) typingIndicator.style.display = 'none';
+    const label = document.getElementById('typingLabel');
+    if (label) {
+        label.textContent = '';
+        label.style.display = 'none';
+    }
 }
 
 window.playIntroVideo = function() {
@@ -676,8 +702,12 @@ window.sendMessage = function(){
     messageInput.value = '';
     showTyping();
     
+    warmTimer = setTimeout(() => {
+        showTyping(true);
+    }, 4500);
+    
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    const timeoutId = setTimeout(() => controller.abort(), 60000);
     
     fetch(WEBHOOK_URL, {
         method: 'POST',
@@ -687,22 +717,24 @@ window.sendMessage = function(){
     })
     .then(response => {
         clearTimeout(timeoutId);
+        hideTyping();
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         return response.json();
     })
     .then(data => {
         hideTyping();
         const reply = data.reply || data.response || data.message || 'I received your message. How else can I help you?';
-        addMessage(reply, 'bot');
+        const buttons = data.buttons || [];
+        addMessage(reply, 'bot', buttons);
     })
     .catch(err => {
         clearTimeout(timeoutId);
         hideTyping();
         let errorMsg = 'Thanks for your message! '; 
-        if (text.toLowerCase().includes('room') || text.toLowerCase().includes('ke')) {
+        if (/\b(room|rooms|ke[1-4]?)\b/i.test(text)) {
             errorMsg += 'Please check our available rooms (KE1–KE4) in the sidebar and submit a booking request directly.';
         } else {
-            errorMsg += 'Please send your request and we will get back to you soon.';
+            errorMsg += 'Sara took a moment to connect. Please try sending your message again, or feel free to submit an inquiry through our booking form.';
         }
         addMessage(errorMsg, 'bot');
     });
