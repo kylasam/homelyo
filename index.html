@@ -1401,11 +1401,11 @@ img {
         <div class="room-selector">
             <div class="room-select-card active" data-room="KE1">
                 <h3>KE1</h3>
-                <p>€656/month</p>
+                <p>€629/month</p>
             </div>
             <div class="room-select-card" data-room="KE2">
                 <h3>KE2</h3>
-                <p>€646/month</p>
+                <p>€649/month</p>
             </div>
             <div class="room-select-card" data-room="KE3">
                 <h3>KE3</h3>
@@ -1463,7 +1463,7 @@ img {
                             <div class="room-size">XL</div>
                         </div>
                         <div class="room-price">
-                            <div class="price-amount">€646</div>
+                            <div class="price-amount">€629</div>
                             <div class="price-period">/month</div>
                         </div>
                     </div>
@@ -1505,7 +1505,7 @@ img {
                             <div class="room-size">L • With balcony</div>
                         </div>
                         <div class="room-price">
-                            <div class="price-amount">€656</div>
+                            <div class="price-amount">€649</div>
                             <div class="price-period">/month</div>
                         </div>
                     </div>
@@ -1780,29 +1780,45 @@ document.querySelectorAll('.room-card, .stat-item, .location-item, .amenity-card
 // Availability System
 let selectedRoom = 'KE1';
 let roomAvailability = {};
-const CSV_URL = 'https://raw.githubusercontent.com/kylasam/homelyo/main/config/availability.csv';
+const CSV_URL = 'config/availability.csv';
+const REMOTE_CSV_URL = 'https://raw.githubusercontent.com/kylasam/homelyo/main/config/availability.csv';
 const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+function parseDate(dateInput) {
+    if (dateInput instanceof Date) return dateInput;
+    const parts = String(dateInput).split('-');
+    if (parts.length === 3) {
+        return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    }
+    return new Date(dateInput);
+}
 
 async function loadAvailabilityData() {
     try {
-        const response = await fetch(CSV_URL);
+        let response;
+        try {
+            response = await fetch(CSV_URL);
+            if (!response.ok) throw new Error('Local CSV not found');
+        } catch (e) {
+            response = await fetch(REMOTE_CSV_URL);
+        }
         const csvText = await response.text();
         const lines = csvText.trim().split('\n');
         
         for (let i = 1; i < lines.length; i++) {
             const [room, freeFrom] = lines[i].split(',').map(s => s.trim());
             if (room && freeFrom) {
-                roomAvailability[room] = new Date(freeFrom);
+                roomAvailability[room] = parseDate(freeFrom);
             }
         }
         generateMonthBlocks();
     } catch (error) {
         console.error('Error loading availability:', error);
         roomAvailability = {
-            'KE1': new Date('2026-05-01'),
-            'KE2': new Date('2026-05-01'),
-            'KE3': new Date('2026-05-01'),
-            'KE4': new Date('2026-07-01')
+            'KE1': parseDate('2026-11-01'),
+            'KE2': parseDate('2026-11-01'),
+            'KE3': parseDate('2027-04-01'),
+            'KE4': parseDate('2027-08-01')
         };
         generateMonthBlocks();
     }
@@ -1810,7 +1826,7 @@ async function loadAvailabilityData() {
 
 function isMonthAvailable(year, month) {
     if (!roomAvailability[selectedRoom]) return false;
-    const freeDate = new Date(roomAvailability[selectedRoom]);
+    const freeDate = parseDate(roomAvailability[selectedRoom]);
     const checkDate = new Date(year, month, 1);
     return checkDate >= new Date(freeDate.getFullYear(), freeDate.getMonth(), 1);
 }
