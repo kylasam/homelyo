@@ -1780,8 +1780,8 @@ document.querySelectorAll('.room-card, .stat-item, .location-item, .amenity-card
 // Availability System
 let selectedRoom = 'KE1';
 let roomAvailability = {};
-const CSV_URL = 'config/availability.csv';
-const REMOTE_CSV_URL = 'https://raw.githubusercontent.com/kylasam/homelyo/main/config/availability.csv';
+const CSV_URL = 'config/availability.csv?v=' + Date.now();
+const REMOTE_CSV_URL = 'https://raw.githubusercontent.com/kylasam/homelyo/main/config/availability.csv?v=' + Date.now();
 const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 function parseDate(dateInput) {
