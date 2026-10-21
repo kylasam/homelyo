@@ -769,6 +769,8 @@ window.sendMessage = function(){
             (data.buttons && data.buttons.some(b => (b.label || '').toLowerCase().includes('booking'))) ||
             reply.toLowerCase().includes('booking form') ||
             reply.toLowerCase().includes('booking request') ||
+            reply.toLowerCase().includes('/book') ||
+            reply.toLowerCase().includes('submit your request') ||
             /\b(i want to book|would like to book|how to book|how do i book|want to rent|like to reserve|apply)\b/i.test(text)
         );
 
