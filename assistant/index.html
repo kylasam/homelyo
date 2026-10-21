@@ -335,6 +335,28 @@ body { font-family: 'Inter', sans-serif; background:#0a0a0a; color:white; min-he
     text-align: right;
 }
 
+.booking-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+    background: linear-gradient(135deg, #ff5a5f 0%, #ff6b9d 100%);
+    border: none;
+    border-radius: 12px;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(255,90,95,0.4);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.booking-cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255,90,95,0.6);
+}
+
 .chat-input-container { display:flex; gap:10px; padding:15px 20px; border-top:1px solid #2a2a2a; }
 .chat-input-container input { flex:1; background:#1a1a1a; border:1px solid #2a2a2a; border-radius:10px; padding:10px; color:white; }
 .chat-input-container button {
@@ -631,6 +653,17 @@ const welcomeVideo = document.getElementById('welcomeVideo');
 const videoWrapper = document.getElementById('videoWrapper');
 let warmTimer = null;
 
+window.openBookingSlider = function(event) {
+    if (event && event.preventDefault) event.preventDefault();
+    const filloutBtn = document.querySelector('[data-fillout-id="gq1XFEqEWJus"] button') || 
+                       document.querySelector('[data-fillout-id="gq1XFEqEWJus"]');
+    if (filloutBtn) {
+        filloutBtn.click();
+    } else {
+        window.open('https://forms.fillout.com/t/gq1XFEqEWJus', '_blank');
+    }
+};
+
 function addMessage(text, sender, buttons = []){
     const div = document.createElement('div');
     div.className = `message ${sender}`;
@@ -640,9 +673,15 @@ function addMessage(text, sender, buttons = []){
     const safeText = sender === 'user' ? text.replace(/\s+/g, ' ').trim() : text;
 
     let buttonsHtml = '';
-    if (Array.isArray(buttons) && buttons.length > 0) {
-        buttonsHtml = `<div class="message-buttons" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;">` +
-            buttons.map(b => `<a href="${b.url || '#'}" target="_blank" style="display:inline-block; font-size:12px; font-weight:600; padding:6px 12px; border-radius:8px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; text-decoration:none;">${b.label || 'Learn More'}</a>`).join('') +
+    // Only display booking button when user expresses booking intent
+    const bookingButtons = (Array.isArray(buttons) ? buttons : []).filter(b => {
+        const lbl = (b.label || '').toLowerCase();
+        return lbl.includes('booking') || lbl.includes('book') || b.action === 'open_form';
+    });
+
+    if (bookingButtons.length > 0) {
+        buttonsHtml = `<div class="message-buttons" style="margin-top:10px;">` +
+            `<button type="button" class="booking-cta-btn" onclick="openBookingSlider(event)">📅 Submit a booking request</button>` +
             `</div>`;
     }
 
@@ -724,19 +763,32 @@ window.sendMessage = function(){
     .then(data => {
         hideTyping();
         const reply = data.reply || data.response || data.message || 'I received your message. How else can I help you?';
-        const buttons = data.buttons || [];
+        
+        const isBooking = Boolean(
+            data.trigger_form ||
+            (data.buttons && data.buttons.some(b => (b.label || '').toLowerCase().includes('booking'))) ||
+            reply.toLowerCase().includes('booking form') ||
+            reply.toLowerCase().includes('booking request') ||
+            /\b(i want to book|would like to book|how to book|how do i book|want to rent|like to reserve|apply)\b/i.test(text)
+        );
+
+        const buttons = isBooking ? [{ label: '📅 Submit a booking request', action: 'open_form' }] : [];
         addMessage(reply, 'bot', buttons);
     })
     .catch(err => {
         clearTimeout(timeoutId);
         hideTyping();
+        const isBooking = /\b(i want to book|would like to book|how to book|how do i book|want to rent|like to reserve|apply)\b/i.test(text);
         let errorMsg = 'Thanks for your message! '; 
-        if (/\b(room|rooms|ke[1-4]?)\b/i.test(text)) {
-            errorMsg += 'Please check our available rooms (KE1–KE4) in the sidebar and submit a booking request directly.';
+        if (isBooking) {
+            errorMsg += 'You can submit your booking request directly using the button below:';
+        } else if (/\b(room|rooms|ke[1-4]?)\b/i.test(text)) {
+            errorMsg += 'Please check our available rooms (KE1–KE4) in the sidebar.';
         } else {
-            errorMsg += 'Sara took a moment to connect. Please try sending your message again, or feel free to submit an inquiry through our booking form.';
+            errorMsg += 'Sara took a moment to connect. Please try sending your message again.';
         }
-        addMessage(errorMsg, 'bot');
+        const buttons = isBooking ? [{ label: '📅 Submit a booking request', action: 'open_form' }] : [];
+        addMessage(errorMsg, 'bot', buttons);
     });
 };
 
