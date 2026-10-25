@@ -169,11 +169,13 @@ Shared areas for joint use include: Fully equipped kitchen (fridge/freezer, indu
 <tr>
 <td class="de">
 1. Das Mietverhältnis beginnt am <strong>{start_date}</strong> und endet am <strong>{end_date}</strong>.<br><br>
-2. Die Vermietung erfolgt zum <strong>vorübergehenden Gebrauch</strong> gemäß § 549 Abs. 2 Nr. 1 BGB (befristeter Aufenthalt zu Studien-, Praktikums- oder Erwerbszwecken in Berlin).
+2. Die Vermietung erfolgt zum <strong>vorübergehenden Gebrauch</strong> gemäß § 549 Abs. 2 Nr. 1 BGB (befristeter Aufenthalt zu Studien-, Praktikums- oder Erwerbszwecken in Berlin).<br><br>
+3. <strong>Vertragsverlängerung, Kündigungsfrist & Mietdauer:</strong> Im Falle einer einvernehmlichen Vertragsverlängerung gilt eine zwingende Kündigungsfrist von <strong>3 Monaten</strong> zum Monatsende (schriftlich bis zum 3. Werktag des Monats). Der Mieter verpflichtet sich, die verlängerte Mietzeit vollumfänglich zu erfüllen bzw. die Mietverpflichtungen bis zum regulären Ablauf der 3-monatigen Kündigungsfrist uneingeschränkt zu bedienen.
 </td>
 <td class="en">
 1. The tenancy begins on <strong>{start_date}</strong> and ends on <strong>{end_date}</strong>.<br><br>
-2. The lease is explicitly concluded for <strong>temporary use</strong> pursuant to Section 549 (2) No. 1 German Civil Code (BGB) for academic, internship, or professional stay in Berlin.
+2. The lease is explicitly concluded for <strong>temporary use</strong> pursuant to Section 549 (2) No. 1 German Civil Code (BGB) for academic, internship, or professional stay in Berlin.<br><br>
+3. <strong>Lease Extension, Notice Period & Tenancy Fulfillment:</strong> In the event of a mutual contract extension, a mandatory notice period of <strong>3 months</strong> to the end of the month applies (in writing by the 3rd business day of the month). The tenant is obligated to serve the full extended tenancy term and fulfill all rental obligations in full through the completion of the mandatory 3-month notice period.
 </td>
 </tr>
 </table>
