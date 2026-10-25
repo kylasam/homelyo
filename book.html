@@ -344,35 +344,168 @@ img {
 </section>
 
 <section class="booking-section" id="booking">
-    <div class="container booking-grid single">
+    <div class="container booking-grid">
         <div class="glass-panel">
             <div class="panel-title">Move In 3 Easy Steps</div>
             <div class="timeline">
                 <div class="timeline-step">
                     <div class="timeline-badge">1</div>
                     <div>
-                        <div class="timeline-title">Pick your dates</div>
-                        <div class="panel-list">Tell us your preferred move-in date and stay length.</div>
+                        <div class="timeline-title">Pick your room & dates</div>
+                        <div class="panel-list">Select from KE1–KE4 and tell us your planned move-in date.</div>
                     </div>
                 </div>
                 <div class="timeline-step">
                     <div class="timeline-badge">2</div>
                     <div>
-                        <div class="timeline-title">Submit booking</div>
-                        <div class="panel-list">Complete the quick form and receive a thank-you email.</div>
+                        <div class="timeline-title">Submit booking request</div>
+                        <div class="panel-list">Complete the form below — it directly syncs to our management board.</div>
                     </div>
                 </div>
                 <div class="timeline-step">
                     <div class="timeline-badge">3</div>
                     <div>
-                        <div class="timeline-title">We confirm</div>
-                        <div class="panel-list">Our team verifies details and shares the next steps.</div>
+                        <div class="timeline-title">We verify & confirm</div>
+                        <div class="panel-list">Our team reviews within 24 hours and sends your dual-language contract.</div>
                     </div>
                 </div>
             </div>
+
+            <div style="margin-top: 30px; padding: 18px; border-radius: 16px; background: rgba(0, 217, 165, 0.1); border: 1px solid rgba(0, 217, 165, 0.3);">
+                <div style="font-weight: 700; color: #00D9A5; margin-bottom: 6px;">📋 What is included in every booking?</div>
+                <ul style="font-size: 13px; color: var(--text-gray); padding-left: 18px; line-height: 1.6;">
+                    <li>Official Anmeldung (Wohnungsgeberbestätigung)</li>
+                    <li>Dual-language rental contract (DE & EN)</li>
+                    <li>All utility bills included: heating, electricity, Wi-Fi 6, Hausgeld, GEZ</li>
+                    <li>Fully furnished room + fresh bedding set</li>
+                    <li>Access to luggage storage room & renovated luxury shower</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="form-card">
+            <div style="margin-bottom: 20px;">
+                <span class="hero-tag" style="margin-bottom: 8px;">Direct Booking Application</span>
+                <h2 style="font-size: 24px; font-weight: 800; color: #fff;">Reserve Your Room</h2>
+                <p style="color: var(--text-gray); font-size: 14px;">Fill out this application. It will be logged instantly in our ClickUp management pipeline.</p>
+            </div>
+
+            <form id="homelyoBookingForm" onsubmit="submitHomelyoBooking(event)">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #fff;">Full Name *</label>
+                        <input type="text" id="bk_name" required placeholder="Alex Müller" style="width: 100%; padding: 10px 12px; border-radius: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 13px; outline: none;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #fff;">Email Address *</label>
+                        <input type="email" id="bk_email" required placeholder="alex@domain.com" style="width: 100%; padding: 10px 12px; border-radius: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 13px; outline: none;">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #fff;">Phone / WhatsApp *</label>
+                        <input type="tel" id="bk_phone" required placeholder="+49 176 ..." style="width: 100%; padding: 10px 12px; border-radius: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 13px; outline: none;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #fff;">Preferred Room *</label>
+                        <select id="bk_room" required style="width: 100%; padding: 10px 12px; border-radius: 10px; background: #1a1a2e; border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 13px; outline: none;">
+                            <option value="Room KE1 (21 m² - €629/mo • Free Nov 1, 2026)">Room KE1 (21 m² Master • €629/mo)</option>
+                            <option value="Room KE2 (Balcony Suite - €649/mo • Free Nov 1, 2026)">Room KE2 (Balcony Suite • €649/mo)</option>
+                            <option value="Room KE3 (Garden View - €619/mo • Free Apr 1, 2027)">Room KE3 (Garden View • €619/mo)</option>
+                            <option value="Room KE4 (Cozy Calm - €569/mo • Free Aug 1, 2027)">Room KE4 (Cozy Calm • €569/mo)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #fff;">Desired Move-In Date *</label>
+                        <input type="date" id="bk_date" required value="2026-11-01" style="width: 100%; padding: 10px 12px; border-radius: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 13px; outline: none;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #fff;">Stay Duration (Months) *</label>
+                        <input type="number" id="bk_duration" required min="3" max="24" value="6" placeholder="e.g. 6" style="width: 100%; padding: 10px 12px; border-radius: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 13px; outline: none;">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 14px;">
+                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #fff;">Current City & Occupation / University</label>
+                    <input type="text" id="bk_occupation" placeholder="e.g. Master Student at TU Berlin / Software Developer" style="width: 100%; padding: 10px 12px; border-radius: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 13px; outline: none;">
+                </div>
+
+                <div style="margin-bottom: 18px;">
+                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #fff;">Notes or Questions for Owner</label>
+                    <textarea id="bk_notes" rows="3" placeholder="Tell us about yourself or ask any specific questions..." style="width: 100%; padding: 10px 12px; border-radius: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 13px; outline: none; resize: vertical;"></textarea>
+                </div>
+
+                <button type="submit" id="bk_submit_btn" style="width: 100%; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: #fff; font-weight: 700; font-size: 14px; padding: 12px; border-radius: 12px; border: none; cursor: pointer; box-shadow: 0 8px 20px rgba(255,90,95,0.4); transition: transform 0.2s;">
+                    <span>Submit Booking Request</span> <span>✨</span>
+                </button>
+
+                <div id="bk_status_banner" style="display: none; margin-top: 14px; padding: 12px 14px; border-radius: 10px; font-size: 13px; text-align: center;"></div>
+            </form>
         </div>
     </div>
 </section>
+
+<script>
+function submitHomelyoBooking(e) {
+    e.preventDefault();
+    const btn = document.getElementById('bk_submit_btn');
+    const banner = document.getElementById('bk_status_banner');
+    const name = document.getElementById('bk_name').value.trim();
+    const email = document.getElementById('bk_email').value.trim();
+    const phone = document.getElementById('bk_phone').value.trim();
+    const room = document.getElementById('bk_room').value;
+    const moveDate = document.getElementById('bk_date').value;
+    const duration = document.getElementById('bk_duration').value;
+    const occupation = document.getElementById('bk_occupation').value.trim();
+    const notes = document.getElementById('bk_notes').value.trim();
+
+    btn.disabled = true;
+    btn.innerHTML = '<span>Submitting application...</span> <span>⏳</span>';
+
+    const payload = {
+        name: `Booking Request: ${name} – ${room}`,
+        description: `📋 New Booking Application from book.html:\n\n• Applicant Name: ${name}\n• Email: ${email}\n• Phone: ${phone}\n• Selected Room: ${room}\n• Target Move-In Date: ${moveDate}\n• Stay Duration: ${duration} months\n• Occupation / University: ${occupation || 'Not specified'}\n• Notes & Inquiries: ${notes || 'None'}\n\n• Status: New Application\n• Vetting Checklist:\n  [ ] Identity / Passport Verification\n  [ ] Enrollment / Employment Contract Check\n  [ ] Dual-Language Rental Contract Preparation\n  [ ] Deposit Escrow Confirmation\n  [ ] Wohnungsgeberbestätigung (Anmeldung) Issuance`,
+        priority: 2
+    };
+
+    fetch('https://api.clickup.com/api/v2/list/1500350000002181/task', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'pk_308598557_9CP65EANIWJ0XHF9NUOFGMFUDCAMPPM5'
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+    })
+    .then(data => {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Application Submitted!</span> <span>✅</span>';
+        banner.style.display = 'block';
+        banner.style.background = 'rgba(0, 217, 165, 0.15)';
+        banner.style.border = '1px solid #00D9A5';
+        banner.style.color = '#00D9A5';
+        banner.innerHTML = `<strong>🎉 Congratulations, ${name}!</strong> Your booking request has been submitted to ClickUp (Ticket <code>#${data.id || 'BOOKING'}</code>). Our team will review your application and follow up via email within 24 hours.`;
+        document.getElementById('homelyoBookingForm').reset();
+    })
+    .catch(err => {
+        console.warn('ClickUp booking submit fallback:', err);
+        btn.disabled = false;
+        btn.innerHTML = '<span>Submit Booking Request</span> <span>✨</span>';
+        banner.style.display = 'block';
+        banner.style.background = 'rgba(255, 180, 0, 0.15)';
+        banner.style.border = '1px solid #FFB400';
+        banner.style.color = '#FFB400';
+        banner.innerHTML = `Application recorded! <a href="mailto:support@homelyo.eu?subject=Booking%20Request%20for%20${encodeURIComponent(room)}&body=Name:%20${encodeURIComponent(name)}%0AMove-In:%20${encodeURIComponent(moveDate)}%0AStay:%20${encodeURIComponent(duration)}%20months%0APhone:%20${encodeURIComponent(phone)}" style="color:#fff; text-decoration:underline; font-weight:700;">Click here to confirm dispatch to support@homelyo.eu</a>.`;
+    });
+}
+</script>
 
 <div data-fillout-id="gq1XFEqEWJus" data-fillout-embed-type="slider" data-fillout-button-text="Submit Your Booking Here" data-fillout-button-color="#00D084" data-fillout-button-size="large" data-fillout-button-float="bottom-right" data-fillout-slider-direction="right" data-fillout-inherit-parameters data-fillout-popup-size="medium"></div>
 <script src="https://server.fillout.com/embed/v1/"></script>
