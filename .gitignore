@@ -1,0 +1,11 @@
+# Ignore local backups and large JSON dumps
+backup/
+*.json
+!package.json
+!manifest.json
+!composer.json
+!docs/*.json
+*.docx
+__pycache__/
+*.pyc
+.DS_Store

@@ -1,0 +1,107 @@
+{
+  "name": "Homelyo - Autonomous Tenant Onboarding & Contract Generation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "homelyo/tenant-onboard",
+        "options": {}
+      },
+      "id": "1",
+      "name": "Fillout / Zite Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "homelyo-tenant-onboard"
+    },
+    {
+      "parameters": {
+        "jsCode": "const root = $input.first().json;\n\nfunction collectNamedArrays(value, found = []) {\n  if (!value || typeof value !== 'object') return found;\n  if (Array.isArray(value.questions)) found.push(value.questions);\n  if (Array.isArray(value.urlParameters)) found.push(value.urlParameters);\n  if (Array.isArray(value.calculations)) found.push(value.calculations);\n  if (Array.isArray(value)) {\n    for (const item of value) collectNamedArrays(item, found);\n  } else {\n    for (const item of Object.values(value)) collectNamedArrays(item, found);\n  }\n  return found;\n}\n\nconst fields = {};\nfor (const list of collectNamedArrays(root)) {\n  for (const item of list) {\n    if (!item || !item.name) continue;\n    fields[String(item.name).trim().toLowerCase()] = item.value ?? '';\n  }\n}\nif (Object.keys(fields).length === 0 && typeof root === 'object') {\n  for (const [k, v] of Object.entries(root)) {\n    fields[String(k).trim().toLowerCase()] = v;\n  }\n}\n\nfunction pick(...keys) {\n  for (const key of keys) {\n    const kLow = key.toLowerCase();\n    for (const [fk, fv] of Object.entries(fields)) {\n      if (fk.includes(kLow) && fv) return String(fv).trim();\n    }\n  }\n  return '';\n}\n\nconst name = pick('full name', 'applicant name', 'name') || 'Guest Tenant';\nconst email = pick('email address', 'email') || 'support@homelyo.eu';\nconst phone = pick('phone', 'whatsapp') || '';\nconst rawRoom = pick('selected room', 'room preference', 'room') || 'KE1';\nconst roomMatch = rawRoom.match(/KE[1-4]/i);\nconst room = roomMatch ? roomMatch[0].toUpperCase() : 'KE1';\n\nconst startDate = pick('target move-in', 'move-in date', 'start date', 'start') || '2026-11-01';\nconst durationMonths = parseInt(pick('stay length', 'duration', 'months') || '6', 10);\n\nconst rentMap = { KE1: 629, KE2: 649, KE3: 619, KE4: 569 };\nconst depositMap = { KE1: 1258, KE2: 1298, KE3: 1238, KE4: 1138 };\n\nreturn [{\n  json: {\n    name,\n    email,\n    phone,\n    room,\n    start_date: startDate,\n    duration_months: durationMonths,\n    rent_amount: rentMap[room] || 629,\n    deposit_amount: depositMap[room] || 1258,\n    source: 'Zite / Fillout Form gq1XFEqEWJus'\n  }\n}];"
+      },
+      "id": "2",
+      "name": "Parse Form Submission",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.clickup.com/api/v2/list/1500350000002181/task",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "pk_308598557_9CP65EANIWJ0XHF9NUOFGMFUDCAMPPM5"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  name: '📋 [NEW APPLICATION] ' + $json.name + ' (' + $json.room + ')',\n  markdown_description: '### 📥 Inbound Booking Request from Fillout Form\\n* **Applicant:** ' + $json.name + '\\n* **Email:** ' + $json.email + '\\n* **Phone:** ' + $json.phone + '\\n* **Room:** ' + $json.room + '\\n* **Move-In:** ' + $json.start_date + '\\n* **Duration:** ' + $json.duration_months + ' months\\n* **Warm Rent:** €' + $json.rent_amount + '/mo\\n* **Deposit:** €' + $json.deposit_amount + '\\n\\nAutonomous folder & contract generation pipeline triggered.',\n  status: 'to do'\n}) }}",
+        "options": {}
+      },
+      "id": "3",
+      "name": "Create ClickUp Booking Task",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [700, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({\n  status: 'SUCCESS',\n  message: 'Booking application received and contract pipeline initiated.',\n  applicant: $json.name,\n  room: $json.room,\n  start_date: $json.start_date\n}) }}",
+        "options": {}
+      },
+      "id": "4",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [920, 300]
+    }
+  ],
+  "connections": {
+    "Fillout / Zite Webhook": {
+      "main": [
+        [
+          {
+            "node": "Parse Form Submission",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Form Submission": {
+      "main": [
+        [
+          {
+            "node": "Create ClickUp Booking Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create ClickUp Booking Task": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Kolkata"
+  }
+}
