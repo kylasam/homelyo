@@ -61,6 +61,8 @@ cockpit_md = """# 🚀 Homelyo Executive Cockpit — Quick Glance
 * 📊 [Looker Studio Report #1: Financial Overview & Balance Sheet](https://datastudio.google.com/u/0/reporting/49f8c6ad-5e9c-4265-931b-719c67611274/page/p_wmttjabrxd)
 * 📈 [Looker Studio Report #2: Revenue Streams & Tenant Billings](https://datastudio.google.com/u/0/reporting/469f33c1-f0d1-4175-bc04-8d180a088760)
 * 🎯 [Looker Studio Report #3: Occupancy & Operations KPIs](https://datastudio.google.com/u/0/reporting/012f2dfd-e933-4f6b-b34b-72ff0730a672/page/K22jF)
+* 📑 [Google Sheet: Executive Performance & BI Cockpit Tab](https://docs.google.com/spreadsheets/d/1rs5dXTyA6xQSbqVQ_ofyCAv2eFZ83CrN8sAx5qfbsTk/edit#gid=580764557)
+* 📗 [Google Sheet: Clean Rent Log Sheet](https://docs.google.com/spreadsheets/d/1rs5dXTyA6xQSbqVQ_ofyCAv2eFZ83CrN8sAx5qfbsTk/edit#gid=672895157)
 * 🖥️ [Grafana Cloud Live Monitoring Dashboard](https://kylash.grafana.net/dashboards/f/homelyo-vgwf4nll67lpxuvevxmeog3r1vacdq6z/?orgId=1)
 * 📁 [Google Drive Master Property Documents Vault](https://drive.google.com/drive/u/0/folders/1jVYbBfrm3SHqIou-Xf9iVrYaLsro5X0p)
 * 🌐 [Homelyo Public Live Website](https://www.homelyo.eu/)
