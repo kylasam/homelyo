@@ -637,19 +637,187 @@ body {
     background: linear-gradient(135deg, rgba(35,35,55,0.9) 0%, rgba(35,35,55,0.7) 100%);
     border: 3px solid rgba(255,90,95,0.25);
     border-radius: 35px;
-    padding: 50px;
+    padding: 45px;
     box-shadow: 10px 10px 0px rgba(255,90,95,0.15);
+}
+
+.calendar-nav-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 25px;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.year-display-wrap {
+    text-align: center;
+    flex: 1;
+    min-width: 200px;
 }
 
 .year-display {
     text-align: center;
     font-size: 42px;
     font-weight: 800;
-    margin-bottom: 45px;
+    margin-bottom: 4px;
     background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    line-height: 1.1;
+}
+
+.calendar-window-tag {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.75);
+    letter-spacing: 0.3px;
+}
+
+.cal-nav-btn {
+    background: linear-gradient(135deg, rgba(255,90,95,0.2) 0%, rgba(255,180,0,0.15) 100%);
+    color: #ffffff;
+    border: 2px solid rgba(255,90,95,0.45);
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 4px 4px 0px rgba(255,90,95,0.25);
+    user-select: none;
+    font-family: inherit;
+}
+
+.cal-nav-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    border-color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 6px 6px 0px rgba(255,90,95,0.4);
+}
+
+.cal-nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    border-color: rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05);
+    box-shadow: none;
+    transform: none;
+}
+
+.calendar-room-summary {
+    margin-bottom: 30px;
+}
+
+.calendar-room-summary .summary-card {
+    background: rgba(20,20,35,0.85);
+    border: 2px solid rgba(255,180,0,0.35);
+    border-radius: 20px;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    flex-wrap: wrap;
+    box-shadow: 6px 6px 0px rgba(0,0,0,0.25);
+}
+
+.summary-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.summary-room-tag {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 14px;
+    padding: 6px 14px;
+    border-radius: 12px;
+    letter-spacing: 0.5px;
+}
+
+.summary-status-text {
+    font-size: 15px;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+.summary-status-text strong {
+    color: #FFB400;
+}
+
+.summary-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.summary-free-badge {
+    background: rgba(0,217,165,0.2);
+    border: 1px solid rgba(0,217,165,0.5);
+    color: #00D9A5;
+    padding: 6px 14px;
+    border-radius: 15px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.summary-cta-btn {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    color: #ffffff !important;
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 13px;
+    text-decoration: none;
+    box-shadow: 3px 3px 0px rgba(255,90,95,0.3);
+    transition: all 0.2s ease;
+    display: inline-block;
+}
+
+.summary-cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 5px 5px 0px rgba(255,90,95,0.5);
+}
+
+.month-block .month-sublabel {
+    font-size: 11px;
+    margin-top: 4px;
+    opacity: 0.85;
+}
+
+.month-block.past {
+    opacity: 0.45;
+    background: rgba(20,20,35,0.5);
+    border-color: rgba(255,255,255,0.15);
+    cursor: default;
+}
+
+.month-block.past .month-name,
+.month-block.past .month-label,
+.month-block.past .month-status {
+    color: rgba(255,255,255,0.5);
+}
+
+.month-block.out-of-window {
+    opacity: 0.35;
+    background: rgba(20,20,35,0.4);
+    border-color: rgba(255,255,255,0.1);
+    cursor: not-allowed;
+}
+
+.month-block.out-of-window .month-name,
+.month-block.out-of-window .month-label,
+.month-block.out-of-window .month-status {
+    color: rgba(255,255,255,0.4);
 }
 
 .months-grid {
@@ -1187,6 +1355,28 @@ body {
         height: 35px;
         font-size: 16px;
     }
+    .calendar-nav-bar {
+        justify-content: center;
+        gap: 12px;
+    }
+    .year-display {
+        font-size: 34px;
+    }
+    .cal-nav-btn {
+        padding: 9px 16px;
+        font-size: 13px;
+    }
+    .calendar-wrapper {
+        padding: 30px 16px;
+    }
+    .summary-card {
+        padding: 14px 16px;
+    }
+    .summary-left, .summary-right {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
 }
 
 img {
@@ -1355,29 +1545,35 @@ img {
         </div>
         <div class="testimonials-grid">
             <div class="testimonial-card">
-                <div class="testimonial-title">5.0/5 Tenant Love</div>
-                <div class="testimonial-subtitle">Highlights from recent residents</div>
+                <div class="testimonial-title">⭐ 5.0/5 — Naeem Ullah Khan</div>
+                <div class="testimonial-subtitle">Verified Resident · Lichtenrader Damm (Nov 2025 – Apr 2026)</div>
                 <div class="rating-list">
-                    <div class="rating-row"><span>Communication</span><span class="rating-score">5.0/5</span></div>
-                    <div class="rating-row"><span>Move-in process</span><span class="rating-score">5.0/5</span></div>
-                    <div class="rating-row"><span>Listing accuracy</span><span class="rating-score">5.0/5</span></div>
+                    <div class="rating-row"><span>Listing Accuracy</span><span class="rating-score">5.0/5</span></div>
+                    <div class="rating-row"><span>Move-in Process</span><span class="rating-score">5.0/5</span></div>
+                    <div class="rating-row"><span>Landlord & Communication</span><span class="rating-score">5.0/5</span></div>
                 </div>
                 <div class="testimonial-comment">
-                    “Met him in person on the day of move in… very nice and amazing person. Both for me and my girlfriend.” 
+                    “It was EXACTLY how it looked in the pictures. I was amazed. I had horrible experiences with properties from here. This was a pleasant change. Went above and beyond to accommodate my early move in. Both me and my girlfriend love the property, and our roommates and landlord both are very nice people so far. So we are happy.”
                 </div>
             </div>
             <div class="testimonial-card">
-                <div class="testimonial-title">Calm, Connected Living</div>
-                <div class="testimonial-subtitle">Neighborhood & property feedback</div>
+                <div class="testimonial-title">⭐ 5.0/5 — Thiruvikkiraman Pandurangan</div>
+                <div class="testimonial-subtitle">Verified Resident · Lichtenrader Damm (Apr 2025 – Oct 2025)</div>
                 <div class="rating-list">
-                    <div class="rating-row"><span>Cleanliness</span><span class="rating-score">5.0/5</span></div>
-                    <div class="rating-row"><span>Amenities</span><span class="rating-score">5.0/5</span></div>
-                    <div class="rating-row"><span>Location</span><span class="rating-score">5.0/5</span></div>
+                    <div class="rating-row"><span>Cleanliness & Amenities</span><span class="rating-score">5.0/5</span></div>
+                    <div class="rating-row"><span>Furniture & Comfort</span><span class="rating-score">5.0/5</span></div>
+                    <div class="rating-row"><span>Location & Transport</span><span class="rating-score">5.0/5</span></div>
                 </div>
                 <div class="testimonial-comment">
-                    “A little bit out of the city, but very calm… supermarkets and restaurants nearby. Everything fine!”
+                    “A little bit out of the city. But, very calm to live and work. Almost everything nearby supermarkets and restaurants. Neighbours very friendly and prompt response from the landlord. Everything fine! Thank you!!”
                 </div>
             </div>
+        </div>
+        <div style="text-align: center; margin-top: 25px;">
+            <a href="https://housinganywhere.com/my/tenant-reviews" target="_blank" rel="noopener noreferrer" class="btn-secondary" style="font-size:14px; padding:10px 24px; border-radius:24px; display:inline-flex; align-items:center; gap:8px;">
+                <span>⭐</span>
+                <span>View Verified Reviews on HousingAnywhere</span>
+            </a>
         </div>
     </div>
 </section>
@@ -1392,7 +1588,7 @@ img {
         <div class="section-header">
             <div class="section-tag">🗓️ Live Availability</div>
             <h2 class="section-title">When Can You Move In?</h2>
-            <p class="section-subtitle">Select a room to see month-by-month availability for 2026</p>
+            <p class="section-subtitle">Select a room to see live month-by-month availability and booking schedule up to 1 year ahead</p>
             <div style="text-align: center; margin-top: 18px; padding: 14px 30px; background: linear-gradient(135deg, rgba(255,90,95,0.18) 0%, rgba(255,180,0,0.12) 100%); border: 3px solid rgba(255,90,95,0.35); border-radius: 30px; display: inline-block; box-shadow: 5px 5px 0px rgba(255,90,95,0.25);">
                 <span style="font-size: 15px; font-weight: 600; color: var(--primary);">⏱️ Minimum booking: 6 months</span>
             </div>
@@ -1402,7 +1598,7 @@ img {
         <div class="room-selector">
             <div class="room-select-card active" data-room="KE1">
                 <h3>KE1</h3>
-                <p>€629/month</p>
+                <p>€609/month</p>
             </div>
             <div class="room-select-card" data-room="KE2">
                 <h3>KE2</h3>
@@ -1418,12 +1614,30 @@ img {
             </div>
         </div>
 
-        <!-- Simplified Month Calendar -->
+        <!-- Simplified Month Calendar with Next/Prev Page (1-Year Rolling Horizon) -->
         <div class="calendar-wrapper">
-            <div class="year-display" id="yearDisplay">2026</div>
+            <div class="calendar-nav-bar">
+                <button type="button" class="cal-nav-btn" id="calPrevBtn" aria-label="Previous Year" disabled>
+                    <span>‹</span> Prev Year
+                </button>
+                <div class="year-display-wrap">
+                    <div class="year-display" id="yearDisplay">2026</div>
+                    <div class="calendar-window-tag" id="calWindowTag">Showing 2026 • Rolling 1-Year Horizon</div>
+                </div>
+                <button type="button" class="cal-nav-btn" id="calNextBtn" aria-label="Next Year">
+                    Next Year <span>›</span>
+                </button>
+            </div>
+
+            <!-- Dynamic Room Booking Summary Banner -->
+            <div class="calendar-room-summary" id="calRoomSummary">
+                <!-- Populated dynamically by JS -->
+            </div>
+
             <div class="months-grid" id="monthsGrid">
                 <!-- Months will be generated here -->
             </div>
+
             <div class="availability-legend">
                 <div class="legend-item">
                     <div class="legend-dot available"></div>
@@ -1432,6 +1646,10 @@ img {
                 <div class="legend-item">
                     <div class="legend-dot booked"></div>
                     <span>Already Booked</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: rgba(255,255,255,0.25); border: 2px solid rgba(255,255,255,0.45);"></div>
+                    <span>Opens Later (&gt; 1 yr)</span>
                 </div>
             </div>
         </div>
@@ -1464,7 +1682,7 @@ img {
                             <div class="room-size">XL</div>
                         </div>
                         <div class="room-price">
-                            <div class="price-amount">€629</div>
+                            <div class="price-amount">€609</div>
                             <div class="price-period">/month</div>
                         </div>
                     </div>
@@ -1784,6 +2002,17 @@ let roomAvailability = {};
 const CSV_URL = 'config/availability.csv?v=' + Date.now();
 const REMOTE_CSV_URL = 'https://raw.githubusercontent.com/kylasam/homelyo/main/config/availability.csv?v=' + Date.now();
 const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const fullMonthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+const todayNow = new Date();
+const currentBaseYear = todayNow.getFullYear();
+const currentBaseMonth = todayNow.getMonth(); // 0-11
+
+// Rolling 1-year horizon: up to 12 months from current date month
+const maxRollingDate = new Date(currentBaseYear, currentBaseMonth + 12, 1);
+const minViewYear = currentBaseYear;
+const maxViewYear = maxRollingDate.getFullYear();
+let currentViewYear = currentBaseYear;
 
 function parseDate(dateInput) {
     if (dateInput instanceof Date) return dateInput;
@@ -1792,6 +2021,92 @@ function parseDate(dateInput) {
         return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
     }
     return new Date(dateInput);
+}
+
+function formatDateDisplay(d) {
+    if (!d || isNaN(d.getTime())) return '';
+    return `${fullMonthNames[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+}
+
+function getDayBefore(d) {
+    const prev = new Date(d.getTime());
+    prev.setDate(prev.getDate() - 1);
+    return prev;
+}
+
+function updateRoomSummary() {
+    const summaryContainer = document.getElementById('calRoomSummary');
+    if (!summaryContainer) return;
+    
+    const freeDate = roomAvailability[selectedRoom] ? parseDate(roomAvailability[selectedRoom]) : null;
+    const startOfCurrentMonth = new Date(currentBaseYear, currentBaseMonth, 1);
+    
+    let html = '';
+    if (!freeDate) {
+        html = `
+            <div class="summary-card">
+                <div class="summary-left">
+                    <span class="summary-room-tag">Room ${selectedRoom}</span>
+                    <span class="summary-status-text">Checking live booking schedule...</span>
+                </div>
+            </div>
+        `;
+    } else if (freeDate <= startOfCurrentMonth) {
+        html = `
+            <div class="summary-card">
+                <div class="summary-left">
+                    <span class="summary-room-tag">Room ${selectedRoom}</span>
+                    <span class="summary-status-text">✨ <strong>Ready for Immediate Move-in!</strong></span>
+                </div>
+                <div class="summary-right">
+                    <span class="summary-free-badge">🌿 Move-in from: <strong>${formatDateDisplay(freeDate)}</strong></span>
+                    <a href="https://www.homelyo.eu/bookings" target="_blank" rel="noopener noreferrer" class="summary-cta-btn">Book Room ${selectedRoom}</a>
+                </div>
+            </div>
+        `;
+    } else {
+        const bookedThroughDate = getDayBefore(freeDate);
+        html = `
+            <div class="summary-card">
+                <div class="summary-left">
+                    <span class="summary-room-tag">Room ${selectedRoom}</span>
+                    <span class="summary-status-text">🔒 Booked through <strong>${formatDateDisplay(bookedThroughDate)}</strong></span>
+                </div>
+                <div class="summary-right">
+                    <span class="summary-free-badge">🌿 Next Available: <strong>${formatDateDisplay(freeDate)}</strong></span>
+                    <a href="https://www.homelyo.eu/bookings" target="_blank" rel="noopener noreferrer" class="summary-cta-btn">Reserve from ${monthNames[freeDate.getMonth()]} ${freeDate.getFullYear()}</a>
+                </div>
+            </div>
+        `;
+    }
+    summaryContainer.innerHTML = html;
+}
+
+function updateCalendarNav() {
+    const yearDisplay = document.getElementById('yearDisplay');
+    const calPrevBtn = document.getElementById('calPrevBtn');
+    const calNextBtn = document.getElementById('calNextBtn');
+    const calWindowTag = document.getElementById('calWindowTag');
+    
+    if (yearDisplay) yearDisplay.textContent = currentViewYear;
+    
+    if (calPrevBtn) {
+        calPrevBtn.disabled = (currentViewYear <= minViewYear);
+        calPrevBtn.title = currentViewYear <= minViewYear ? 'You are at current year' : `View ${currentViewYear - 1}`;
+    }
+    
+    if (calNextBtn) {
+        calNextBtn.disabled = (currentViewYear >= maxViewYear);
+        calNextBtn.title = currentViewYear >= maxViewYear ? 'Calendar view limited to 1 year ahead' : `View ${currentViewYear + 1}`;
+    }
+    
+    if (calWindowTag) {
+        const startLabel = `${monthNames[currentBaseMonth]} ${currentBaseYear}`;
+        const endMonth = maxRollingDate.getMonth();
+        const endYear = maxRollingDate.getFullYear();
+        const endLabel = `${monthNames[endMonth]} ${endYear}`;
+        calWindowTag.textContent = `Showing ${currentViewYear} • Rolling 1-Year Horizon (${startLabel} – ${endLabel})`;
+    }
 }
 
 async function loadAvailabilityData() {
@@ -1834,24 +2149,63 @@ function isMonthAvailable(year, month) {
 
 function generateMonthBlocks() {
     const monthsGrid = document.getElementById('monthsGrid');
+    if (!monthsGrid) return;
     monthsGrid.innerHTML = '';
-    const year = 2026;
+    
+    updateCalendarNav();
+    updateRoomSummary();
+    
+    const startOfCurrentMonth = new Date(currentBaseYear, currentBaseMonth, 1);
     
     for (let month = 0; month < 12; month++) {
-        const isAvailable = isMonthAvailable(year, month);
+        const checkDate = new Date(currentViewYear, month, 1);
+        const isPastMonth = checkDate < startOfCurrentMonth;
+        const isBeyondWindow = checkDate > maxRollingDate;
+        const isAvailable = !isPastMonth && !isBeyondWindow && isMonthAvailable(currentViewYear, month);
+        
         const monthBlock = document.createElement('div');
-        monthBlock.className = `month-block ${isAvailable ? 'available' : 'booked'}`;
-        monthBlock.innerHTML = `
-            <div class="month-name">${monthNames[month]}</div>
-            <div class="month-status">${isAvailable ? '✓' : '✗'}</div>
-            <div class="month-label">${isAvailable ? 'FREE' : 'BOOKED'}</div>
-        `;
-        if (isAvailable) {
+        
+        if (isBeyondWindow) {
+            monthBlock.className = 'month-block out-of-window';
+            monthBlock.title = 'Booking window opens 1 year in advance';
+            monthBlock.innerHTML = `
+                <div class="month-name">${monthNames[month]} ${currentViewYear}</div>
+                <div class="month-status">—</div>
+                <div class="month-label">LATER</div>
+                <div class="month-sublabel">&gt; 1 yr ahead</div>
+            `;
+        } else if (isPastMonth) {
+            monthBlock.className = 'month-block past';
+            monthBlock.innerHTML = `
+                <div class="month-name">${monthNames[month]} ${currentViewYear}</div>
+                <div class="month-status">—</div>
+                <div class="month-label">PAST</div>
+                <div class="month-sublabel">Completed</div>
+            `;
+        } else if (isAvailable) {
+            monthBlock.className = 'month-block available';
+            monthBlock.title = `Click to book Room ${selectedRoom} for ${monthNames[month]} ${currentViewYear}`;
+            monthBlock.innerHTML = `
+                <div class="month-name">${monthNames[month]} ${currentViewYear}</div>
+                <div class="month-status">✓</div>
+                <div class="month-label">FREE</div>
+                <div class="month-sublabel">Move-in Ready</div>
+            `;
             monthBlock.style.cursor = 'pointer';
             monthBlock.addEventListener('click', () => {
                 window.open('https://www.homelyo.eu/bookings', '_blank', 'noopener,noreferrer');
             });
+        } else {
+            monthBlock.className = 'month-block booked';
+            monthBlock.title = `Room ${selectedRoom} is booked for ${monthNames[month]} ${currentViewYear}`;
+            monthBlock.innerHTML = `
+                <div class="month-name">${monthNames[month]} ${currentViewYear}</div>
+                <div class="month-status">✗</div>
+                <div class="month-label">BOOKED</div>
+                <div class="month-sublabel">Occupied</div>
+            `;
         }
+        
         monthsGrid.appendChild(monthBlock);
     }
 }
@@ -1865,6 +2219,28 @@ document.querySelectorAll('.room-select-card').forEach(card => {
         generateMonthBlocks();
     });
 });
+
+// Calendar Page Navigation Events
+const calPrevBtn = document.getElementById('calPrevBtn');
+const calNextBtn = document.getElementById('calNextBtn');
+
+if (calPrevBtn) {
+    calPrevBtn.addEventListener('click', () => {
+        if (currentViewYear > minViewYear) {
+            currentViewYear--;
+            generateMonthBlocks();
+        }
+    });
+}
+
+if (calNextBtn) {
+    calNextBtn.addEventListener('click', () => {
+        if (currentViewYear < maxViewYear) {
+            currentViewYear++;
+            generateMonthBlocks();
+        }
+    });
+}
 
 // Carousel
 const carousels = {};
