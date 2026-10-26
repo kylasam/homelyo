@@ -2205,6 +2205,7 @@ document.querySelectorAll('.room-select-card').forEach(card => {
         document.querySelectorAll('.room-select-card').forEach(c => c.classList.remove('active'));
         card.classList.add('active');
         selectedRoom = card.dataset.room;
+        currentViewYear = currentBaseYear; // Reset calendar year back to base year on room change
         generateMonthBlocks();
     });
 });
