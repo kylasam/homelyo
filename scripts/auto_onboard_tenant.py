@@ -19,7 +19,9 @@ import subprocess
 # Configuration & Constants
 PARENT_FOLDER_ID = "1jVYbBfrm3SHqIou-Xf9iVrYaLsro5X0p"  # Master Property Folder
 TEMPLATE_FOLDER_ID = "16gimsgZ5BaVDk766sMDAuZWJcKJtKdqe"  # Template Folder
-SPREADSHEET_ID = "1gcQ4nv-lu8j3Kt3mNoFx11W7jkU0Umu1Ee2C2wM6Nvw"  # Master Fillout Spreadsheet
+MASTER_BI_SPREADSHEET_ID = "1rs5dXTyA6xQSbqVQ_ofyCAv2eFZ83CrN8sAx5qfbsTk"  # Looker Studio DataStudio Backend
+FILLOUT_SPREADSHEET_ID = "1gcQ4nv-lu8j3Kt3mNoFx11W7jkU0Umu1Ee2C2wM6Nvw"  # Fillout Inquiries Sheet
+SPREADSHEET_ID = MASTER_BI_SPREADSHEET_ID
 
 CLICKUP_TOKEN = "pk_105682594_CCTOZ8K23KHPSAY3JQTVV1G23QTN63IG"
 CLICKUP_HEADERS = {"Authorization": CLICKUP_TOKEN, "Content-Type": "application/json"}
