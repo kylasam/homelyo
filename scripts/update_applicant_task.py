@@ -1,7 +1,7 @@
 import urllib.request
 import json
 
-TOKEN = 'pk_308598557_9CP65EANIWJ0XHF9NUOFGMFUDCAMPPM5'
+TOKEN = 'pk_105682594_CCTOZ8K23KHPSAY3JQTVV1G23QTN63IG'
 HEADERS = {'Authorization': TOKEN, 'Content-Type': 'application/json'}
 
 desc = """### 📋 Homelyo Inbound Booking Request & Tenant Onboarding Dossier
@@ -76,20 +76,20 @@ payload = {
 }
 
 req = urllib.request.Request(
-    'https://api.clickup.com/api/v2/task/1amhxucnauh',
+    'https://api.clickup.com/api/v2/task/1ampw4tj1tz',
     data=json.dumps(payload).encode('utf-8'),
     headers=HEADERS,
     method='PUT'
 )
 with urllib.request.urlopen(req) as resp:
-    print('Updated task 1amhxucnauh status:', resp.status)
+    print('Updated task 1ampw4tj1tz status:', resp.status)
 
 comment_payload = {
     'comment_text': '✉️ Prepared Email Draft for Document Vetting added to task description. Google Drive folder, dual-language contract (Google Doc & PDF), and Google Sheet have been generated.',
     'notify_all': False
 }
 req2 = urllib.request.Request(
-    'https://api.clickup.com/api/v2/task/1amhxucnauh/comment',
+    'https://api.clickup.com/api/v2/task/1ampw4tj1tz/comment',
     data=json.dumps(comment_payload).encode('utf-8'),
     headers=HEADERS,
     method='POST'
