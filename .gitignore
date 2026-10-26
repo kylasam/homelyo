@@ -6,6 +6,12 @@ backup/
 !composer.json
 !docs/*.json
 *.docx
+!template_contract.docx
+contracts_generated/
 __pycache__/
 *.pyc
 .DS_Store
+
+# Environment variables & secrets
+.env*
+

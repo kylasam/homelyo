@@ -54,7 +54,7 @@ def main():
                     "parameters": [
                         {
                             "name": "Authorization",
-                            "value": "pk_105682594_CCTOZ8K23KHPSAY3JQTVV1G23QTN63IG"
+                            "value": "pk_314452952_6STD829UQJXD0ROPHUVS41YXEPHXUIE2"
                         },
                         {
                             "name": "Content-Type",
@@ -82,7 +82,7 @@ def main():
                     "parameters": [
                         {
                             "name": "Authorization",
-                            "value": "pk_105682594_CCTOZ8K23KHPSAY3JQTVV1G23QTN63IG"
+                            "value": "pk_314452952_6STD829UQJXD0ROPHUVS41YXEPHXUIE2"
                         },
                         {
                             "name": "Content-Type",

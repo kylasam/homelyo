@@ -23,7 +23,7 @@ MASTER_BI_SPREADSHEET_ID = "1rs5dXTyA6xQSbqVQ_ofyCAv2eFZ83CrN8sAx5qfbsTk"  # Loo
 FILLOUT_SPREADSHEET_ID = "1gcQ4nv-lu8j3Kt3mNoFx11W7jkU0Umu1Ee2C2wM6Nvw"  # Fillout Inquiries Sheet
 SPREADSHEET_ID = MASTER_BI_SPREADSHEET_ID
 
-CLICKUP_TOKEN = "pk_105682594_CCTOZ8K23KHPSAY3JQTVV1G23QTN63IG"
+CLICKUP_TOKEN = "pk_314452952_6STD829UQJXD0ROPHUVS41YXEPHXUIE2"
 CLICKUP_HEADERS = {"Authorization": CLICKUP_TOKEN, "Content-Type": "application/json"}
 LIST_TENANTS = "1500520000038641"  # Tenants & Room Occupancy (Homelyo Workspace)
 LIST_INQUIRIES = "1500520000038640"  # Booking Requests & Tenant Inquiries (Homelyo Workspace)
@@ -104,165 +104,53 @@ def copy_drive_file(token, file_id, new_name, target_folder_id):
     with urllib.request.urlopen(req) as resp:
         return json.loads(resp.read().decode())
 
+from build_contract_templates import (
+    render_contract_data,
+    render_contract_docx,
+    render_contract_html,
+    DOCX_TEMPLATE_PATH,
+    HTML_TEMPLATE_PATH
+)
+
 def generate_contract_html(tenant_name, tenant_email, tenant_phone, room_code, start_date, end_date, rent_amount, deposit_amount):
-    spec = ROOM_SPECS.get(room_code, ROOM_SPECS["KE1"])
-    room_title = spec["title"]
-    room_size = spec["size"]
-    today_str = datetime.date.today().strftime("%d. %B %Y")
-    
-    html = f"""<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<style>
-body {{ font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.5; color: #1a1a1a; margin: 40px; font-size: 11pt; }}
-h1 {{ text-align: center; font-size: 16pt; color: #0d3b66; margin-bottom: 4px; text-transform: uppercase; }}
-h2 {{ text-align: center; font-size: 13pt; color: #555; margin-top: 0; margin-bottom: 25px; }}
-h3 {{ font-size: 12pt; color: #0d3b66; border-bottom: 1.5px solid #0d3b66; padding-bottom: 4px; margin-top: 24px; }}
-.party-box {{ display: flex; justify-content: space-between; background: #f8f9fa; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 20px; }}
-.party-col {{ width: 48%; }}
-.bilingual-table {{ width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 16px; }}
-.bilingual-table td {{ width: 50%; vertical-align: top; padding: 6px 12px; font-size: 10pt; line-height: 1.45; }}
-.de {{ border-right: 1px solid #cbd5e1; padding-right: 14px; background: #fafbfc; }}
-.en {{ padding-left: 14px; color: #2d3748; }}
-.highlight {{ font-weight: bold; color: #0d3b66; }}
-.signatures {{ margin-top: 40px; display: flex; justify-content: space-between; }}
-.sig-box {{ width: 45%; border-top: 1px solid #000; padding-top: 8px; text-align: center; font-size: 10pt; }}
-</style>
-</head>
-<body>
+    """
+    Renders the official bilingual Homelyo Rental Contract in HTML format
+    with embedded Homelyo logo and exact clause layout.
+    """
+    tenant_dict = render_contract_data(
+        tenant_name, tenant_email, tenant_phone, room_code, start_date, end_date, rent_amount, deposit_amount
+    )
+    return render_contract_html(tenant_dict)
 
-<h1>Wohnraummietvertrag für WG-Zimmer</h1>
-<h2>Co-Living Room Tenancy Agreement</h2>
+def upload_contract_to_drive(token, folder_id, doc_name, tenant_name, tenant_email, tenant_phone, room_code, start_date, end_date, rent_amount, deposit_amount):
+    """
+    Renders the master templated contract (with Homelyo logo, tables & AGB),
+    uploads as a native Google Doc, exports as official PDF, and uploads DOCX to tenant folder.
+    """
+    tenant_dict = render_contract_data(
+        tenant_name, tenant_email, tenant_phone, room_code, start_date, end_date, rent_amount, deposit_amount
+    )
+    temp_docx_path = f"/tmp/{doc_name}.docx"
+    render_contract_docx(tenant_dict, temp_docx_path)
 
-<div class="party-box">
-    <div class="party-col">
-        <strong>Vermieter / Landlord:</strong><br>
-        Kylasam Nallagoundanpalayam Arruchamy<br>
-        Lichtenrader Damm 80, 12305 Berlin, Deutschland<br>
-        Email: support@homelyo.eu | Tel: +49 176 8332 9439<br>
-        Web: www.homelyo.eu
-    </div>
-    <div class="party-col">
-        <strong>Mieter / Tenant:</strong><br>
-        <strong>{tenant_name}</strong><br>
-        Email: {tenant_email}<br>
-        Telefon: {tenant_phone or 'Auf Anfrage / On file'}<br>
-        Mietobjekt: Zimmer {room_code} (1. OG rechts)
-    </div>
-</div>
+    with open(temp_docx_path, "rb") as f:
+        docx_bytes = f.read()
 
-<h3>§ 1 Mietgegenstand / Rented Property</h3>
-<table class="bilingual-table">
-<tr>
-<td class="de">
-Vermietet wird das möblierte Zimmer <strong>{room_code} ({room_title})</strong> mit ca. <strong>{room_size} m²</strong> Wohnfläche in der Wohnung Lichtenrader Damm 80, 12305 Berlin (1. Obergeschoss rechts).<br><br>
-Zur Mitbenutzung stehen zur Verfügung: Voll ausgestattete Einbauküche (Kühl-Gefrierkombination, Induktionskochfeld, Backofen, Mikrowelle), das renovierte Duschbad/WC, die Diele sowie der separate Gemeinschafts-Gepäckraum.
-</td>
-<td class="en">
-Rented is the fully furnished private bedroom <strong>{room_code} ({room_title})</strong> with approx. <strong>{room_size} m²</strong> floor space in the apartment at Lichtenrader Damm 80, 12305 Berlin (1st floor right).<br><br>
-Shared areas for joint use include: Fully equipped kitchen (fridge/freezer, induction cooktop, oven, microwave), luxury renovated shower/WC, hallway, and dedicated separate common luggage storage room.
-</td>
-</tr>
-</table>
+    boundary = "===============HOMELYO_BOUNDARY=="
 
-<h3>§ 2 Mietzeit & Zweck / Rental Term & Purpose</h3>
-<table class="bilingual-table">
-<tr>
-<td class="de">
-1. Das Mietverhältnis beginnt am <strong>{start_date}</strong> und endet am <strong>{end_date}</strong>.<br><br>
-2. Die Vermietung erfolgt zum <strong>vorübergehenden Gebrauch</strong> gemäß § 549 Abs. 2 Nr. 1 BGB (befristeter Aufenthalt zu Studien-, Praktikums- oder Erwerbszwecken in Berlin).<br><br>
-3. <strong>Vertragsverlängerung, Kündigungsfrist & Mietdauer:</strong> Im Falle einer einvernehmlichen Vertragsverlängerung gilt eine zwingende Kündigungsfrist von <strong>3 Monaten</strong> zum Monatsende (schriftlich bis zum 3. Werktag des Monats). Der Mieter verpflichtet sich, die verlängerte Mietzeit vollumfänglich zu erfüllen bzw. die Mietverpflichtungen bis zum regulären Ablauf der 3-monatigen Kündigungsfrist uneingeschränkt zu bedienen.
-</td>
-<td class="en">
-1. The tenancy begins on <strong>{start_date}</strong> and ends on <strong>{end_date}</strong>.<br><br>
-2. The lease is explicitly concluded for <strong>temporary use</strong> pursuant to Section 549 (2) No. 1 German Civil Code (BGB) for academic, internship, or professional stay in Berlin.<br><br>
-3. <strong>Lease Extension, Notice Period & Tenancy Fulfillment:</strong> In the event of a mutual contract extension, a mandatory notice period of <strong>3 months</strong> to the end of the month applies (in writing by the 3rd business day of the month). The tenant is obligated to serve the full extended tenancy term and fulfill all rental obligations in full through the completion of the mandatory 3-month notice period.
-</td>
-</tr>
-</table>
-
-<h3>§ 3 Miete & Nebenkosten / Rent & Utilities</h3>
-<table class="bilingual-table">
-<tr>
-<td class="de">
-Die monatliche Warmmiete beträgt pauschal <strong>€{rent_amount:,.2f}</strong>.<br><br>
-In der Pauschale sind sämtliche Betriebs- und Nebenkosten enthalten: Heizung, Warm-/Kaltwasser, Strom (100% Ökostrom), Hausgeld, Gebäudeversicherung, GEZ Rundfunkbeitrag sowie Vodafone 1000 Mbit/s Highspeed WLAN (Wi-Fi 6). Eine gesonderte Abrechnung der Nebenkosten findet nicht statt.<br><br>
-Die Miete ist monatlich im Voraus bis spätestens zum 3. Werktag des Monats per SEPA-Überweisung zu entrichten.
-</td>
-<td class="en">
-The monthly all-inclusive warm rent is fixed at <strong>€{rent_amount:,.2f}</strong>.<br><br>
-This flat-rate covers all operational utilities: heating, water, electricity (100% green energy), HOA/Hausgeld, building insurance, mandatory TV/radio tax (GEZ), and 1,000 Mbps Vodafone Wi-Fi 6 Internet. No separate utility reconciliation will occur.<br><br>
-Rent is payable in advance on or before the 3rd business day of each calendar month via SEPA bank transfer.
-</td>
-</tr>
-</table>
-
-<h3>§ 4 Kaution / Security Deposit</h3>
-<table class="bilingual-table">
-<tr>
-<td class="de">
-Der Mieter leistet vor der Schlüsselübergabe eine Kaution in Höhe von <strong>€{deposit_amount:,.2f}</strong>.<br><br>
-Die Kaution wird auf einem separaten Kautionskonto verwahrt und nach ordnungsgemäßer Rückgabe des Zimmers und Unterzeichnung des Auszugsprotokolls innerhalb von maximal 30 Tagen auf das angegebene Konto des Mieters zurücküberwiesen, abzüglich etwaiger Schäden oder offener Forderungen.
-</td>
-<td class="en">
-The tenant pays a security deposit of <strong>€{deposit_amount:,.2f}</strong> prior to key handover.<br><br>
-The deposit is kept in an escrow account and shall be reimbursed to the tenant within 30 days after room handover and sign-off of the exit protocol, less any proven damages, cleaning fees, or outstanding balances.
-</td>
-</tr>
-</table>
-
-<h3>§ 5 Schlüssel & Hausordnung / Keys & House Rules</h3>
-<table class="bilingual-table">
-<tr>
-<td class="de">
-Der Mieter erhält 4 Schlüssel: 1x Hauseingang, 1x Wohnungstür, 1x Zimmertür, 1x Briefkasten.<br><br>
-Die Hausordnung (insb. Ruhezeiten 22:00 – 07:00 Uhr und striktes Rauchverbot in der gesamten Wohnung) ist wesentlicher Bestandteil dieses Vertrages. Eine behördliche Wohnungsgeberbestätigung (Anmeldung) wird unverzüglich nach Einzug ausgestellt.
-</td>
-<td class="en">
-The tenant receives 4 keys: 1x building entrance, 1x apartment door, 1x room door, 1x mailbox.<br><br>
-The House Rules (in particular quiet hours 22:00 – 07:00 and strict non-smoking policy throughout the apartment) form an integral part of this agreement. An official landlord confirmation (Wohnungsgeberbestätigung / Anmeldung) is provided upon move-in.
-</td>
-</tr>
-</table>
-
-<div style="margin-top: 30px; font-size: 10pt;">
-Berlin, den {today_str}
-</div>
-
-<div class="signatures">
-    <div class="sig-box">
-        Kylasam N. A.<br>
-        <strong>Vermieter / Landlord</strong>
-    </div>
-    <div class="sig-box">
-        {tenant_name}<br>
-        <strong>Mieter / Tenant</strong>
-    </div>
-</div>
-
-</body>
-</html>
-"""
-    return html
-
-def upload_contract_to_drive(token, folder_id, doc_name, html_content):
-    # Upload as Google Doc
+    # 1. Upload DOCX and convert to Google Doc
     metadata = {
         "name": doc_name,
         "mimeType": "application/vnd.google-apps.document",
         "parents": [folder_id]
     }
-    boundary = "===============HOMELYO_BOUNDARY=="
     body = (
         f"--{boundary}\r\n"
         f"Content-Type: application/json; charset=UTF-8\r\n\r\n"
         f"{json.dumps(metadata)}\r\n"
         f"--{boundary}\r\n"
-        f"Content-Type: text/html; charset=UTF-8\r\n\r\n"
-        f"{html_content}\r\n"
-        f"--{boundary}--\r\n"
-    ).encode("utf-8")
+        f"Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document\r\n\r\n"
+    ).encode("utf-8") + docx_bytes + f"\r\n--{boundary}--\r\n".encode("utf-8")
 
     req = urllib.request.Request(
         "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
@@ -274,7 +162,7 @@ def upload_contract_to_drive(token, folder_id, doc_name, html_content):
         doc_res = json.loads(resp.read().decode())
         doc_id = doc_res["id"]
 
-    # Export as PDF & upload PDF version to folder
+    # 2. Export converted Google Doc as PDF & upload PDF to folder
     export_url = f"https://www.googleapis.com/drive/v3/files/{doc_id}/export?mimeType=application/pdf"
     exp_req = urllib.request.Request(export_url, headers={"Authorization": f"Bearer {token}"})
     with urllib.request.urlopen(exp_req) as resp:
@@ -303,7 +191,35 @@ def upload_contract_to_drive(token, folder_id, doc_name, html_content):
         pdf_res = json.loads(resp.read().decode())
         pdf_id = pdf_res["id"]
 
-    return doc_id, pdf_id
+    # 3. Upload raw DOCX version to folder for direct Microsoft Word download
+    docx_metadata = {
+        "name": f"{doc_name}.docx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "parents": [folder_id]
+    }
+    docx_body = (
+        f"--{boundary}\r\n"
+        f"Content-Type: application/json; charset=UTF-8\r\n\r\n"
+        f"{json.dumps(docx_metadata)}\r\n"
+        f"--{boundary}\r\n"
+        f"Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document\r\n\r\n"
+    ).encode("utf-8") + docx_bytes + f"\r\n--{boundary}--\r\n".encode("utf-8")
+
+    docx_req = urllib.request.Request(
+        "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
+        data=docx_body,
+        headers={"Authorization": f"Bearer {token}", "Content-Type": f"multipart/related; boundary={boundary}"},
+        method="POST"
+    )
+    docx_id = None
+    try:
+        with urllib.request.urlopen(docx_req) as resp:
+            docx_res = json.loads(resp.read().decode())
+            docx_id = docx_res["id"]
+    except Exception as e:
+        print(f"  ⚠ Notice: Could not upload standalone docx: {e}")
+
+    return doc_id, pdf_id, docx_id
 
 def sync_to_google_sheet(token, tenant_name, tenant_email, room_code, start_date, end_date, rent_amount, deposit_amount, gdrive_folder_url, platform):
     d_start = datetime.datetime.strptime(start_date, "%Y-%m-%d").date()
@@ -522,10 +438,14 @@ def onboard_tenant(name, email, phone, room, start_date, end_date=None, duration
 
     contract_doc_name = f"Rental_Contract_{clean_name}_{room}_{start_tag}_{end_tag}"
     print(f"📝 Generating dual-language rental contract: {contract_doc_name} (€{rent_amount:,.2f}/mo)...")
-    html = generate_contract_html(name, email, phone, room, start_date, end_date, rent_amount, deposit_amount)
-    doc_id, pdf_id = upload_contract_to_drive(token, folder_id, contract_doc_name, html)
+    doc_id, pdf_id, docx_id = upload_contract_to_drive(
+        token, folder_id, contract_doc_name,
+        name, email, phone, room, start_date, end_date, rent_amount, deposit_amount
+    )
     print(f"  ✓ Contract Google Doc ID: {doc_id}")
     print(f"  ✓ Contract PDF ID: {pdf_id}")
+    if docx_id:
+        print(f"  ✓ Contract Word DOCX ID: {docx_id}")
 
     # Step 4: Sync to Google Sheet
     print("📊 Synchronizing Google Sheet (tenant_details & rent_log)...")
@@ -549,6 +469,7 @@ def onboard_tenant(name, email, phone, room, start_date, end_date=None, duration
         "folder_url": folder_url,
         "contract_doc_url": f"https://docs.google.com/document/d/{doc_id}/edit",
         "contract_pdf_url": f"https://drive.google.com/file/d/{pdf_id}/view",
+        "contract_docx_url": f"https://drive.google.com/file/d/{docx_id}/view" if docx_id else None,
         "clickup_task_id": cu_id
     }
     print(f"\n🎉 Onboarding Complete in One Shot!")

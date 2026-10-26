@@ -38,7 +38,7 @@ else if (msgLower.includes("pet") || msgLower.includes("dog") || msgLower.includ
 else if (msgLower.includes("train") || msgLower.includes("bus") || msgLower.includes("station") || msgLower.includes("supermarket")) intent = "location_transit";
 else if (msgLower.includes("washer") || msgLower.includes("wifi") || msgLower.includes("internet") || msgLower.includes("kitchen")) intent = "amenities";
 
-const clickupToken = "pk_105682594_CCTOZ8K23KHPSAY3JQTVV1G23QTN63IG";
+const clickupToken = "pk_314452952_6STD829UQJXD0ROPHUVS41YXEPHXUIE2";
 let parentMessageId = null;
 
 // If this is Turn 2+, check if a parent thread exists for this session in ClickUp

@@ -67,7 +67,7 @@ return [{
         if node["name"] == "Dispatch to Homelyo ClickUp Chat":
             node["parameters"]["url"] = "https://api.clickup.com/api/v3/workspaces/1500520000004763/chat/channels/1ampw4t88mv-92/messages"
             node["parameters"]["headerParameters"]["parameters"] = [
-                {"name": "Authorization", "value": "pk_105682594_CCTOZ8K23KHPSAY3JQTVV1G23QTN63IG"},
+                {"name": "Authorization", "value": "pk_314452952_6STD829UQJXD0ROPHUVS41YXEPHXUIE2"},
                 {"name": "Content-Type", "value": "application/json"},
                 {"name": "accept", "value": "application/json"}
             ]
