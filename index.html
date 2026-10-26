@@ -634,6 +634,57 @@ body {
 .room-select-card.active p {
     color: rgba(255,255,255,0.95);
 }
+.room-avail-tag {
+    margin-top: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 12px;
+    background: rgba(255, 180, 0, 0.18);
+    border: 1px solid rgba(255, 180, 0, 0.45);
+    color: #FFB400;
+    display: inline-block;
+    transition: all 0.25s ease;
+    letter-spacing: 0.2px;
+}
+.room-avail-tag.avail-soon {
+    background: rgba(0, 217, 165, 0.22);
+    border-color: rgba(0, 217, 165, 0.55);
+    color: #00D9A5;
+}
+.room-select-card.active .room-avail-tag {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.6);
+    color: #ffffff;
+}
+
+@keyframes reactiveFadeIn {
+    0% { opacity: 0.25; transform: translateY(4px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+.grid-animate {
+    animation: reactiveFadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.reactive-pulse {
+    animation: reactiveFadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.summary-cta-btn.jump-btn {
+    background: linear-gradient(135deg, rgba(255,180,0,0.3) 0%, rgba(255,90,95,0.3) 100%);
+    border: 1px solid rgba(255,180,0,0.7);
+    color: #ffffff;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 8px 18px;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+}
+.summary-cta-btn.jump-btn:hover {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%);
+    border-color: #ffffff;
+    transform: translateY(-2px);
+}
 
 /* Simplified Month Calendar */
 .calendar-wrapper {
@@ -1599,21 +1650,25 @@ img {
 
         <!-- Room Selector -->
         <div class="room-selector">
-            <div class="room-select-card active" data-room="KE1">
+            <div class="room-select-card active" data-room="KE1" onclick="selectRoom('KE1')">
                 <h3>KE1</h3>
                 <p>€639/month</p>
+                <div class="room-avail-tag" id="availTag-KE1">Next: May 1, 2027</div>
             </div>
-            <div class="room-select-card" data-room="KE2">
+            <div class="room-select-card" data-room="KE2" onclick="selectRoom('KE2')">
                 <h3>KE2</h3>
                 <p>€649/month</p>
+                <div class="room-avail-tag avail-soon" id="availTag-KE2">Next: Nov 1, 2026</div>
             </div>
-            <div class="room-select-card" data-room="KE3">
+            <div class="room-select-card" data-room="KE3" onclick="selectRoom('KE3')">
                 <h3>KE3</h3>
                 <p>€619/month</p>
+                <div class="room-avail-tag" id="availTag-KE3">Next: Apr 1, 2027</div>
             </div>
-            <div class="room-select-card" data-room="KE4">
+            <div class="room-select-card" data-room="KE4" onclick="selectRoom('KE4')">
                 <h3>KE4</h3>
                 <p>€569/month</p>
+                <div class="room-avail-tag" id="availTag-KE4">Next: Aug 1, 2027</div>
             </div>
         </div>
 
@@ -2001,9 +2056,6 @@ document.querySelectorAll('.room-card, .stat-item, .location-item, .amenity-card
 
 // Availability System
 let selectedRoom = 'KE1';
-let roomAvailability = {};
-const CSV_URL = 'config/availability.csv?v=' + Date.now();
-const REMOTE_CSV_URL = 'https://raw.githubusercontent.com/kylasam/homelyo/main/config/availability.csv?v=' + Date.now();
 const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const fullMonthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
@@ -2014,10 +2066,10 @@ const currentBaseMonth = todayNow.getMonth(); // 0-11
 // 2-year horizon: through 2028 fully for all rooms (flexible & long-term stays)
 const minViewYear = currentBaseYear;
 const maxViewYear = 2028;
-const maxRollingDate = new Date(maxViewYear, 11, 31);
 let currentViewYear = currentBaseYear;
 
 function parseDate(dateInput) {
+    if (!dateInput) return null;
     if (dateInput instanceof Date) return dateInput;
     const parts = String(dateInput).split('-');
     if (parts.length === 3) {
@@ -2025,6 +2077,17 @@ function parseDate(dateInput) {
     }
     return new Date(dateInput);
 }
+
+// Synchronous default room availability (instantly reactive without waiting for network)
+let roomAvailability = {
+    'KE1': parseDate('2027-05-01'),
+    'KE2': parseDate('2026-11-01'),
+    'KE3': parseDate('2027-04-01'),
+    'KE4': parseDate('2027-08-01')
+};
+
+const CSV_URL = 'config/availability.csv?v=' + Date.now();
+const REMOTE_CSV_URL = 'https://raw.githubusercontent.com/kylasam/homelyo/main/config/availability.csv?v=' + Date.now();
 
 function formatDateDisplay(d) {
     if (!d || isNaN(d.getTime())) return '';
@@ -2044,44 +2107,99 @@ function updateRoomSummary() {
     const freeDate = roomAvailability[selectedRoom] ? parseDate(roomAvailability[selectedRoom]) : null;
     const startOfCurrentMonth = new Date(currentBaseYear, currentBaseMonth, 1);
     
-    let html = '';
+    // Update the room selector card badges dynamically
+    Object.keys(roomAvailability).forEach(r => {
+        const tagEl = document.getElementById(`availTag-${r}`);
+        if (tagEl && roomAvailability[r]) {
+            const rDate = parseDate(roomAvailability[r]);
+            tagEl.textContent = `Next: ${monthNames[rDate.getMonth()]} 1, ${rDate.getFullYear()}`;
+            if (rDate <= new Date(currentBaseYear, 11, 31)) {
+                tagEl.classList.add('avail-soon');
+            } else {
+                tagEl.classList.remove('avail-soon');
+            }
+        }
+    });
+
     if (!freeDate) {
-        html = `
-            <div class="summary-card">
+        summaryContainer.innerHTML = `
+            <div class="summary-card reactive-pulse">
                 <div class="summary-left">
                     <span class="summary-room-tag">Room ${selectedRoom}</span>
                     <span class="summary-status-text">Checking live booking schedule...</span>
                 </div>
             </div>
         `;
-    } else if (freeDate <= startOfCurrentMonth) {
+        return;
+    }
+
+    const freeYear = freeDate.getFullYear();
+    const freeMonth = freeDate.getMonth();
+    const bookedThroughDate = getDayBefore(freeDate);
+
+    let html = '';
+
+    // Condition 1: Viewing a year AFTER the room becomes free (e.g. 2028 when room is free from 2026 or 2027)
+    if (currentViewYear > freeYear) {
         html = `
-            <div class="summary-card">
+            <div class="summary-card reactive-pulse">
                 <div class="summary-left">
-                    <span class="summary-room-tag">Room ${selectedRoom}</span>
-                    <span class="summary-status-text">✨ <strong>Ready for Immediate Move-in!</strong></span>
+                    <span class="summary-room-tag">Room ${selectedRoom} • ${currentViewYear}</span>
+                    <span class="summary-status-text">✨ <strong>100% Free & Move-in Ready throughout ${currentViewYear}!</strong> (Jan–Dec)</span>
                 </div>
                 <div class="summary-right">
-                    <span class="summary-free-badge">🌿 Move-in from: <strong>${formatDateDisplay(freeDate)}</strong></span>
-                    <a href="https://www.homelyo.eu/bookings" target="_blank" rel="noopener noreferrer" class="summary-cta-btn">Book Room ${selectedRoom}</a>
+                    <span class="summary-free-badge">🌿 12 Months Available in ${currentViewYear}</span>
+                    <a href="https://www.homelyo.eu/bookings" target="_blank" rel="noopener noreferrer" class="summary-cta-btn">Book Room ${selectedRoom} for ${currentViewYear}</a>
                 </div>
             </div>
         `;
-    } else {
-        const bookedThroughDate = getDayBefore(freeDate);
+    } 
+    // Condition 2: Viewing the EXACT year the room transitions to free (e.g. 2027 for KE1, KE3, KE4; 2026 for KE2)
+    else if (currentViewYear === freeYear) {
+        if (freeDate <= startOfCurrentMonth) {
+            html = `
+                <div class="summary-card reactive-pulse">
+                    <div class="summary-left">
+                        <span class="summary-room-tag">Room ${selectedRoom} • ${currentViewYear}</span>
+                        <span class="summary-status-text">✨ <strong>Ready for Immediate Move-in!</strong></span>
+                    </div>
+                    <div class="summary-right">
+                        <span class="summary-free-badge">🌿 Move-in from: <strong>${formatDateDisplay(freeDate)}</strong></span>
+                        <a href="https://www.homelyo.eu/bookings" target="_blank" rel="noopener noreferrer" class="summary-cta-btn">Book Room ${selectedRoom}</a>
+                    </div>
+                </div>
+            `;
+        } else {
+            html = `
+                <div class="summary-card reactive-pulse">
+                    <div class="summary-left">
+                        <span class="summary-room-tag">Room ${selectedRoom} • ${currentViewYear}</span>
+                        <span class="summary-status-text">🔒 Booked through <strong>${formatDateDisplay(bookedThroughDate)}</strong></span>
+                    </div>
+                    <div class="summary-right">
+                        <span class="summary-free-badge">🌿 Next Available: <strong>${formatDateDisplay(freeDate)}</strong></span>
+                        <a href="https://www.homelyo.eu/bookings" target="_blank" rel="noopener noreferrer" class="summary-cta-btn">Reserve from ${monthNames[freeMonth]} ${freeYear}</a>
+                    </div>
+                </div>
+            `;
+        }
+    } 
+    // Condition 3: Viewing a year BEFORE the room becomes free (e.g. viewing 2026 when KE1 is booked until May 2027)
+    else {
         html = `
-            <div class="summary-card">
+            <div class="summary-card reactive-pulse">
                 <div class="summary-left">
-                    <span class="summary-room-tag">Room ${selectedRoom}</span>
-                    <span class="summary-status-text">🔒 Booked through <strong>${formatDateDisplay(bookedThroughDate)}</strong></span>
+                    <span class="summary-room-tag">Room ${selectedRoom} • ${currentViewYear}</span>
+                    <span class="summary-status-text">🔒 <strong>Booked for all remaining ${currentViewYear}</strong> (through ${formatDateDisplay(bookedThroughDate)})</span>
                 </div>
                 <div class="summary-right">
                     <span class="summary-free-badge">🌿 Next Available: <strong>${formatDateDisplay(freeDate)}</strong></span>
-                    <a href="https://www.homelyo.eu/bookings" target="_blank" rel="noopener noreferrer" class="summary-cta-btn">Reserve from ${monthNames[freeDate.getMonth()]} ${freeDate.getFullYear()}</a>
+                    <button type="button" class="summary-cta-btn jump-btn" onclick="jumpToYear(${freeYear})">Jump to ${freeYear} Availability ›</button>
                 </div>
             </div>
         `;
     }
+
     summaryContainer.innerHTML = html;
 }
 
@@ -2128,13 +2246,7 @@ async function loadAvailabilityData() {
         }
         generateMonthBlocks();
     } catch (error) {
-        console.error('Error loading availability:', error);
-        roomAvailability = {
-            'KE1': parseDate('2027-05-01'),
-            'KE2': parseDate('2026-11-01'),
-            'KE3': parseDate('2027-04-01'),
-            'KE4': parseDate('2027-08-01')
-        };
+        console.error('Error loading availability CSV:', error);
         generateMonthBlocks();
     }
 }
@@ -2150,6 +2262,11 @@ function generateMonthBlocks() {
     const monthsGrid = document.getElementById('monthsGrid');
     if (!monthsGrid) return;
     monthsGrid.innerHTML = '';
+    
+    // Trigger smooth fade animation
+    monthsGrid.classList.remove('grid-animate');
+    void monthsGrid.offsetWidth; // trigger reflow
+    monthsGrid.classList.add('grid-animate');
     
     updateCalendarNav();
     updateRoomSummary();
@@ -2199,14 +2316,42 @@ function generateMonthBlocks() {
     }
 }
 
-// Room selection
+// Room Selection Action (Synchronously resets viewing year to base year and re-renders both banner & cards)
+function selectRoom(roomName) {
+    if (!roomName) return;
+    selectedRoom = roomName;
+    
+    document.querySelectorAll('.room-select-card').forEach(c => {
+        if (c.dataset.room === roomName) {
+            c.classList.add('active');
+        } else {
+            c.classList.remove('active');
+        }
+    });
+    
+    // Always reset viewing year back to base year on room change
+    currentViewYear = currentBaseYear;
+    generateMonthBlocks();
+}
+
+// Year Jump Action
+function jumpToYear(targetYear) {
+    const yr = parseInt(targetYear, 10);
+    if (!isNaN(yr) && yr >= minViewYear && yr <= maxViewYear) {
+        currentViewYear = yr;
+        generateMonthBlocks();
+    }
+}
+
+// Global attachments for onclick attributes and external caller resilience
+window.selectRoom = selectRoom;
+window.jumpToYear = jumpToYear;
+window.generateMonthBlocks = generateMonthBlocks;
+
+// Room selection click listeners
 document.querySelectorAll('.room-select-card').forEach(card => {
     card.addEventListener('click', () => {
-        document.querySelectorAll('.room-select-card').forEach(c => c.classList.remove('active'));
-        card.classList.add('active');
-        selectedRoom = card.dataset.room;
-        currentViewYear = currentBaseYear; // Reset calendar year back to base year on room change
-        generateMonthBlocks();
+        selectRoom(card.dataset.room);
     });
 });
 
