@@ -1586,11 +1586,11 @@ img {
         <div class="cartoon-heart" style="position: absolute; top: 15%; left: 10%; font-size: 32px;">💝</div>
         
         <div class="section-header">
-            <div class="section-tag">🗓️ Live Availability</div>
+            <div class="section-tag">🗓️ Live Availability (2-Year Horizon)</div>
             <h2 class="section-title">When Can You Move In?</h2>
-            <p class="section-subtitle">Select a room to see live month-by-month availability and booking schedule up to 1 year ahead</p>
+            <p class="section-subtitle">Select a room to see live month-by-month availability up to 2 years ahead (through 2028) for flexible & long-term stays</p>
             <div style="text-align: center; margin-top: 18px; padding: 14px 30px; background: linear-gradient(135deg, rgba(255,90,95,0.18) 0%, rgba(255,180,0,0.12) 100%); border: 3px solid rgba(255,90,95,0.35); border-radius: 30px; display: inline-block; box-shadow: 5px 5px 0px rgba(255,90,95,0.25);">
-                <span style="font-size: 15px; font-weight: 600; color: var(--primary);">⏱️ Minimum booking: 6 months</span>
+                <span style="font-size: 15px; font-weight: 600; color: var(--primary);">⏱️ Minimum booking: 6 months • Long-term leases up to 2 years welcome</span>
             </div>
         </div>
 
@@ -1614,7 +1614,7 @@ img {
             </div>
         </div>
 
-        <!-- Simplified Month Calendar with Next/Prev Page (1-Year Rolling Horizon) -->
+        <!-- Simplified Month Calendar with Next/Prev Page (2-Year Horizon through 2028) -->
         <div class="calendar-wrapper">
             <div class="calendar-nav-bar">
                 <button type="button" class="cal-nav-btn" id="calPrevBtn" aria-label="Previous Year" disabled>
@@ -1622,7 +1622,7 @@ img {
                 </button>
                 <div class="year-display-wrap">
                     <div class="year-display" id="yearDisplay">2026</div>
-                    <div class="calendar-window-tag" id="calWindowTag">Showing 2026 • Rolling 1-Year Horizon</div>
+                    <div class="calendar-window-tag" id="calWindowTag">Showing 2026 • 2-Year Horizon (2026 – 2028)</div>
                 </div>
                 <button type="button" class="cal-nav-btn" id="calNextBtn" aria-label="Next Year">
                     Next Year <span>›</span>
@@ -1649,7 +1649,7 @@ img {
                 </div>
                 <div class="legend-item">
                     <div class="legend-dot" style="background: rgba(255,255,255,0.25); border: 2px solid rgba(255,255,255,0.45);"></div>
-                    <span>Opens Later (&gt; 1 yr)</span>
+                    <span>Past Months</span>
                 </div>
             </div>
         </div>
@@ -2008,10 +2008,10 @@ const todayNow = new Date();
 const currentBaseYear = todayNow.getFullYear();
 const currentBaseMonth = todayNow.getMonth(); // 0-11
 
-// Rolling 1-year horizon: up to 12 months from current date month
-const maxRollingDate = new Date(currentBaseYear, currentBaseMonth + 12, 1);
+// 2-year horizon: through 2028 fully for all rooms (flexible & long-term stays)
 const minViewYear = currentBaseYear;
-const maxViewYear = maxRollingDate.getFullYear();
+const maxViewYear = 2028;
+const maxRollingDate = new Date(maxViewYear, 11, 31);
 let currentViewYear = currentBaseYear;
 
 function parseDate(dateInput) {
@@ -2097,15 +2097,11 @@ function updateCalendarNav() {
     
     if (calNextBtn) {
         calNextBtn.disabled = (currentViewYear >= maxViewYear);
-        calNextBtn.title = currentViewYear >= maxViewYear ? 'Calendar view limited to 1 year ahead' : `View ${currentViewYear + 1}`;
+        calNextBtn.title = currentViewYear >= maxViewYear ? 'Calendar view available through 2028' : `View ${currentViewYear + 1}`;
     }
     
     if (calWindowTag) {
-        const startLabel = `${monthNames[currentBaseMonth]} ${currentBaseYear}`;
-        const endMonth = maxRollingDate.getMonth();
-        const endYear = maxRollingDate.getFullYear();
-        const endLabel = `${monthNames[endMonth]} ${endYear}`;
-        calWindowTag.textContent = `Showing ${currentViewYear} • Rolling 1-Year Horizon (${startLabel} – ${endLabel})`;
+        calWindowTag.textContent = `Showing ${currentViewYear} • Full 2-Year Horizon (2026 – 2028) • Long-Term Stays Welcome`;
     }
 }
 
@@ -2167,12 +2163,12 @@ function generateMonthBlocks() {
         
         if (isBeyondWindow) {
             monthBlock.className = 'month-block out-of-window';
-            monthBlock.title = 'Booking window opens 1 year in advance';
+            monthBlock.title = 'Booking window opens in the future';
             monthBlock.innerHTML = `
                 <div class="month-name">${monthNames[month]} ${currentViewYear}</div>
                 <div class="month-status">—</div>
                 <div class="month-label">LATER</div>
-                <div class="month-sublabel">&gt; 1 yr ahead</div>
+                <div class="month-sublabel">&gt; 2 yrs ahead</div>
             `;
         } else if (isPastMonth) {
             monthBlock.className = 'month-block past';
