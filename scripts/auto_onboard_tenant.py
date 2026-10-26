@@ -377,6 +377,12 @@ def sync_to_google_sheet(token, tenant_name, tenant_email, room_code, start_date
         pass
 
 def sync_to_clickup(tenant_name, tenant_email, tenant_phone, room_code, start_date, end_date, rent_amount, deposit_amount, gdrive_url, doc_id, pdf_id):
+    # Convert dates to Unix millisecond timestamps for ClickUp Calendar & Timeline view
+    d_start_dt = datetime.datetime.strptime(start_date, "%Y-%m-%d")
+    d_end_dt = datetime.datetime.strptime(end_date, "%Y-%m-%d")
+    start_ts_ms = int(d_start_dt.timestamp() * 1000)
+    due_ts_ms = int(d_end_dt.timestamp() * 1000)
+
     # ClickUp Task in Tenants & Room Occupancy
     desc = f"""### 🏠 New Tenant Onboarding Profile — {tenant_name} ({room_code})
 * **Room:** {room_code} ({ROOM_SPECS.get(room_code, {}).get('title', 'Bedroom')})
@@ -395,17 +401,22 @@ def sync_to_clickup(tenant_name, tenant_email, tenant_phone, room_code, start_da
 ---
 ### ✅ Onboarding Package Included
 * [x] Google Drive dedicated folder created
-* [x] Dual-language German & English Mietvertrag generated
+* [x] Dual-language German & English Mietvertrag generated (with mandatory 3-month notice clause)
 * [x] House Rules (Hausordnung) attached
 * [x] Apartment Handover Protocol (Übergabeprotokoll) prepared
 * [x] Keys Acknowledgment sheet prepared
 * [x] Official Wohnungsgeberbestätigung (Anmeldung) template ready
 * [x] Google Sheet tenant_details & rent_log synchronized
+* [ ] Verify first month rent payout (€{rent_amount:,.2f}) & deposit transfer (€{deposit_amount:,.2f})
+* [ ] Collect signed Mietvertrag from tenant
+* [ ] In-person key handover & initial inspection protocol on {start_date}
 """
     task_payload = {
-        "name": f"🟡 [ACTIVE LEASE] Room {room_code} – {tenant_name}",
+        "name": f"🟡 [OCCUPIED until {d_end_dt.strftime('%b %d, %Y')}] Room {room_code} – {tenant_name} (€{rent_amount:,.0f}/mo)",
         "markdown_description": desc,
-        "status": "occupied (active lease)"
+        "status": "occupied (active lease)",
+        "start_date": start_ts_ms,
+        "due_date": due_ts_ms
     }
     r = urllib.request.Request(
         f"https://api.clickup.com/api/v2/list/{LIST_TENANTS}/task",
@@ -431,7 +442,9 @@ def sync_to_clickup(tenant_name, tenant_email, tenant_phone, room_code, start_da
     settle_payload = {
         "name": f"🔒 [Room {room_code}] {tenant_name} – Deposit €{deposit_amount:,.2f}",
         "markdown_description": settle_desc,
-        "status": "to do"
+        "status": "to do",
+        "start_date": start_ts_ms,
+        "due_date": due_ts_ms
     }
     r2 = urllib.request.Request(
         f"https://api.clickup.com/api/v2/list/{LIST_SETTLEMENT}/task",
@@ -447,7 +460,7 @@ def sync_to_clickup(tenant_name, tenant_email, tenant_phone, room_code, start_da
 
     return task_id
 
-def onboard_tenant(name, email, phone, room, start_date, end_date=None, duration_months=None, platform="Direct / Homelyo Portal"):
+def onboard_tenant(name, email, phone, room, start_date, end_date=None, duration_months=None, platform="Direct / Homelyo Portal", rent_amount=None, deposit_amount=None):
     room = room.upper().strip()
     if room not in ROOM_SPECS:
         raise ValueError(f"Invalid room '{room}'. Must be KE1, KE2, KE3, or KE4.")
@@ -495,10 +508,18 @@ def onboard_tenant(name, email, phone, room, start_date, end_date=None, duration
             print(f"  ⚠ Failed copying {t['name']}: {e}")
 
     # Step 3: Generate Contract
-    rent_amount = ROOM_SPECS[room]["rent"]
-    deposit_amount = ROOM_SPECS[room]["deposit"]
+    if rent_amount is None:
+        rent_amount = ROOM_SPECS[room]["rent"]
+    else:
+        rent_amount = float(rent_amount)
+
+    if deposit_amount is None:
+        deposit_amount = ROOM_SPECS[room]["deposit"]
+    else:
+        deposit_amount = float(deposit_amount)
+
     contract_doc_name = f"Rental_Contract_{clean_name}_{room}_{start_tag}_{end_tag}"
-    print(f"📝 Generating dual-language rental contract: {contract_doc_name}...")
+    print(f"📝 Generating dual-language rental contract: {contract_doc_name} (€{rent_amount:,.2f}/mo)...")
     html = generate_contract_html(name, email, phone, room, start_date, end_date, rent_amount, deposit_amount)
     doc_id, pdf_id = upload_contract_to_drive(token, folder_id, contract_doc_name, html)
     print(f"  ✓ Contract Google Doc ID: {doc_id}")
@@ -541,7 +562,20 @@ if __name__ == "__main__":
     parser.add_argument("--end", default=None, help="End Date (YYYY-MM-DD)")
     parser.add_argument("--duration", type=int, default=None, help="Duration in months (default 6)")
     parser.add_argument("--platform", default="Direct / Homelyo Portal", help="Booking channel")
+    parser.add_argument("--rent", type=float, default=None, help="Monthly warm rent in EUR")
+    parser.add_argument("--deposit", type=float, default=None, help="Security deposit in EUR")
 
     args = parser.parse_args()
-    res = onboard_tenant(args.name, args.email, args.phone, args.room, args.start, args.end, args.duration, args.platform)
+    res = onboard_tenant(
+        name=args.name,
+        email=args.email,
+        phone=args.phone,
+        room=args.room,
+        start_date=args.start,
+        end_date=args.end,
+        duration_months=args.duration,
+        platform=args.platform,
+        rent_amount=args.rent,
+        deposit_amount=args.deposit
+    )
     print(json.dumps(res, indent=2))
