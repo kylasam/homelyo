@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Homelyo - Your Perfect Home in Berlin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2092,16 +2095,16 @@ function updateCalendarNav() {
     
     if (calPrevBtn) {
         calPrevBtn.disabled = (currentViewYear <= minViewYear);
-        calPrevBtn.title = currentViewYear <= minViewYear ? 'You are at current year' : `View ${currentViewYear - 1}`;
+        calPrevBtn.title = currentViewYear <= minViewYear ? 'Viewing current year (2026)' : `View ${currentViewYear - 1}`;
     }
     
     if (calNextBtn) {
         calNextBtn.disabled = (currentViewYear >= maxViewYear);
-        calNextBtn.title = currentViewYear >= maxViewYear ? 'Calendar view available through 2028' : `View ${currentViewYear + 1}`;
+        calNextBtn.title = currentViewYear >= maxViewYear ? 'Calendar view available through December 31, 2028' : `View ${currentViewYear + 1}`;
     }
     
     if (calWindowTag) {
-        calWindowTag.textContent = `Showing ${currentViewYear} • Full 2-Year Horizon (2026 – 2028) • Long-Term Stays Welcome`;
+        calWindowTag.textContent = `Showing ${currentViewYear} • Availability & Booking Open Till Dec 31, 2028`;
     }
 }
 
@@ -2156,21 +2159,11 @@ function generateMonthBlocks() {
     for (let month = 0; month < 12; month++) {
         const checkDate = new Date(currentViewYear, month, 1);
         const isPastMonth = checkDate < startOfCurrentMonth;
-        const isBeyondWindow = checkDate > maxRollingDate;
-        const isAvailable = !isPastMonth && !isBeyondWindow && isMonthAvailable(currentViewYear, month);
+        const isAvailable = !isPastMonth && isMonthAvailable(currentViewYear, month);
         
         const monthBlock = document.createElement('div');
         
-        if (isBeyondWindow) {
-            monthBlock.className = 'month-block out-of-window';
-            monthBlock.title = 'Booking window opens in the future';
-            monthBlock.innerHTML = `
-                <div class="month-name">${monthNames[month]} ${currentViewYear}</div>
-                <div class="month-status">—</div>
-                <div class="month-label">LATER</div>
-                <div class="month-sublabel">&gt; 2 yrs ahead</div>
-            `;
-        } else if (isPastMonth) {
+        if (isPastMonth) {
             monthBlock.className = 'month-block past';
             monthBlock.innerHTML = `
                 <div class="month-name">${monthNames[month]} ${currentViewYear}</div>
@@ -2180,7 +2173,7 @@ function generateMonthBlocks() {
             `;
         } else if (isAvailable) {
             monthBlock.className = 'month-block available';
-            monthBlock.title = `Click to book Room ${selectedRoom} for ${monthNames[month]} ${currentViewYear}`;
+            monthBlock.title = `Click to book Room ${selectedRoom} for ${monthNames[month]} ${currentViewYear} (Available through Dec 31, 2028)`;
             monthBlock.innerHTML = `
                 <div class="month-name">${monthNames[month]} ${currentViewYear}</div>
                 <div class="month-status">✓</div>

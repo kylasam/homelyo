@@ -421,11 +421,11 @@ img {
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
                     <div>
                         <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #fff;">Desired Move-In Date *</label>
-                        <input type="date" id="bk_date" required value="2026-11-01" style="width: 100%; padding: 10px 12px; border-radius: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 13px; outline: none;">
+                        <input type="date" id="bk_date" required value="2026-11-01" min="2026-11-01" max="2028-12-31" style="width: 100%; padding: 10px 12px; border-radius: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 13px; outline: none;">
                     </div>
                     <div>
                         <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #fff;">Stay Duration (Months) *</label>
-                        <input type="number" id="bk_duration" required min="3" max="24" value="6" placeholder="e.g. 6" style="width: 100%; padding: 10px 12px; border-radius: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 13px; outline: none;">
+                        <input type="number" id="bk_duration" required min="3" max="26" value="6" placeholder="e.g. 6 to 26 (through Dec 2028)" style="width: 100%; padding: 10px 12px; border-radius: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 13px; outline: none;">
                     </div>
                 </div>
 
