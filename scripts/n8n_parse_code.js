@@ -83,14 +83,8 @@ To proceed with verifying your booking and preparing your digital tenancy agreem
    • Clear scan or photo of your valid Passport (photo & biographical page).
    • Valid German Visa / Entry Visa (Type D) or German Residence Permit (Aufenthaltstitel).
 
-2. University & Employment Verification:
-   • Official University Admission / Academic Appointment Letter or Employment Contract.
-
-3. Proof of Financial Capability:
-   • Bank statements from the last 3 months, or official stipend / salary disbursement documentation confirming sufficient funds.
-
-4. Emergency Contact Information:
-   • Full name, relationship, contact phone number, and email address of your designated emergency contact.
+2. Proof of Financial Capability:
+   • Bank statements from the last 3 months confirming sufficient funds (or blocked account confirmation).
 
 Room Summary & Financial Overview:
 • Room: ${room} (${roomTitle})
@@ -130,8 +124,7 @@ const markdownDescription = `### 📋 Homelyo Inbound Booking Application Dossie
 ### ✅ Next Steps & Verification Checklist
 - [ ] Identity & Passport Verification
 - [ ] German Visa / Residence Permit Check
-- [ ] University Enrollment / Employment Contract Check
-- [ ] 3 Months Proof of Funds / Stipend Verification
+- [ ] 3 Months Bank Statements / Proof of Funds
 - [ ] Send Prepared Document Request Email Below
 - [ ] Prepare Dual-Language Mietvertrag & Escrow Agreement
 
