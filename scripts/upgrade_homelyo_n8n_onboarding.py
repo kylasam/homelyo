@@ -48,13 +48,13 @@ def main():
         {
             "parameters": {
                 "method": "POST",
-                "url": "https://api.clickup.com/api/v2/list/1500350000002181/task",
+                "url": "https://api.clickup.com/api/v2/list/1500520000038640/task",
                 "sendHeaders": True,
                 "headerParameters": {
                     "parameters": [
                         {
                             "name": "Authorization",
-                            "value": "pk_308598557_9CP65EANIWJ0XHF9NUOFGMFUDCAMPPM5"
+                            "value": "pk_105682594_CCTOZ8K23KHPSAY3JQTVV1G23QTN63IG"
                         },
                         {
                             "name": "Content-Type",

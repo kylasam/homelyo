@@ -541,12 +541,12 @@ function submitHomelyoBooking(e) {
     })
     .catch(err => {
         console.warn('n8n webhook fallback to ClickUp:', err);
-        // Fallback: Post directly to ClickUp API
-        fetch('https://api.clickup.com/api/v2/list/1500350000002181/task', {
+        // Fallback: Post directly to ClickUp API (Homelyo Workspace)
+        fetch('https://api.clickup.com/api/v2/list/1500520000038640/task', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'pk_308598557_9CP65EANIWJ0XHF9NUOFGMFUDCAMPPM5'
+                'Authorization': 'pk_105682594_CCTOZ8K23KHPSAY3JQTVV1G23QTN63IG'
             },
             body: JSON.stringify({
                 name: `Booking Request: ${name} – ${room}`,

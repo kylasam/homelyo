@@ -737,6 +737,15 @@ window.sendMessage = function(){
     const text = messageInput.value.trim();
     if(!text) return;
     
+    // Maintain a persistent conversation session ID for this browser tab
+    let chatSessionId = sessionStorage.getItem('homelyo_chat_session_id');
+    if (!chatSessionId) {
+        chatSessionId = 'sess_' + Math.random().toString(36).substring(2, 8);
+        sessionStorage.setItem('homelyo_chat_session_id', chatSessionId);
+    }
+    let turnCount = parseInt(sessionStorage.getItem('homelyo_turn_count') || '0', 10) + 1;
+    sessionStorage.setItem('homelyo_turn_count', turnCount);
+
     addMessage(text, 'user');
     messageInput.value = '';
     showTyping();
@@ -751,7 +760,12 @@ window.sendMessage = function(){
     fetch(WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text }),
+        body: JSON.stringify({ 
+            message: text,
+            session_id: chatSessionId,
+            turn: turnCount,
+            timestamp: new Date().toISOString()
+        }),
         signal: controller.signal
     })
     .then(response => {

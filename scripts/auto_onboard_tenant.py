@@ -21,11 +21,11 @@ PARENT_FOLDER_ID = "1jVYbBfrm3SHqIou-Xf9iVrYaLsro5X0p"  # Master Property Folder
 TEMPLATE_FOLDER_ID = "16gimsgZ5BaVDk766sMDAuZWJcKJtKdqe"  # Template Folder
 SPREADSHEET_ID = "1rs5dXTyA6xQSbqVQ_ofyCAv2eFZ83CrN8sAx5qfbsTk"  # Master Spreadsheet
 
-CLICKUP_TOKEN = "pk_308598557_9CP65EANIWJ0XHF9NUOFGMFUDCAMPPM5"
+CLICKUP_TOKEN = "pk_105682594_CCTOZ8K23KHPSAY3JQTVV1G23QTN63IG"
 CLICKUP_HEADERS = {"Authorization": CLICKUP_TOKEN, "Content-Type": "application/json"}
-LIST_TENANTS = "1500350000002180"  # Tenants & Room Occupancy
-LIST_INQUIRIES = "1500350000002181"  # Booking Requests
-LIST_SETTLEMENT = "1500350000002195"  # Tenant Expenses & Deposit Settlement
+LIST_TENANTS = "1500520000038641"  # Tenants & Room Occupancy (Homelyo Workspace)
+LIST_INQUIRIES = "1500520000038640"  # Booking Requests & Tenant Inquiries (Homelyo Workspace)
+LIST_SETTLEMENT = "1500520000038642"  # Tenant Expenses & Deposit Settlement (Homelyo Workspace)
 
 ROOM_SPECS = {
     "KE1": {
