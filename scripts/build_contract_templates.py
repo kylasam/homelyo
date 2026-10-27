@@ -250,6 +250,9 @@ def render_contract_data(
     return data
 
 def generate_html_template():
+    if os.path.exists(HTML_TEMPLATE_PATH):
+        with open(HTML_TEMPLATE_PATH, "r", encoding="utf-8") as f:
+            return f.read()
     return """<!DOCTYPE html>
 <html lang="de">
 <head>
@@ -258,87 +261,110 @@ def generate_html_template():
 <style>
 @page {
   size: A4 portrait;
-  margin: 14mm 15mm 14mm 15mm;
+  margin: 42pt;
 }
 * {
   box-sizing: border-box;
 }
 body {
-  font-family: Arial, Helvetica, "Liberation Sans", sans-serif;
-  font-size: 8.7pt;
-  line-height: 1.34;
-  color: #111;
+  font-family: "Liberation Sans", Arial, Helvetica, sans-serif;
+  font-size: 9pt;
+  line-height: 1.28;
+  color: #000;
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
 }
 .page {
-  height: 269mm;
-  max-height: 269mm;
+  height: 757pt;
+  max-height: 757pt;
   position: relative;
   page-break-after: always;
+  break-after: page;
   overflow: hidden;
 }
 .page:last-child {
   page-break-after: avoid;
+  break-after: avoid;
 }
 .page-footer-num {
   position: absolute;
   bottom: 0;
   right: 0;
-  font-size: 8.5pt;
-  color: #444;
+  font-family: DejaVu Sans, Arial, sans-serif;
+  font-size: 10pt;
+  color: #000;
 }
 .cols {
   display: flex;
   justify-content: space-between;
-  width: 100%;
+  width: 511pt;
 }
 .col-de, .col-en {
-  width: 48.2%;
+  width: 233pt;
 }
 .clause-h {
-  font-size: 9.8pt;
+  font-size: 11.4pt;
   font-weight: bold;
-  margin: 8px 0 3px 0;
+  margin: 10pt 0 3pt 0;
   color: #000;
 }
 .clause-p {
-  margin: 0 0 5px 0;
+  font-size: 9pt;
+  line-height: 1.28;
+  margin: 0 0 5pt 0;
   text-align: justify;
 }
-.bank-grid {
-  width: 100%;
-  margin: 4px 0 6px 0;
-  font-size: 8.4pt;
+.party-heading {
+  font-size: 11.4pt;
+  margin-bottom: 24pt;
+  color: #000;
 }
-.bank-grid td {
-  padding: 1px 0;
-  vertical-align: top;
-}
-.bank-lbl {
-  color: #444;
-  font-size: 8pt;
-}
-.bank-val {
+.party-heading strong {
   font-weight: bold;
 }
-.sub-list {
-  padding-left: 14px;
-  margin: 2px 0 4px 0;
-}
-.sub-list li {
-  margin-bottom: 2px;
-}
-.sign-table {
+.party-table {
   width: 100%;
-  margin-top: 40px;
+  border-collapse: collapse;
 }
-.sign-table td {
-  width: 50%;
-  vertical-align: top;
-  font-size: 9.2pt;
-  line-height: 1.45;
+.party-table td {
+  padding: 0 0 18pt 0;
+  vertical-align: bottom;
+  font-size: 9pt;
+}
+.party-table .lbl {
+  width: 44%;
+  text-align: left;
+  color: #575d64;
+}
+.party-table .val {
+  width: 56%;
+  text-align: right;
+  font-weight: bold;
+  color: #000;
+  line-height: 1.25;
+}
+.bank-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2pt 0 8pt 0;
+}
+.bank-table td {
+  padding: 2.5pt 0;
+  vertical-align: bottom;
+  font-size: 9pt;
+}
+.bank-table .b-lbl {
+  width: 44%;
+  text-align: left;
+  color: #575d64;
+}
+.bank-table .b-val {
+  width: 56%;
+  text-align: right;
+  font-weight: bold;
+  color: #000;
+  line-height: 1.25;
 }
 </style>
 </head>
@@ -346,42 +372,66 @@ body {
 
 <!-- ================================= PAGE 1 ================================= -->
 <div class="page" id="page-1">
-  <div style="text-align: center; margin-top: 60px; margin-bottom: 80px;">
-    <div style="font-size: 27pt; font-weight: bold; color: #000; letter-spacing: -0.5px;">Mietvertrag</div>
-    <div style="font-size: 17pt; color: #222; margin-top: 8px;">Rental Agreement</div>
+  <div style="text-align: center; margin-top: 24pt; margin-bottom: 96pt;">
+    <div style="font-size: 30pt; font-weight: bold; color: #000; letter-spacing: -0.2px;">Mietvertrag</div>
+    <div style="font-size: 18pt; color: #000; margin-top: 10pt;">Rental Agreement</div>
   </div>
 
-  <div class="cols" style="margin-bottom: 70px;">
+  <div class="cols" style="margin-bottom: 110pt;">
     <div class="col-de">
-      <div style="font-weight: bold; font-size: 11pt; margin-bottom: 26px;">Zwischen Vermieter:</div>
-      <div style="font-size: 8.5pt; color: #555;">Vorname, Nachname</div>
-      <div style="font-size: 10.5pt; font-weight: bold; margin-bottom: 22px;">Kylasam NA</div>
-      <div style="font-size: 8.5pt; color: #555;">Anschrift</div>
-      <div style="font-size: 10pt; line-height: 1.4;">Forckenbeckstraße 64,<br>14199 Berlin, Deutschland</div>
+      <div class="party-heading">Zwischen <strong>Vermieter:</strong></div>
+      <table class="party-table">
+        <tr>
+          <td class="lbl">Vorname, Nachname</td>
+          <td class="val">Kylasam NA</td>
+        </tr>
+        <tr>
+          <td class="lbl">Anschrift</td>
+          <td class="val">Forckenbeckstraße 64,<br>14199 Berlin, Deutschland</td>
+        </tr>
+      </table>
     </div>
     <div class="col-en">
-      <div style="font-weight: bold; font-size: 11pt; margin-bottom: 26px;">The landlord:</div>
-      <div style="font-size: 8.5pt; color: #555;">Name, Surname</div>
-      <div style="font-size: 10.5pt; font-weight: bold; margin-bottom: 22px;">Kylasam NA</div>
-      <div style="font-size: 8.5pt; color: #555;">Address</div>
-      <div style="font-size: 10pt; line-height: 1.4;">Forckenbeckstraße 64,<br>14199 Berlin, Germany</div>
+      <div class="party-heading">The <strong>landlord:</strong></div>
+      <table class="party-table">
+        <tr>
+          <td class="lbl">Name, Surname</td>
+          <td class="val">Kylasam NA</td>
+        </tr>
+        <tr>
+          <td class="lbl">Address</td>
+          <td class="val">Forckenbeckstraße 64,<br>14199 Berlin, Germany</td>
+        </tr>
+      </table>
     </div>
   </div>
 
   <div class="cols">
     <div class="col-de">
-      <div style="font-weight: bold; font-size: 11pt; margin-bottom: 26px;">Zwischen Mieter:</div>
-      <div style="font-size: 8.5pt; color: #555;">Vorname, Nachname</div>
-      <div style="font-size: 10.5pt; font-weight: bold; margin-bottom: 22px;">{{TENANT_NAME}}</div>
-      <div style="font-size: 8.5pt; color: #555;">Anschrift</div>
-      <div style="font-size: 10pt; line-height: 1.4;">{{TENANT_ADDRESS_DE}}</div>
+      <div class="party-heading">Zwischen <strong>Mieter:</strong></div>
+      <table class="party-table">
+        <tr>
+          <td class="lbl">Vorname, Nachname</td>
+          <td class="val">{{TENANT_NAME}}</td>
+        </tr>
+        <tr>
+          <td class="lbl">Anschrift</td>
+          <td class="val">{{TENANT_ADDRESS_DE}}</td>
+        </tr>
+      </table>
     </div>
     <div class="col-en">
-      <div style="font-weight: bold; font-size: 11pt; margin-bottom: 26px;">The tenant:</div>
-      <div style="font-size: 8.5pt; color: #555;">Name, Surname</div>
-      <div style="font-size: 10.5pt; font-weight: bold; margin-bottom: 22px;">{{TENANT_NAME}}</div>
-      <div style="font-size: 8.5pt; color: #555;">Address</div>
-      <div style="font-size: 10pt; line-height: 1.4;">{{TENANT_ADDRESS_EN}}</div>
+      <div class="party-heading">The <strong>tenant:</strong></div>
+      <table class="party-table">
+        <tr>
+          <td class="lbl">Name, Surname</td>
+          <td class="val">{{TENANT_NAME}}</td>
+        </tr>
+        <tr>
+          <td class="lbl">Address</td>
+          <td class="val">{{TENANT_ADDRESS_EN}}</td>
+        </tr>
+      </table>
     </div>
   </div>
 
@@ -444,8 +494,8 @@ body {
       <div class="clause-h">3. Miete</div>
       <p class="clause-p">(1) Die Miete beträgt monatlich <strong>{{RENT_AMOUNT}}€</strong>, in Worten: <strong>{{RENT_WORDS_DE}} EURO</strong>.<br>
       Hierin enthalten ist<br>
-      <span style="display:inline-block; margin-left:10px;">• eine Nettokaltmiete inklusive Möblierungszuschlag</span><br>
-      <span style="display:inline-block; margin-left:10px;">• Nebenkosten inkl. Betriebs-, Heiz-, Warmwasser-, Strom- und Internetkosten</span></p>
+      <span style="display:inline-block; margin-left:10px;">eine Nettokaltmiete inklusive Möblierungszuschlag</span><br>
+      <span style="display:inline-block; margin-left:10px;">Nebenkosten inkl. Betriebs-, Heiz-, Warmwasser-, Strom- und Internetkosten</span></p>
 
       <p class="clause-p">(2) Der Mieter hat für eine sachgemäße, nicht übertriebene Nutzung (Fair Usage) der Nebenkosten zu sorgen. Hier ist besonders auf den sachgemäßen Verbrauch von Strom, Wasser und Heizung zu achten.</p>
       <p class="clause-p">Die Gesamtmiete beinhaltet eine Internet-Flatrate. Weitere Kosten, die durch die Nutzung der Internetverbindung entstehen (z.B. kostenpflichtige oder illegale Downloads etc.), sind vom Mieter der Wohnung selbst zu tragen und werden mit dem Vermieter abgerechnet. Beim Einzug stellt der Vermieter dem Mieter den Router und die Zugangsdaten für die WLAN-Verbindung zur Verfügung. Beide Parteien sind sich einig, dass der Mieter allein für die Nutzung der Internetverbindungen und die illegale Internetnutzung verantwortlich ist. Bei illegaler Nutzung kann der Vermieter die Internetverbindung ohne Vorankündigung sperren. In diesem Fall hat der Mieter keinen Anspruch auf Mietminderung.</p>
@@ -459,12 +509,12 @@ body {
     </div>
 
     <div class="col-en">
-      <div style="height: 18px;"></div>
+      <div style="height: 14pt;"></div>
       <div class="clause-h">3. Rent</div>
       <p class="clause-p">(1) The rent amounts to <strong>€{{RENT_AMOUNT}}</strong> per month, in words: <strong>{{RENT_WORDS_EN}} EURO</strong>.<br>
       This includes<br>
-      <span style="display:inline-block; margin-left:10px;">• basic rent (ger:, Nettokaltmiete) which includes a furniture surcharge</span><br>
-      <span style="display:inline-block; margin-left:10px;">• Additional expenses lump sum incl. operating, utility, heating, electricity and internet cost</span></p>
+      <span style="display:inline-block; margin-left:10px;">basic rent (ger:, Nettokaltmiete) which includes a furniture surcharge</span><br>
+      <span style="display:inline-block; margin-left:10px;">Additional expenses lump sum incl. operating, utility, heating, electricity and internet cost</span></p>
 
       <p class="clause-p">(2) The tenant must ensure proper, non-exaggerated use (fair usage) of the utility costs in particular a proper consumption of electricity, water and heating is important.</p>
       <p class="clause-p">The total rent includes an Internet flat rate. Further costs arising from the use of the Internet connection (e.g. fee-based or illegal downloads, etc.) are to be borne by the tenant of the apartment and will be settled with the landlord. When moving in, the landlord provides the tenant with the router and the login details to connect to the WLAN. Both parties agree that the tenant is solely responsible for the Internet connection and liable for the illegal use of the Internet. In the event of illegal use, the landlord can block the Internet connection without prior notice. In this case, the tenant cannot claim a reduction in rent.</p>
@@ -485,32 +535,24 @@ body {
 <div class="page" id="page-4">
   <div class="cols">
     <div class="col-de">
-      <table class="bank-grid">
-        <tr><td class="bank-lbl">Kontoinhaber:</td></tr>
-        <tr><td class="bank-val">Kylasam Nallagoundanpalayam Arruchamy</td></tr>
-        <tr><td class="bank-lbl">IBAN:</td></tr>
-        <tr><td class="bank-val">DE87100110012624542768</td></tr>
-        <tr><td class="bank-lbl">BIC:</td></tr>
-        <tr><td class="bank-val">NTSBDEB1XXX</td></tr>
-        <tr><td class="bank-lbl">Verwendungszweck:</td></tr>
-        <tr><td class="bank-val">{{TENANT_NAME}} "Monat / Jahr"</td></tr>
+      <table class="bank-table">
+        <tr><td class="b-lbl">Kontoinhaber:</td><td class="b-val">Kylasam Nallagoundanpalayam<br>Arruchamy</td></tr>
+        <tr><td class="b-lbl">IBAN:</td><td class="b-val">DE87100110012624542768</td></tr>
+        <tr><td class="b-lbl">BIC:</td><td class="b-val">NTSBDEB1XXX</td></tr>
+        <tr><td class="b-lbl">Verwendungszweck:</td><td class="b-val">{{TENANT_NAME}}<br>"Monat / Jahr"</td></tr>
       </table>
 
       <p class="clause-p">(3) Für die Rechtzeitigkeit der Zahlung kommt es nicht auf die Absendung, sondern auf den Eingang des Geldes an.</p>
       <p class="clause-p">(4) Der Mieter hat für jede Mahnung/ Zahlungserinnerung wegen verspäteter Zahlung der Miete {{LATE_FEE}} Euro für pauschalierte Mahnkosten zu zahlen, sofern der Mieter nicht nachweist, dass dem Vermieter geringere bzw. keine Kosten entstanden sind.</p>
 
-      <div class="clause-h">5. Mietsicherheit/ Kaution</div>
+      <div class="clause-h" style="margin-top: 14pt;">5. Mietsicherheit/ Kaution</div>
       <p class="clause-p">(1) Der Mieter leistet für die Erfüllung seiner Pflichten aus diesem Mietvertrag zu Beginn des Mietverhältnisses eine Sicherheit in Höhe von <strong>{{DEPOSIT_AMOUNT}}€</strong>, an den Vermieter auf folgendes Konto:</p>
 
-      <table class="bank-grid">
-        <tr><td class="bank-lbl">Kontoinhaber:</td></tr>
-        <tr><td class="bank-val">Kylasam Nallagoundanpalayam Arruchamy</td></tr>
-        <tr><td class="bank-lbl">IBAN:</td></tr>
-        <tr><td class="bank-val">DE25120400000011466000</td></tr>
-        <tr><td class="bank-lbl">BIC:</td></tr>
-        <tr><td class="bank-val">COBADEFFXXX</td></tr>
-        <tr><td class="bank-lbl">Verwendungszweck:</td></tr>
-        <tr><td class="bank-val">{{TENANT_NAME}} "Kaution"</td></tr>
+      <table class="bank-table">
+        <tr><td class="b-lbl">Kontoinhaber:</td><td class="b-val">Kylasam Nallagoundanpalayam<br>Arruchamy</td></tr>
+        <tr><td class="b-lbl">IBAN:</td><td class="b-val">DE25120400000011466000</td></tr>
+        <tr><td class="b-lbl">BIC:</td><td class="b-val">COBADEFFXXX</td></tr>
+        <tr><td class="b-lbl">Verwendungszweck:</td><td class="b-val">{{TENANT_NAME}}<br>"Kaution"</td></tr>
       </table>
       <p class="clause-p">oder in bar bei Mietvertragsschluss.</p>
 
@@ -519,32 +561,24 @@ body {
     </div>
 
     <div class="col-en">
-      <table class="bank-grid">
-        <tr><td class="bank-lbl">Account holder:</td></tr>
-        <tr><td class="bank-val">Kylasam Nallagoundanpalayam Arruchamy</td></tr>
-        <tr><td class="bank-lbl">IBAN:</td></tr>
-        <tr><td class="bank-val">DE87100110012624542768</td></tr>
-        <tr><td class="bank-lbl">BIC:</td></tr>
-        <tr><td class="bank-val">NTSBDEB1XXX</td></tr>
-        <tr><td class="bank-lbl">Payment reference:</td></tr>
-        <tr><td class="bank-val">{{TENANT_NAME}} "Month / Year"</td></tr>
+      <table class="bank-table">
+        <tr><td class="b-lbl">Account holder:</td><td class="b-val">Kylasam Nallagoundanpalayam<br>Arruchamy</td></tr>
+        <tr><td class="b-lbl">IBAN:</td><td class="b-val">DE87100110012624542768</td></tr>
+        <tr><td class="b-lbl">BIC:</td><td class="b-val">NTSBDEB1XXX</td></tr>
+        <tr><td class="b-lbl">Payment reference:</td><td class="b-val">{{TENANT_NAME}}<br>"Month / Year"</td></tr>
       </table>
 
       <p class="clause-p">(3) Punctual payment does not depend on the time of transfer, but on the receipt of the money.</p>
       <p class="clause-p">(4) For each reminder/overdue payment notice attributable to the late payment of the rent, the tenant must pay a fee of €{{LATE_FEE}} as a reminder cost, unless the tenant proves that the landlord has incurred lower or no expenses.</p>
 
-      <div class="clause-h">5. Security deposit</div>
+      <div class="clause-h" style="margin-top: 14pt;">5. Security deposit</div>
       <p class="clause-p">(1) For the fulfilment of his/ her obligations from this rental agreement, the tenant shall pay a security deposit of <strong>€{{DEPOSIT_AMOUNT}}</strong>, to the landlord due upon the beginning of rental period, to the following bank account:</p>
 
-      <table class="bank-grid">
-        <tr><td class="bank-lbl">Account holder:</td></tr>
-        <tr><td class="bank-val">Kylasam Nallagoundanpalayam Arruchamy</td></tr>
-        <tr><td class="bank-lbl">IBAN:</td></tr>
-        <tr><td class="bank-val">DE25120400000011466000</td></tr>
-        <tr><td class="bank-lbl">BIC:</td></tr>
-        <tr><td class="bank-val">COBADEFFXXX</td></tr>
-        <tr><td class="bank-lbl">Payment reference:</td></tr>
-        <tr><td class="bank-val">{{TENANT_NAME}} "Deposit"</td></tr>
+      <table class="bank-table">
+        <tr><td class="b-lbl">Account holder:</td><td class="b-val">Kylasam Nallagoundanpalayam<br>Arruchamy</td></tr>
+        <tr><td class="b-lbl">IBAN:</td><td class="b-val">DE25120400000011466000</td></tr>
+        <tr><td class="b-lbl">BIC:</td><td class="b-val">COBADEFFXXX</td></tr>
+        <tr><td class="b-lbl">Payment reference:</td><td class="b-val">{{TENANT_NAME}}<br>"Deposit"</td></tr>
       </table>
       <p class="clause-p">or in cash upon conclusion of the rental contract.</p>
 
@@ -660,22 +694,24 @@ body {
     </div>
   </div>
 
-  <table class="sign-table">
-    <tr>
-      <td>
-        <div style="font-weight: bold; color: #000;">Kylasam Nallagoundanpalayam Arruchamy</div>
-        <div style="color: #444; font-size: 8.8pt; margin: 3px 0 16px 0;">{{LANDLORD_SIGN_DATE}}</div>
-        <div style="font-weight: bold; font-size: 9.5pt; color: #111;">Vom Vermieter akzeptiert</div>
-        <div style="font-size: 8.8pt; color: #555;">Accepted by Landlord</div>
-      </td>
-      <td>
-        <div style="font-weight: bold; color: #000;">{{TENANT_NAME}}</div>
-        <div style="color: #444; font-size: 8.8pt; margin: 3px 0 16px 0;">{{TENANT_SIGN_DATE}}</div>
-        <div style="font-weight: bold; font-size: 9.5pt; color: #111;">Vom Mieter akzeptiert</div>
-        <div style="font-size: 8.8pt; color: #555;">Accepted by Tenant</div>
-      </td>
-    </tr>
-  </table>
+  <div class="cols" style="margin-top: 130pt;">
+    <div class="col-de">
+      <div style="font-weight: bold; font-size: 9pt; color: #000;">Kylasam Nallagoundanpalayam Arruchamy</div>
+      <div style="font-size: 9pt; color: #000; margin: 3pt 0 16pt 0;">{{LANDLORD_SIGN_DATE}}</div>
+      <div style="display: flex; justify-content: space-between; width: 100%;">
+        <span style="font-weight: bold; font-size: 9pt; color: #000;">Vom Vermieter akzeptiert</span>
+        <span style="font-size: 9pt; color: #575d64;">Accepted by Landlord</span>
+      </div>
+    </div>
+    <div class="col-en">
+      <div style="font-weight: bold; font-size: 9pt; color: #000;">{{TENANT_NAME}}</div>
+      <div style="font-size: 9pt; color: #000; margin: 3pt 0 16pt 0;">{{TENANT_SIGN_DATE}}</div>
+      <div style="display: flex; justify-content: space-between; width: 100%;">
+        <span style="font-weight: bold; font-size: 9pt; color: #000;">Vom Mieter akzeptiert</span>
+        <span style="font-size: 9pt; color: #575d64;">Accepted by Tenant</span>
+      </div>
+    </div>
+  </div>
 
   <div class="page-footer-num">7/7</div>
 </div>
@@ -901,7 +937,7 @@ def convert_html_to_pdf(html_path, pdf_path):
         "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
         "--headless",
         "--disable-gpu",
-        "--print-to-pdf-no-header",
+        "--no-pdf-header-footer",
         f"--print-to-pdf={pdf_path}",
         html_path
     ]
