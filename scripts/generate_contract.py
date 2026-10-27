@@ -260,6 +260,7 @@ def main():
     parser.add_argument("--advance", type=float, default=None, help="Security Deposit / Advance in EUR (alias to --deposit)")
     parser.add_argument("--purpose", default=None, help="Purpose of stay (e.g. 'temporary housing needs')")
     parser.add_argument("--filename", default=None, help="Custom filename base (e.g. 'Umakant_yadav_ke1_20261101_20270430')")
+    parser.add_argument("--address", default=None, help="Tenant current permanent address (auto-formats DE/EN)")
     parser.add_argument("--address-de", default=None, help="Tenant Address in German")
     parser.add_argument("--address-en", default=None, help="Tenant Address in English")
     parser.add_argument("--reason-de", default=None, help="Reason for temporary stay in German")
@@ -285,6 +286,15 @@ def main():
 
     deposit_val = args.deposit if args.deposit is not None else args.advance
 
+    addr_de = args.address_de
+    addr_en = args.address_en
+    if args.address:
+        a_clean = args.address.strip()
+        if not addr_de:
+            addr_de = f"{a_clean}, Deutschland" if ("deutschland" not in a_clean.lower() and "germany" not in a_clean.lower()) else a_clean
+        if not addr_en:
+            addr_en = f"{a_clean}, Germany" if ("deutschland" not in a_clean.lower() and "germany" not in a_clean.lower()) else a_clean.replace("Deutschland", "Germany")
+
     print(f"\n========================================================")
     print(f"🏠 HOMELYO CONTRACT GENERATOR (7-PAGE BILINGUAL FORMAT)")
     print(f"========================================================")
@@ -301,8 +311,8 @@ def main():
         end_date=args.end,
         rent=args.rent,
         deposit=deposit_val,
-        address_de=args.address_de,
-        address_en=args.address_en,
+        address_de=addr_de,
+        address_en=addr_en,
         reason_de=args.reason_de,
         reason_en=args.reason_en,
         individual_de=args.individual_de,

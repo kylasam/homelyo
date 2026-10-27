@@ -387,7 +387,6 @@ def sync_to_clickup(tenant_name, tenant_email, tenant_phone, room_code, start_da
     task_payload = {
         "name": f"🟡 [OCCUPIED until {d_end_dt.strftime('%b %d, %Y')}] Room {room_code} – {tenant_name} (€{rent_amount:,.0f}/mo)",
         "markdown_description": desc,
-        "status": "occupied (active lease)",
         "start_date": start_ts_ms,
         "due_date": due_ts_ms
     }
@@ -891,6 +890,9 @@ if __name__ == "__main__":
     parser.add_argument("--rent", type=float, default=None, help="Monthly warm rent in EUR")
     parser.add_argument("--deposit", type=float, default=None, help="Security deposit in EUR")
     parser.add_argument("--advance", type=float, default=None, help="Advance / Security deposit in EUR")
+    parser.add_argument("--address", default=None, help="Tenant current permanent address")
+    parser.add_argument("--address-de", default=None, help="Tenant Address in German")
+    parser.add_argument("--address-en", default=None, help="Tenant Address in English")
     parser.add_argument("--purpose", default=None, help="Purpose of stay (e.g. 'temporary housing needs')")
 
     args = parser.parse_args()
@@ -908,6 +910,15 @@ if __name__ == "__main__":
 
     deposit_val = args.deposit if args.deposit is not None else args.advance
 
+    addr_de = args.address_de
+    addr_en = args.address_en
+    if args.address:
+        a_clean = args.address.strip()
+        if not addr_de:
+            addr_de = f"{a_clean}, Deutschland" if ("deutschland" not in a_clean.lower() and "germany" not in a_clean.lower()) else a_clean
+        if not addr_en:
+            addr_en = f"{a_clean}, Germany" if ("deutschland" not in a_clean.lower() and "germany" not in a_clean.lower()) else a_clean.replace("Deutschland", "Germany")
+
     res = onboard_tenant(
         name=tenant_name,
         email=args.email,
@@ -919,6 +930,8 @@ if __name__ == "__main__":
         platform=args.platform,
         rent_amount=args.rent,
         deposit_amount=deposit_val,
-        purpose=args.purpose
+        purpose=args.purpose,
+        address_de=addr_de,
+        address_en=addr_en
     )
     print(json.dumps(res, indent=2))
