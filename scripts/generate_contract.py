@@ -96,7 +96,7 @@ def query_claude_ai(info):
     if not openrouter_key:
         print("  ℹ OpenRouter API key not configured, using direct template mapping.")
         return None
-        "You are Homelyo's Coliving Tenancy Contract Filling Engine. Given applicant booking parameters, "
+    system_prompt = (
         "return JSON only with fields: TENANT_NAME, TENANT_EMAIL, TENANT_PHONE, TENANT_ADDRESS, "
         "TENANT_ROOM_ID, ROOM_TITLE, ROOM_SIZE, ROOM_NUMBER, CONTRACT_START_DT, CONTRACT_END_DT, "
         "RENT_PER_MONTH, DEPOSIT_AMOUNT, DEPOSIT_AMOUNT_PAY_BEFORE_DT, TENANCY_PURPOSE_DE, "
