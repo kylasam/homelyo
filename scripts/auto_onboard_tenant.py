@@ -63,9 +63,8 @@ ROOM_SPECS = {
 TEMPLATE_FILES = [
     {"id": "15rkiK8grB2nYpFZfQs7RTakmcBFM0A_k", "name": "House_Rules.pdf"},
     {"id": "1Y_RSVUYcObC1UWWL0GguS8CCS49dd9-e", "name": "Apartment_Handover_Protocol.pdf"},
-    {"id": "1JFhXsitxEO5WETo-r2O9jqc7SFnNGkel", "name": "Keys_Acknowledgement.pdf"},
-    {"id": "1yrIDs6kVUPZc8A1guV-BaUXf_x4JsfHB", "name": "wohnungsgeberbestaetigung.pdf"},
-    {"id": "1mNXbTpDbUxWQOn25c0waOFjaUAxpyLPq", "name": "Inventory_List.pdf"}
+    {"id": "1mNXbTpDbUxWQOn25c0waOFjaUAxpyLPq", "name": "Inventory_List.pdf"},
+    {"id": "1z_ao-a8JTagdBPMaz-sw380FCr59HNov", "name": "S+U-Bahn_Berlin_Transit_Map.pdf"}
 ]
 
 def get_gcloud_token():
@@ -378,6 +377,304 @@ def sync_to_clickup(tenant_name, tenant_email, tenant_phone, room_code, start_da
 
     return task_id
 
+def upload_prefilled_wohnungsgeberbestaetigung(token, folder_id, tenant_name, room_code, start_date):
+    """
+    Fills out the official Wohnungsgeberbestätigung (§ 19 Abs. 3 BMG) AcroForm fields
+    with tenant, landlord, and property details and uploads to the tenant folder.
+    """
+    import pypdf
+    from pypdf.generic import BooleanObject, NameObject
+
+    # Download base template from Google Drive
+    template_id = "1yrIDs6kVUPZc8A1guV-BaUXf_x4JsfHB"
+    req = urllib.request.Request(
+        f"https://www.googleapis.com/drive/v3/files/{template_id}?alt=media",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    with urllib.request.urlopen(req) as resp:
+        template_bytes = resp.read()
+
+    temp_template_path = "/tmp/wgb_temp_base.pdf"
+    with open(temp_template_path, "wb") as f:
+        f.write(template_bytes)
+
+    reader = pypdf.PdfReader(temp_template_path)
+    writer = pypdf.PdfWriter()
+    writer.append(reader)
+
+    # Parse name
+    parts = tenant_name.strip().split()
+    if len(parts) > 1:
+        vorname = parts[0]
+        nachname = " ".join(parts[1:])
+    else:
+        vorname = tenant_name
+        nachname = ""
+
+    d_start = datetime.datetime.strptime(start_date, "%Y-%m-%d")
+    date_de = d_start.strftime("%d.%m.%Y")
+
+    field_values = {
+        "Familienname1": "Nallagoundanpalayam Arruchamy Kylasam",
+        "Straße1": "Forckenbeckstraße 64",
+        "Postleitzahl1": "14199",
+        "Ort1": "Berlin",
+        "Einzugsdatum1": date_de,
+        "Straße2": "Lichtenrader Damm 80",
+        "Zusatzangaben1": f"2EG, WE-11 (Zimmer {room_code})",
+        "Postleitzahl2": "12305",
+        "Ort2": "Berlin",
+        "FamiliennameRow1": nachname,
+        "VornameRow1": vorname,
+        "Datum Unterschrift Wohnungsgeber bzw Wohnungseigentümer": date_de
+    }
+
+    for page in writer.pages:
+        writer.update_page_form_field_values(page, field_values)
+
+    if "/AcroForm" in writer._root_object:
+        writer._root_object["/AcroForm"].update({
+            NameObject("/NeedAppearances"): BooleanObject(True)
+        })
+
+    temp_out_path = f"/tmp/wgb_{tenant_name.replace(' ', '_')}.pdf"
+    with open(temp_out_path, "wb") as f:
+        writer.write(f)
+
+    with open(temp_out_path, "rb") as f:
+        pdf_bytes = f.read()
+
+    clean_name = tenant_name.replace(" ", "_").replace("-", "_")
+    boundary = "===============HOMELYO_BOUNDARY=="
+    meta = {
+        "name": f"wohnungsgeberbestaetigung_{clean_name}.pdf",
+        "mimeType": "application/pdf",
+        "parents": [folder_id]
+    }
+    body = (
+        f"--{boundary}\r\n"
+        f"Content-Type: application/json; charset=UTF-8\r\n\r\n"
+        f"{json.dumps(meta)}\r\n"
+        f"--{boundary}\r\n"
+        f"Content-Type: application/pdf\r\n\r\n"
+    ).encode("utf-8") + pdf_bytes + f"\r\n--{boundary}--\r\n".encode("utf-8")
+
+    req_up = urllib.request.Request(
+        "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
+        data=body,
+        headers={"Authorization": f"Bearer {token}", "Content-Type": f"multipart/related; boundary={boundary}"},
+        method="POST"
+    )
+    with urllib.request.urlopen(req_up) as resp:
+        res = json.loads(resp.read().decode())
+        return res["id"]
+
+def upload_personalized_welcome_kit(token, folder_id, tenant_name, room_code, start_date, end_date, contract_doc_id, contract_pdf_id):
+    """
+    Renders and uploads a personalized Welcome Kit (Google Doc, PDF, and DOCX)
+    with WiFi details, quiet hours, room specifics, emergency numbers, and contract links.
+    """
+    from docx import Document
+    from docx.shared import Pt
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
+
+    # Download room template from Template Folder if available, or build standard
+    template_id_map = {
+        "KE1": "1Wbx3gTcfI1O7mK--GqU6y0TUN8Akc3h8",
+        "KE2": "1KpFS7OQRgpzh9DPynp43gkl6KYjenZiU",
+        "KE3": "1tDDu4TuTLJR2JuS-47FJKqgkb5SIB2jv",
+        "KE4": "1-grsqQQlDvMfD42o85Kouiq3S6n6dlfx"
+    }
+    tmpl_id = template_id_map.get(room_code, "1KpFS7OQRgpzh9DPynp43gkl6KYjenZiU")
+
+    req = urllib.request.Request(
+        f"https://www.googleapis.com/drive/v3/files/{tmpl_id}?alt=media",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    with urllib.request.urlopen(req) as resp:
+        tmpl_bytes = resp.read()
+
+    temp_in = f"/tmp/tmpl_welcome_{room_code}.docx"
+    with open(temp_in, "wb") as f:
+        f.write(tmpl_bytes)
+
+    doc = Document(temp_in)
+    contract_url = f"https://docs.google.com/document/d/{contract_doc_id}/edit"
+    contract_pdf_url = f"https://drive.google.com/file/d/{contract_pdf_id}/view"
+
+    d_s = datetime.datetime.strptime(start_date, "%Y-%m-%d").strftime("%d %B %Y").upper()
+    d_e = datetime.datetime.strptime(end_date, "%Y-%m-%d").strftime("%d %B %Y").upper()
+
+    for p in doc.paragraphs:
+        if "🌟 Welcome" in p.text:
+            p.text = f"🌟 Welcome {tenant_name} 🙂 – {room_code} ({ROOM_SPECS.get(room_code, {}).get('title', 'Suite')})"
+            p.style.font.size = Pt(20)
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        elif "01 NOVEMBER" in p.text or "Tenancy:" in p.text or "Booking Period:" in p.text:
+            p.text = f"📅 Booking Period: {d_s} – {d_e}\n📍 Address: Lichtenrader Damm 80, 12305 Berlin (2. OG, WE-11)"
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        elif "Scan this QR code" in p.text:
+            p.text = f"📄 View Your Digital Tenancy Agreement (Mietvertrag):\n{contract_url}\n(PDF Download: {contract_pdf_url})"
+        elif "Scannen Sie diesen QR-Code" in p.text:
+            p.text = "Scannen oder klicken Sie auf den obigen Link, um Ihren Mietvertrag einzusehen."
+
+    clean_name = tenant_name.replace(" ", "_").replace("-", "_")
+    out_docx_path = f"/tmp/Welcome_Kit_{room_code}_{clean_name}.docx"
+    doc.save(out_docx_path)
+
+    with open(out_docx_path, "rb") as f:
+        docx_bytes = f.read()
+
+    boundary = "===============HOMELYO_BOUNDARY=="
+    doc_name = f"Welcome_Kit_{room_code}_{clean_name}"
+
+    # 1. Google Doc
+    meta = {"name": doc_name, "mimeType": "application/vnd.google-apps.document", "parents": [folder_id]}
+    body = (
+        f"--{boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n{json.dumps(meta)}\r\n"
+        f"--{boundary}\r\nContent-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document\r\n\r\n"
+    ).encode("utf-8") + docx_bytes + f"\r\n--{boundary}--\r\n".encode("utf-8")
+    req_doc = urllib.request.Request(
+        "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
+        data=body,
+        headers={"Authorization": f"Bearer {token}", "Content-Type": f"multipart/related; boundary={boundary}"},
+        method="POST"
+    )
+    with urllib.request.urlopen(req_doc) as resp:
+        w_doc_id = json.loads(resp.read().decode())["id"]
+
+    # 2. Export PDF
+    exp_url = f"https://www.googleapis.com/drive/v3/files/{w_doc_id}/export?mimeType=application/pdf"
+    exp_req = urllib.request.Request(exp_url, headers={"Authorization": f"Bearer {token}"})
+    with urllib.request.urlopen(exp_req) as resp:
+        w_pdf_bytes = resp.read()
+
+    pdf_meta = {"name": f"{doc_name}.pdf", "mimeType": "application/pdf", "parents": [folder_id]}
+    pdf_body = (
+        f"--{boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n{json.dumps(pdf_meta)}\r\n"
+        f"--{boundary}\r\nContent-Type: application/pdf\r\n\r\n"
+    ).encode("utf-8") + w_pdf_bytes + f"\r\n--{boundary}--\r\n".encode("utf-8")
+    req_pdf = urllib.request.Request(
+        "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
+        data=pdf_body,
+        headers={"Authorization": f"Bearer {token}", "Content-Type": f"multipart/related; boundary={boundary}"},
+        method="POST"
+    )
+    with urllib.request.urlopen(req_pdf) as resp:
+        w_pdf_id = json.loads(resp.read().decode())["id"]
+
+    # 3. Upload DOCX
+    docx_meta = {"name": f"{doc_name}.docx", "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "parents": [folder_id]}
+    docx_body = (
+        f"--{boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n{json.dumps(docx_meta)}\r\n"
+        f"--{boundary}\r\nContent-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document\r\n\r\n"
+    ).encode("utf-8") + docx_bytes + f"\r\n--{boundary}--\r\n".encode("utf-8")
+    req_raw = urllib.request.Request(
+        "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
+        data=docx_body,
+        headers={"Authorization": f"Bearer {token}", "Content-Type": f"multipart/related; boundary={boundary}"},
+        method="POST"
+    )
+    with urllib.request.urlopen(req_raw) as resp:
+        w_docx_id = json.loads(resp.read().decode())["id"]
+
+    return w_doc_id, w_pdf_id, w_docx_id
+
+def upload_personalized_keys_acknowledgement(token, folder_id, tenant_name, room_code, start_date):
+    """
+    Renders and uploads a personalized Keys Acknowledgement document (Google Doc & PDF).
+    """
+    from docx import Document
+    from docx.shared import Pt
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
+
+    doc = Document()
+    title = doc.add_heading(level=0)
+    run = title.add_run("🔑 Keys Information / Schlüssel-Informationen")
+    run.font.size = Pt(20)
+    title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    doc.add_paragraph("\n")
+
+    room_title = ROOM_SPECS.get(room_code, {}).get("title", "Room")
+
+    doc.add_heading("Key Inventory / Schlüsselübersicht", level=1)
+    doc.add_paragraph(
+        "English:\n"
+        "Each tenant will receive a total of 4 keys:\n"
+        "• Main entrance / Haupteingang — 1\n"
+        "• Apartment door / Wohnungstür — 1\n"
+        "• Letterbox / Briefkasten — 1\n"
+        f"• Room key ({room_code} - {room_title}) / Zimmertür — 1\n\n"
+        "Please keep all keys safe. In case of loss, tenants will be responsible for the cost of replacement. "
+        "This may result in high replacement charges, as locks may need to be changed for security reasons.\n\n"
+        "Deutsch:\n"
+        "Jeder Mieter erhält insgesamt 4 Schlüssel:\n"
+        "• Haupteingang — 1\n"
+        "• Wohnungstür — 1\n"
+        "• Briefkasten — 1\n"
+        f"• Zimmertür ({room_code} - {room_title}) — 1\n\n"
+        "Bitte bewahren Sie alle Schlüssel sorgfältig auf. Im Falle eines Verlustes trägt der Mieter die Kosten für den Ersatz. "
+        "Dies kann zu hohen Ersatzkosten führen, da Schlösser aus Sicherheitsgründen ausgetauscht werden müssen."
+    )
+
+    d_start = datetime.datetime.strptime(start_date, "%Y-%m-%d").strftime("%d.%m.%Y")
+    doc.add_paragraph("\n")
+    doc.add_heading("📝 Acknowledgement / Bestätigung", level=1)
+    doc.add_paragraph(
+        "I acknowledge receipt of 4 keys and agree to follow the key policy above.\n"
+        "Ich bestätige den Empfang von 4 Schlüsseln und verpflichte mich, die obige Schlüsselregelung einzuhalten.\n\n"
+        f"Tenant name / Name Mieter:  {tenant_name}\n"
+        f"Room / Zimmer:              {room_code} ({room_title})\n"
+        f"Move-in Date / Einzugsdatum: {d_start}\n"
+        "Address / Anschrift:        Lichtenrader Damm 80, 12305 Berlin\n"
+        "Signature / Unterschrift:   _______________________________________\n"
+    )
+
+    clean_name = tenant_name.replace(" ", "_").replace("-", "_")
+    out_docx_path = f"/tmp/Keys_Acknowledgement_{clean_name}.docx"
+    doc.save(out_docx_path)
+
+    with open(out_docx_path, "rb") as f:
+        docx_bytes = f.read()
+
+    boundary = "===============HOMELYO_BOUNDARY=="
+    doc_name = f"Keys_Acknowledgement_{clean_name}"
+
+    meta = {"name": doc_name, "mimeType": "application/vnd.google-apps.document", "parents": [folder_id]}
+    body = (
+        f"--{boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n{json.dumps(meta)}\r\n"
+        f"--{boundary}\r\nContent-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document\r\n\r\n"
+    ).encode("utf-8") + docx_bytes + f"\r\n--{boundary}--\r\n".encode("utf-8")
+    req_doc = urllib.request.Request(
+        "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
+        data=body,
+        headers={"Authorization": f"Bearer {token}", "Content-Type": f"multipart/related; boundary={boundary}"},
+        method="POST"
+    )
+    with urllib.request.urlopen(req_doc) as resp:
+        k_doc_id = json.loads(resp.read().decode())["id"]
+
+    exp_url = f"https://www.googleapis.com/drive/v3/files/{k_doc_id}/export?mimeType=application/pdf"
+    exp_req = urllib.request.Request(exp_url, headers={"Authorization": f"Bearer {token}"})
+    with urllib.request.urlopen(exp_req) as resp:
+        k_pdf_bytes = resp.read()
+
+    pdf_meta = {"name": f"{doc_name}.pdf", "mimeType": "application/pdf", "parents": [folder_id]}
+    pdf_body = (
+        f"--{boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n{json.dumps(pdf_meta)}\r\n"
+        f"--{boundary}\r\nContent-Type: application/pdf\r\n\r\n"
+    ).encode("utf-8") + k_pdf_bytes + f"\r\n--{boundary}--\r\n".encode("utf-8")
+    req_pdf = urllib.request.Request(
+        "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
+        data=pdf_body,
+        headers={"Authorization": f"Bearer {token}", "Content-Type": f"multipart/related; boundary={boundary}"},
+        method="POST"
+    )
+    with urllib.request.urlopen(req_pdf) as resp:
+        k_pdf_id = json.loads(resp.read().decode())["id"]
+
+    return k_doc_id, k_pdf_id
+
 def onboard_tenant(name, email, phone, room, start_date, end_date=None, duration_months=None, platform="Direct / Homelyo Portal", rent_amount=None, deposit_amount=None):
     room = room.upper().strip()
     if room not in ROOM_SPECS:
@@ -447,6 +744,37 @@ def onboard_tenant(name, email, phone, room, start_date, end_date=None, duration
     if docx_id:
         print(f"  ✓ Contract Word DOCX ID: {docx_id}")
 
+    # Step 3b: Generate Pre-filled Wohnungsgeberbestätigung (§ 19 BMG)
+    print("🏛️ Generating pre-filled Wohnungsgeberbestätigung for Bürgeramt registration...")
+    wgb_id = None
+    try:
+        wgb_id = upload_prefilled_wohnungsgeberbestaetigung(token, folder_id, name, room, start_date)
+        print(f"  ✓ Wohnungsgeberbestätigung PDF ID: {wgb_id}")
+    except Exception as e:
+        print(f"  ⚠ Failed generating Wohnungsgeberbestätigung: {e}")
+
+    # Step 3c: Generate Personalized Welcome Kit
+    print("🌟 Generating personalized Welcome Kit (WiFi, emergency contacts, local stores)...")
+    w_doc_id, w_pdf_id, w_docx_id = None, None, None
+    try:
+        w_doc_id, w_pdf_id, w_docx_id = upload_personalized_welcome_kit(
+            token, folder_id, name, room, start_date, end_date, doc_id, pdf_id
+        )
+        print(f"  ✓ Welcome Kit PDF ID: {w_pdf_id}")
+    except Exception as e:
+        print(f"  ⚠ Failed generating Welcome Kit: {e}")
+
+    # Step 3d: Generate Personalized Keys Acknowledgement
+    print("🔑 Generating personalized Keys Acknowledgement...")
+    k_doc_id, k_pdf_id = None, None
+    try:
+        k_doc_id, k_pdf_id = upload_personalized_keys_acknowledgement(
+            token, folder_id, name, room, start_date
+        )
+        print(f"  ✓ Keys Acknowledgement PDF ID: {k_pdf_id}")
+    except Exception as e:
+        print(f"  ⚠ Failed generating Keys Acknowledgement: {e}")
+
     # Step 4: Sync to Google Sheet
     print("📊 Synchronizing Google Sheet (tenant_details & rent_log)...")
     try:
@@ -470,6 +798,9 @@ def onboard_tenant(name, email, phone, room, start_date, end_date=None, duration
         "contract_doc_url": f"https://docs.google.com/document/d/{doc_id}/edit",
         "contract_pdf_url": f"https://drive.google.com/file/d/{pdf_id}/view",
         "contract_docx_url": f"https://drive.google.com/file/d/{docx_id}/view" if docx_id else None,
+        "wohnungsgeberbestaetigung_pdf_url": f"https://drive.google.com/file/d/{wgb_id}/view" if wgb_id else None,
+        "welcome_kit_pdf_url": f"https://drive.google.com/file/d/{w_pdf_id}/view" if w_pdf_id else None,
+        "keys_acknowledgement_pdf_url": f"https://drive.google.com/file/d/{k_pdf_id}/view" if k_pdf_id else None,
         "clickup_task_id": cu_id
     }
     print(f"\n🎉 Onboarding Complete in One Shot!")
