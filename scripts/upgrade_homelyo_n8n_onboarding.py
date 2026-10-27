@@ -121,7 +121,7 @@ def main():
                 },
                 "sendBody": True,
                 "specifyBody": "json",
-                "jsonBody": "={{ JSON.stringify({\n  from: 'Homelyo Inquiries <noreply@wealthyo.in>',\n  reply_to: $node[\"Parse Form Submission\"].json.email,\n  to: ['support@homelyo.eu'],\n  subject: $node[\"Parse Form Submission\"].json.admin_email_subject,\n  text: $node[\"Parse Form Submission\"].json.admin_email_text,\n  html: $node[\"Parse Form Submission\"].json.admin_email_html\n}) }}",
+                "jsonBody": "={{ JSON.stringify({\n  from: 'Homelyo Inquiries <noreply@wealthyo.in>',\n  reply_to: $node[\"Parse Form Submission\"].json.email,\n  to: ['support@homelyo.eu', 'support@wealthyo.in'],\n  subject: $node[\"Parse Form Submission\"].json.admin_email_subject,\n  text: $node[\"Parse Form Submission\"].json.admin_email_text,\n  html: $node[\"Parse Form Submission\"].json.admin_email_html\n}) }}",
                 "options": {
                     "continueOnFail": True
                 }

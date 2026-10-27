@@ -86,23 +86,18 @@ Thank you for your interest in Homelyo Berlin! We have received your booking app
 
 We would be delighted to welcome you to our coliving community in Berlin Lichtenrade.
 
+Required Verification Documents:
 To proceed with verifying your booking and preparing your digital tenancy agreement (Mietvertrag & Wohnungsgeberbestätigung for your Bürgeramt city registration), please reply to this email with copies of the following documents:
 
 1. Identification & Legal Stay:
    • Clear scan or photo of your valid Passport (photo & biographical page).
-   • Valid German Visa / Entry Visa (Type D) or German Residence Permit (Aufenthaltstitel).
+   • Valid German Visa or German Residence Permit (Aufenthaltstitel).
 
-2. University & Employment Verification:
-   • Official University Admission / Academic Appointment Letter or Employment Contract.
-
-3. Proof of Financial Capability:
+2. Proof of Financial Capability:
    • Bank statements from the last 3 months, or official stipend / salary disbursement documentation confirming sufficient funds.
 
-4. Emergency Contact Information:
-   • Full name, relationship, contact phone number, and email address of your designated emergency contact.
-
 Room Summary & Financial Overview:
-• Room: ${room} (${roomTitle})
+• Room: Room ${room} (${roomTitle})
 • Warm Rent: €${rentAmount} / month (all-inclusive: heating, electricity, water, high-speed Wi-Fi)
 • Deposit (Kaution): 1000€ (held in escrow in accordance with German tenancy law)
 • Move-in Date: ${startDate}
@@ -121,86 +116,120 @@ Email: support@homelyo.eu
 Web: https://www.homelyo.eu`;
 
 const emailHtml = `<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
-<style>
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; color: #1e293b; margin: 0; padding: 24px; line-height: 1.6; }
-.card { max-width: 620px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-.header { background: #0f172a; padding: 24px 32px; border-bottom: 3px solid #00D084; text-align: left; }
-.header h1 { margin: 0; color: #ffffff; font-size: 22px; font-weight: 700; }
-.header p { margin: 4px 0 0; color: #94a3b8; font-size: 13px; }
-.content { padding: 32px; }
-h2 { font-size: 16px; color: #0f172a; margin-top: 24px; margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; }
-ol { padding-left: 20px; margin: 12px 0; }
-li { margin-bottom: 12px; }
-ul { margin: 6px 0 0; padding-left: 18px; color: #475569; }
-.summary-box { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 18px 22px; margin: 24px 0; }
-.summary-box ul { list-style: none; padding-left: 0; margin: 0; }
-.summary-box li { margin-bottom: 6px; color: #166534; font-size: 14px; }
-.footer { background: #f8fafc; padding: 20px 32px; border-top: 1px solid #e2e8f0; font-size: 13px; color: #64748b; }
-a { color: #00D084; text-decoration: none; font-weight: 600; }
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Homelyo Berlin — Booking Verification</title>
 </head>
-<body>
-<div class="card">
-  <div class="header">
-    <h1>🏠 Homelyo Coliving Berlin</h1>
-    <p>Lichtenrader Damm 80, 12305 Berlin</p>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f1f5f9; color: #1e293b; margin: 0; padding: 24px; line-height: 1.6;">
+<div style="max-width: 620px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);">
+  
+  <!-- Header with Official Homelyo Logo -->
+  <div style="background-color: #0f172a; padding: 24px 32px; border-bottom: 3px solid #00D084;">
+    <table cellpadding="0" cellspacing="0" border="0" style="width: 100%;">
+      <tr>
+        <td style="vertical-align: middle;">
+          <img src="https://storage.googleapis.com/wealthyo-social-media-assets/homelyo/Homelyo-logo-header.png" alt="Homelyo Coliving Berlin" style="height: 48px; width: auto; max-width: 220px; display: block; border: 0;" />
+        </td>
+        <td style="vertical-align: middle; text-align: right; color: #94a3b8; font-size: 13px; line-height: 1.4;">
+          <strong style="color: #f8fafc;">Homelyo Coliving</strong><br>
+          Lichtenrader Damm 80<br>
+          12305 Berlin, Germany
+        </td>
+      </tr>
+    </table>
   </div>
-  <div class="content">
-    <p>Dear <strong>${name}</strong>,</p>
-    <p>Thank you for your interest in Homelyo Berlin! We have received your booking application for <strong>Room ${room} (${roomTitle})</strong> with your requested move-in date on <strong>${startDate}</strong>.</p>
-    <p>We would be delighted to welcome you to our coliving community in Berlin Lichtenrade.</p>
-    
-    <h2>📄 Required Verification Documents</h2>
-    <p>To proceed with verifying your booking and preparing your digital tenancy agreement (<em>Mietvertrag &amp; Wohnungsgeberbestätigung</em> for your Bürgeramt city registration), please reply to this email with copies of the following documents:</p>
-    
-    <ol>
-      <li><strong>Identification &amp; Legal Stay:</strong>
-        <ul>
-          <li>Clear scan or photo of your valid Passport (photo &amp; biographical page).</li>
-          <li>Valid German Visa / Entry Visa (Type D) or German Residence Permit (<em>Aufenthaltstitel</em>).</li>
+
+  <!-- Content Container -->
+  <div style="padding: 32px;">
+    <p style="margin: 0 0 16px 0; font-size: 15px; color: #0f172a;">Dear <strong>${name}</strong>,</p>
+    <p style="margin: 0 0 14px 0; font-size: 14px; color: #334155; line-height: 1.6;">
+      Thank you for your interest in Homelyo Berlin! We have received your booking application for <strong>Room ${room} (${roomTitle})</strong> with your requested move-in date on <strong>${startDate}</strong>.
+    </p>
+    <p style="margin: 0 0 24px 0; font-size: 14px; color: #334155; line-height: 1.6;">
+      We would be delighted to welcome you to our coliving community in Berlin Lichtenrade.
+    </p>
+
+    <!-- Required Verification Documents Card -->
+    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px 24px; margin: 24px 0;">
+      <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">
+        📄 Required Verification Documents
+      </div>
+      <p style="margin: 0 0 14px 0; font-size: 13.5px; color: #475569; line-height: 1.5;">
+        To proceed with verifying your booking and preparing your digital tenancy agreement (<em>Mietvertrag &amp; Wohnungsgeberbestätigung</em> for your Bürgeramt city registration), please reply directly to this email with copies of:
+      </p>
+      
+      <!-- Point 1 -->
+      <div style="margin-bottom: 12px; padding: 12px 16px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px;">
+        <div style="font-weight: 600; color: #0f172a; font-size: 14px;">1. Identification &amp; Legal Stay</div>
+        <ul style="margin: 6px 0 0 0; padding-left: 18px; color: #475569; font-size: 13px; line-height: 1.5;">
+          <li>Clear scan or photo of your valid <strong>Passport</strong> (photo &amp; biographical page).</li>
+          <li>Valid <strong>German Visa</strong> or <strong>German Residence Permit</strong> (<em>Aufenthaltstitel</em>).</li>
         </ul>
-      </li>
-      <li><strong>University &amp; Employment Verification:</strong>
-        <ul>
-          <li>Official University Admission / Academic Appointment Letter or Employment Contract.</li>
+      </div>
+
+      <!-- Point 2 -->
+      <div style="margin-bottom: 0; padding: 12px 16px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px;">
+        <div style="font-weight: 600; color: #0f172a; font-size: 14px;">2. Proof of Financial Capability</div>
+        <ul style="margin: 6px 0 0 0; padding-left: 18px; color: #475569; font-size: 13px; line-height: 1.5;">
+          <li><strong>Bank statements</strong> from the last 3 months, or official stipend / salary disbursement documentation confirming sufficient funds.</li>
         </ul>
-      </li>
-      <li><strong>Proof of Financial Capability:</strong>
-        <ul>
-          <li>Bank statements from the last 3 months, or official stipend / salary disbursement documentation confirming sufficient funds.</li>
-        </ul>
-      </li>
-      <li><strong>Emergency Contact Information:</strong>
-        <ul>
-          <li>Full name, relationship, contact phone number, and email address of your designated emergency contact.</li>
-        </ul>
-      </li>
-    </ol>
-    
-    <div class="summary-box">
-      <strong>Room Summary &amp; Financial Overview:</strong>
-      <ul>
-        <li>• <strong>Room:</strong> Room ${room} (${roomTitle})</li>
-        <li>• <strong>Warm Rent:</strong> €${rentAmount} / month (all-inclusive: heating, electricity, water, high-speed Wi-Fi)</li>
-        <li>• <strong>Deposit (Kaution):</strong> 1000€ (held in escrow in accordance with German tenancy law)</li>
-        <li>• <strong>Move-in Date:</strong> ${startDate}</li>
-        <li>• <strong>Initial Duration:</strong> ${durationMonths} months</li>
-      </ul>
+      </div>
     </div>
-    
-    <p>Once we receive and review your documents, we will share the digital tenancy agreement for your review and electronic signature.</p>
-    <p>If you have any questions about the room, public transit connections, or the move-in process, please feel free to reach out.</p>
-    
-    <p style="margin-top: 24px;">Best regards,<br>
-    <strong>The Homelyo Team</strong><br>
-    Homelyo Coliving Berlin</p>
+
+    <!-- Room Summary & Financial Overview Card -->
+    <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 20px 24px; margin: 24px 0;">
+      <div style="font-size: 15px; font-weight: 700; color: #166534; margin-bottom: 12px; border-bottom: 1px solid #bbf7d0; padding-bottom: 8px;">
+        🏠 Room Summary &amp; Financial Overview
+      </div>
+      <table cellpadding="0" cellspacing="0" border="0" style="width: 100%; font-size: 13.5px; line-height: 1.6; color: #1e293b;">
+        <tr>
+          <td style="padding: 5px 0; color: #15803d; font-weight: 600; width: 145px;">Selected Room:</td>
+          <td style="padding: 5px 0; font-weight: 600; color: #0f172a;">Room ${room} (${roomTitle})</td>
+        </tr>
+        <tr>
+          <td style="padding: 5px 0; color: #15803d; font-weight: 600;">Monthly Warm Rent:</td>
+          <td style="padding: 5px 0; font-weight: 600; color: #0f172a;">€${rentAmount} / month <span style="font-weight: normal; font-size: 12px; color: #64748b;">(all-inclusive: heating, electricity, water, Wi-Fi)</span></td>
+        </tr>
+        <tr>
+          <td style="padding: 5px 0; color: #15803d; font-weight: 600;">Deposit (Kaution):</td>
+          <td style="padding: 5px 0; font-weight: 600; color: #0f172a;">1000€ <span style="font-weight: normal; font-size: 12px; color: #64748b;">(held in escrow under German tenancy law)</span></td>
+        </tr>
+        <tr>
+          <td style="padding: 5px 0; color: #15803d; font-weight: 600;">Move-In Date:</td>
+          <td style="padding: 5px 0; font-weight: 600; color: #0f172a;">${startDate}</td>
+        </tr>
+        <tr>
+          <td style="padding: 5px 0; color: #15803d; font-weight: 600;">Initial Duration:</td>
+          <td style="padding: 5px 0; font-weight: 600; color: #0f172a;">${durationMonths} months</td>
+        </tr>
+      </table>
+    </div>
+
+    <p style="font-size: 14px; color: #334155; line-height: 1.6;">
+      Once we receive and review your documents, we will share the digital tenancy agreement for your review and electronic signature.
+    </p>
+    <p style="font-size: 14px; color: #334155; line-height: 1.6;">
+      If you have any questions about the room, public transit connections, or the move-in process, please feel free to reach out.
+    </p>
+
+    <!-- Sign-off -->
+    <div style="margin-top: 28px; padding-top: 18px; border-top: 1px solid #e2e8f0;">
+      <p style="margin: 0; font-size: 14px; color: #0f172a; line-height: 1.5;">
+        Best regards,<br>
+        <strong>The Homelyo Team</strong><br>
+        <span style="color: #64748b; font-size: 13px;">Homelyo Coliving Berlin</span>
+      </p>
+    </div>
   </div>
-  <div class="footer">
-    📍 Lichtenrader Damm 80, 12305 Berlin<br>
-    📧 Email: <a href="mailto:support@homelyo.eu">support@homelyo.eu</a> &nbsp;|&nbsp; 🌐 Web: <a href="https://www.homelyo.eu" target="_blank">https://www.homelyo.eu</a>
+
+  <!-- Footer -->
+  <div style="background-color: #f8fafc; padding: 20px 32px; border-top: 1px solid #e2e8f0; font-size: 12.5px; color: #64748b; text-align: center; line-height: 1.6;">
+    📍 Lichtenrader Damm 80, 12305 Berlin &nbsp;|&nbsp; 📧 <a href="mailto:support@homelyo.eu" style="color: #059669; text-decoration: none; font-weight: 600;">support@homelyo.eu</a> &nbsp;|&nbsp; 🌐 <a href="https://www.homelyo.eu" target="_blank" style="color: #059669; text-decoration: none; font-weight: 600;">www.homelyo.eu</a>
+    <div style="margin-top: 8px; font-size: 11.5px; color: #94a3b8;">
+      Homelyo Berlin Coliving · Fully furnished rooms with all-inclusive flatrate and official city registration (Anmeldung).
+    </div>
   </div>
 </div>
 </body>
@@ -228,25 +257,43 @@ Applicant Details:
 A document verification request has been automatically dispatched to ${email}.`;
 
 const adminEmailHtml = `<!DOCTYPE html>
-<html>
-<body style="font-family: sans-serif; color: #1e293b; padding: 20px;">
-  <h2>📥 New Inbound Booking Application Received</h2>
-  <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
-    <tr><td style="padding: 8px; border-bottom: 1px solid #e2e8f0; font-weight: bold;">Applicant:</td><td style="padding: 8px; border-bottom: 1px solid #e2e8f0;">${name}</td></tr>
-    <tr><td style="padding: 8px; border-bottom: 1px solid #e2e8f0; font-weight: bold;">Email:</td><td style="padding: 8px; border-bottom: 1px solid #e2e8f0;"><a href="mailto:${email}">${email}</a></td></tr>
-    <tr><td style="padding: 8px; border-bottom: 1px solid #e2e8f0; font-weight: bold;">Phone:</td><td style="padding: 8px; border-bottom: 1px solid #e2e8f0;">${phone}</td></tr>
-    <tr><td style="padding: 8px; border-bottom: 1px solid #e2e8f0; font-weight: bold;">Room Preference:</td><td style="padding: 8px; border-bottom: 1px solid #e2e8f0;">Room ${room} (${roomTitle})</td></tr>
-    <tr><td style="padding: 8px; border-bottom: 1px solid #e2e8f0; font-weight: bold;">Move-In Date:</td><td style="padding: 8px; border-bottom: 1px solid #e2e8f0;">${startDate}</td></tr>
-    <tr><td style="padding: 8px; border-bottom: 1px solid #e2e8f0; font-weight: bold;">Duration:</td><td style="padding: 8px; border-bottom: 1px solid #e2e8f0;">${durationMonths} months</td></tr>
-    <tr><td style="padding: 8px; border-bottom: 1px solid #e2e8f0; font-weight: bold;">Warm Rent:</td><td style="padding: 8px; border-bottom: 1px solid #e2e8f0;">€${rentAmount} / month</td></tr>
-    <tr><td style="padding: 8px; border-bottom: 1px solid #e2e8f0; font-weight: bold;">Deposit:</td><td style="padding: 8px; border-bottom: 1px solid #e2e8f0;">1000€</td></tr>
-    <tr><td style="padding: 8px; border-bottom: 1px solid #e2e8f0; font-weight: bold;">Occupation / Univ:</td><td style="padding: 8px; border-bottom: 1px solid #e2e8f0;">${occupation}</td></tr>
-    <tr><td style="padding: 8px; border-bottom: 1px solid #e2e8f0; font-weight: bold;">Current Address:</td><td style="padding: 8px; border-bottom: 1px solid #e2e8f0;">${currentAddress}</td></tr>
-    <tr><td style="padding: 8px; border-bottom: 1px solid #e2e8f0; font-weight: bold;">Occupants:</td><td style="padding: 8px; border-bottom: 1px solid #e2e8f0;">${occupants}</td></tr>
-    <tr><td style="padding: 8px; border-bottom: 1px solid #e2e8f0; font-weight: bold;">Referral Source:</td><td style="padding: 8px; border-bottom: 1px solid #e2e8f0;">${hearAbout}</td></tr>
-    <tr><td style="padding: 8px; border-bottom: 1px solid #e2e8f0; font-weight: bold;">Notes / Inquiries:</td><td style="padding: 8px; border-bottom: 1px solid #e2e8f0;">${notes}</td></tr>
-  </table>
-  <p style="margin-top: 20px; font-size: 13px; color: #64748b;">Automated document verification request has been dispatched to ${email}.</p>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f1f5f9; color: #1e293b; padding: 20px;">
+  <div style="max-width: 640px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+    <div style="background-color: #0f172a; padding: 20px 24px; border-bottom: 3px solid #00D084;">
+      <table cellpadding="0" cellspacing="0" border="0" style="width: 100%;">
+        <tr>
+          <td><img src="https://storage.googleapis.com/wealthyo-social-media-assets/homelyo/Homelyo-logo-header.png" alt="Homelyo" style="height: 40px; display: block; border: 0;" /></td>
+          <td style="text-align: right; color: #00D084; font-weight: bold; font-size: 14px;">NEW BOOKING INQUIRY</td>
+        </tr>
+      </table>
+    </div>
+    <div style="padding: 24px;">
+      <h2 style="font-size: 17px; margin: 0 0 16px 0; color: #0f172a;">📥 Inbound Booking Dossier: ${name}</h2>
+      <table style="width: 100%; border-collapse: collapse; font-size: 13.5px; line-height: 1.5;">
+        <tr><td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold; width: 140px; background: #f8fafc;">Applicant:</td><td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0;"><strong>${name}</strong></td></tr>
+        <tr><td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold; background: #f8fafc;">Email:</td><td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0;"><a href="mailto:${email}" style="color: #0284c7; text-decoration: none;">${email}</a></td></tr>
+        <tr><td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold; background: #f8fafc;">Phone / WhatsApp:</td><td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0;"><a href="tel:${phone}" style="color: #0284c7; text-decoration: none;">${phone}</a></td></tr>
+        <tr><td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold; background: #f8fafc;">Room Selection:</td><td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0; font-weight: 600; color: #0f172a;">Room ${room} (${roomTitle})</td></tr>
+        <tr><td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold; background: #f8fafc;">Move-In Date:</td><td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0;">${startDate}</td></tr>
+        <tr><td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold; background: #f8fafc;">Stay Duration:</td><td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0;">${durationMonths} months</td></tr>
+        <tr><td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold; background: #f8fafc;">Warm Rent:</td><td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0; color: #166534; font-weight: bold;">€${rentAmount} / month</td></tr>
+        <tr><td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold; background: #f8fafc;">Deposit (Kaution):</td><td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0;">1000€</td></tr>
+        <tr><td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold; background: #f8fafc;">Occupation / Univ:</td><td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0;">${occupation}</td></tr>
+        <tr><td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold; background: #f8fafc;">Current Address:</td><td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0;">${currentAddress}</td></tr>
+        <tr><td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold; background: #f8fafc;">Occupants:</td><td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0;">${occupants}</td></tr>
+        <tr><td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold; background: #f8fafc;">Referral Source:</td><td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0;">${hearAbout}</td></tr>
+        <tr><td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold; background: #f8fafc;">Notes / Inquiries:</td><td style="padding: 8px 10px; border-bottom: 1px solid #e2e8f0;">${notes}</td></tr>
+      </table>
+      <div style="margin-top: 20px; padding: 12px 16px; background: #f0fdf4; border-left: 4px solid #00D084; font-size: 13px; color: #166534;">
+        ✓ Automated document verification request dispatched to <strong>${email}</strong>.<br>
+        ✓ ClickUp task &amp; chat alert created.
+      </div>
+    </div>
+  </div>
 </body>
 </html>`;
 
@@ -268,8 +315,8 @@ const markdownDescription = `### 📋 Homelyo Inbound Booking Application Dossie
 
 ---
 ### ✅ Next Steps & Verification Checklist
-- [ ] Identity & Passport Verification
-- [ ] German Visa / Residence Permit Check
+- [ ] Identification & Passport Verification
+- [ ] German Visa / Residence Permit (Aufenthaltstitel) Check
 - [ ] 3 Months Bank Statements / Proof of Funds
 - [x] Auto-Sent Document Request Email to Tenant (${email})
 - [ ] Prepare Dual-Language Mietvertrag & Escrow Agreement
@@ -290,7 +337,7 @@ const chatAlert = `📋 **[NEW HOMELYO BOOKING REQUEST]**
 • **Occupation:** ${occupation}
 • **Notes:** ${notes}
 
-✉️ *Document verification request auto-dispatched to applicant (${email}) and notification to support@homelyo.eu.*`;
+✉️ *Document verification request auto-dispatched to applicant (${email}) and notification to support@homelyo.eu / support@wealthyo.in.*`;
 
 return [{
   json: {
