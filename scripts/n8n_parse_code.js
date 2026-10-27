@@ -337,7 +337,7 @@ const chatAlert = `📋 **[NEW HOMELYO BOOKING REQUEST]**
 • **Occupation:** ${occupation}
 • **Notes:** ${notes}
 
-✉️ *Document verification request auto-dispatched to applicant (${email}) and notification to support@homelyo.eu / support@wealthyo.in.*`;
+✉️ *Document verification request auto-dispatched to applicant (${email}) and notification to support@homelyo.eu.*`;
 
 return [{
   json: {
