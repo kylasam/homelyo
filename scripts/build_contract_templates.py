@@ -160,9 +160,18 @@ def num_to_words_en(n):
         parts.append(_under_thousand(rem))
     return " ".join(parts)
 
+def parse_date_flex(d_str):
+    if not d_str:
+        return ""
+    d_str = str(d_str).strip()
+    if len(d_str) == 8 and d_str.isdigit():
+        return f"{d_str[:4]}-{d_str[4:6]}-{d_str[6:8]}"
+    return d_str
+
 def format_date_bilingual(date_str):
     if not date_str:
         return "", ""
+    date_str = parse_date_flex(date_str)
     dt = datetime.datetime.strptime(date_str, "%Y-%m-%d")
     de_months = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"]
     en_months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
@@ -206,14 +215,26 @@ def render_contract_data(
     end_de, end_en = format_date_bilingual(end_date)
 
     if not tenant_address_de:
-        tenant_address_de = "Type 4 building no 3 flat no 4 esis hospital quarters , Vashi sector-5 sagar vihar road, 400703 Navi Mumbai, Indien"
+        if "Bhargavi" in tenant_name:
+            tenant_address_de = "Type 4 building no 3 flat no 4 esis hospital quarters , Vashi sector-5 sagar vihar road, 400703 Navi Mumbai, Indien"
+        else:
+            tenant_address_de = "[Wohnsitz vor Einzug / Current Permanent Address Pending]"
     if not tenant_address_en:
-        tenant_address_en = "Type 4 building no 3 flat no 4 esis hospital quarters , Vashi sector-5 sagar vihar road, 400703 Navi Mumbai, India"
+        if "Bhargavi" in tenant_name:
+            tenant_address_en = "Type 4 building no 3 flat no 4 esis hospital quarters , Vashi sector-5 sagar vihar road, 400703 Navi Mumbai, India"
+        else:
+            tenant_address_en = "[Current Permanent Address to be submitted by tenant]"
 
     if not reason_de:
-        reason_de = "Aufgrund eines Studiensemesters außerhalb seines eigentlichen Studienortes."
+        if "Bhargavi" in tenant_name:
+            reason_de = "Aufgrund eines Studiensemesters außerhalb seines eigentlichen Studienortes."
+        else:
+            reason_de = "Aufgrund des vorübergehenden Wohnbedarfs zum Zwecke des Aufenthalts in Berlin."
     if not reason_en:
-        reason_en = "Due to a semester of study outside of his/her normal place of study."
+        if "Bhargavi" in tenant_name:
+            reason_en = "Due to a semester of study outside of his/her normal place of study."
+        else:
+            reason_en = "Due to temporary housing needs for the duration of the stay in Berlin."
 
     default_indiv_de = "5 % Erhöhung der Miete pro Jahr<br>Wenn Sie es mit anderen Personen teilen, müssen Sie den Kauf gemeinsamer Gegenstände wie WC-Reinigungsflüssigkeit unter den Mietern einplanen."
     default_indiv_en = "5% increase on rent/year<br>if shared with other people, need to plan buying common items like wc cleaning liquid among tenants."

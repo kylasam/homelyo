@@ -107,41 +107,85 @@ from build_contract_templates import (
     render_contract_data,
     render_contract_docx,
     render_contract_html,
+    convert_html_to_pdf,
     DOCX_TEMPLATE_PATH,
     HTML_TEMPLATE_PATH
 )
 
-def generate_contract_html(tenant_name, tenant_email, tenant_phone, room_code, start_date, end_date, rent_amount, deposit_amount):
+def parse_date_flex(d_str):
+    if not d_str:
+        return ""
+    d_str = str(d_str).strip()
+    if len(d_str) == 8 and d_str.isdigit():
+        return f"{d_str[:4]}-{d_str[4:6]}-{d_str[6:8]}"
+    return d_str
+
+def generate_contract_html(tenant_name, tenant_email, tenant_phone, room_code, start_date, end_date, rent_amount, deposit_amount, **kwargs):
     """
     Renders the official bilingual Homelyo Rental Contract in HTML format
     with embedded Homelyo logo and exact clause layout.
     """
     tenant_dict = render_contract_data(
-        tenant_name, tenant_email, tenant_phone, room_code, start_date, end_date, rent_amount, deposit_amount
+        tenant_name=tenant_name,
+        tenant_email=tenant_email,
+        tenant_phone=tenant_phone,
+        room_code=room_code,
+        start_date=start_date,
+        end_date=end_date,
+        rent_amount=rent_amount,
+        deposit_amount=deposit_amount,
+        **kwargs
     )
     return render_contract_html(tenant_dict)
 
-def upload_contract_to_drive(token, folder_id, doc_name, tenant_name, tenant_email, tenant_phone, room_code, start_date, end_date, rent_amount, deposit_amount):
+def upload_contract_to_drive(token, folder_id, doc_name, tenant_name, tenant_email, tenant_phone, room_code, start_date, end_date, rent_amount, deposit_amount, **kwargs):
     """
     Renders the master templated contract (with Homelyo logo, tables & AGB),
-    uploads as a native Google Doc, exports as official PDF, and uploads DOCX to tenant folder.
+    uploads as a native Google Doc, generates high-fidelity local Chrome PDF without headers/footers,
+    and uploads both PDF and DOCX to the tenant folder.
     """
+    start_date = parse_date_flex(start_date)
+    end_date = parse_date_flex(end_date)
+
     tenant_dict = render_contract_data(
-        tenant_name, tenant_email, tenant_phone, room_code, start_date, end_date, rent_amount, deposit_amount
+        tenant_name=tenant_name,
+        tenant_email=tenant_email,
+        tenant_phone=tenant_phone,
+        room_code=room_code,
+        start_date=start_date,
+        end_date=end_date,
+        rent_amount=rent_amount,
+        deposit_amount=deposit_amount,
+        **kwargs
     )
     temp_docx_path = f"/tmp/{doc_name}.docx"
     render_contract_docx(tenant_dict, temp_docx_path)
+
+    temp_html_path = f"/tmp/{doc_name}.html"
+    temp_pdf_path = f"/tmp/{doc_name}.pdf"
+    html_content = render_contract_html(tenant_dict)
+    with open(temp_html_path, "w", encoding="utf-8") as f:
+        f.write(html_content)
+
+    # 1. Render high-fidelity local PDF via Chrome
+    pdf_bytes = None
+    try:
+        convert_html_to_pdf(temp_html_path, temp_pdf_path)
+        with open(temp_pdf_path, "rb") as f:
+            pdf_bytes = f.read()
+    except Exception as e:
+        print(f"  ⚠ Local Chrome PDF rendering fallback: {e}")
 
     with open(temp_docx_path, "rb") as f:
         docx_bytes = f.read()
 
     boundary = "===============HOMELYO_BOUNDARY=="
 
-    # 1. Upload DOCX and convert to Google Doc
+    # 2. Upload DOCX and convert to Google Doc
     metadata = {
         "name": doc_name,
         "mimeType": "application/vnd.google-apps.document",
-        "parents": [folder_id, "1CZcV4XWuY4pSpfNjkubdHsxprKg1f2xB"]
+        "parents": [folder_id]
     }
     body = (
         f"--{boundary}\r\n"
@@ -161,16 +205,17 @@ def upload_contract_to_drive(token, folder_id, doc_name, tenant_name, tenant_ema
         doc_res = json.loads(resp.read().decode())
         doc_id = doc_res["id"]
 
-    # 2. Export converted Google Doc as PDF & upload PDF to folder
-    export_url = f"https://www.googleapis.com/drive/v3/files/{doc_id}/export?mimeType=application/pdf"
-    exp_req = urllib.request.Request(export_url, headers={"Authorization": f"Bearer {token}"})
-    with urllib.request.urlopen(exp_req) as resp:
-        pdf_bytes = resp.read()
+    # 3. If local PDF was not generated, export converted Google Doc as PDF
+    if not pdf_bytes:
+        export_url = f"https://www.googleapis.com/drive/v3/files/{doc_id}/export?mimeType=application/pdf"
+        exp_req = urllib.request.Request(export_url, headers={"Authorization": f"Bearer {token}"})
+        with urllib.request.urlopen(exp_req) as resp:
+            pdf_bytes = resp.read()
 
     pdf_metadata = {
         "name": f"{doc_name}.pdf",
         "mimeType": "application/pdf",
-        "parents": [folder_id, "1CZcV4XWuY4pSpfNjkubdHsxprKg1f2xB"]
+        "parents": [folder_id]
     }
     pdf_body = (
         f"--{boundary}\r\n"
@@ -194,7 +239,7 @@ def upload_contract_to_drive(token, folder_id, doc_name, tenant_name, tenant_ema
     docx_metadata = {
         "name": f"{doc_name}.docx",
         "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        "parents": [folder_id, "1CZcV4XWuY4pSpfNjkubdHsxprKg1f2xB"]
+        "parents": [folder_id]
     }
     docx_body = (
         f"--{boundary}\r\n"
@@ -217,6 +262,17 @@ def upload_contract_to_drive(token, folder_id, doc_name, tenant_name, tenant_ema
             docx_id = docx_res["id"]
     except Exception as e:
         print(f"  ⚠ Notice: Could not upload standalone docx: {e}")
+
+    # Archive copy to generated_contracts if folder_id is not already the generated_contracts folder
+    archive_folder_id = "1CZcV4XWuY4pSpfNjkubdHsxprKg1f2xB"
+    if folder_id != archive_folder_id:
+        try:
+            copy_drive_file(token, doc_id, doc_name, archive_folder_id)
+            copy_drive_file(token, pdf_id, f"{doc_name}.pdf", archive_folder_id)
+            if docx_id:
+                copy_drive_file(token, docx_id, f"{doc_name}.docx", archive_folder_id)
+        except Exception as e:
+            print(f"  ⚠ Notice: Could not sync copy to generated_contracts archive: {e}")
 
     return doc_id, pdf_id, docx_id
 
@@ -675,10 +731,14 @@ def upload_personalized_keys_acknowledgement(token, folder_id, tenant_name, room
 
     return k_doc_id, k_pdf_id
 
-def onboard_tenant(name, email, phone, room, start_date, end_date=None, duration_months=None, platform="Direct / Homelyo Portal", rent_amount=None, deposit_amount=None):
+def onboard_tenant(name, email="", phone="", room="KE1", start_date="", end_date=None, duration_months=None, platform="Direct / Homelyo Portal", rent_amount=None, deposit_amount=None, purpose=None, reason_de=None, reason_en=None, address_de=None, address_en=None):
     room = room.upper().strip()
     if room not in ROOM_SPECS:
         raise ValueError(f"Invalid room '{room}'. Must be KE1, KE2, KE3, or KE4.")
+
+    start_date = parse_date_flex(start_date)
+    if end_date:
+        end_date = parse_date_flex(end_date)
 
     d_start = datetime.datetime.strptime(start_date, "%Y-%m-%d").date()
     if not end_date:
@@ -694,6 +754,15 @@ def onboard_tenant(name, email, phone, room, start_date, end_date=None, duration
         end_date = d_end.strftime("%Y-%m-%d")
     else:
         d_end = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
+
+    if purpose and not reason_de:
+        p_low = purpose.lower()
+        if "temporary" in p_low or "housing" in p_low or "wohnbedarf" in p_low:
+            reason_de = "Aufgrund des vorübergehenden Wohnbedarfs zum Zwecke des Aufenthalts in Berlin."
+            reason_en = "Due to temporary housing needs for residency in Berlin."
+        else:
+            reason_de = f"Aufgrund von: {purpose}"
+            reason_en = f"Due to: {purpose}"
 
     token = get_gcloud_token()
     if not token:
@@ -737,7 +806,8 @@ def onboard_tenant(name, email, phone, room, start_date, end_date=None, duration
     print(f"📝 Generating dual-language rental contract: {contract_doc_name} (€{rent_amount:,.2f}/mo)...")
     doc_id, pdf_id, docx_id = upload_contract_to_drive(
         token, folder_id, contract_doc_name,
-        name, email, phone, room, start_date, end_date, rent_amount, deposit_amount
+        name, email, phone, room, start_date, end_date, rent_amount, deposit_amount,
+        reason_de=reason_de, reason_en=reason_en, tenant_address_de=address_de, tenant_address_en=address_en
     )
     print(f"  ✓ Contract Google Doc ID: {doc_id}")
     print(f"  ✓ Contract PDF ID: {pdf_id}")
@@ -808,20 +878,38 @@ def onboard_tenant(name, email, phone, room, start_date, end_date=None, duration
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Homelyo Autonomous Tenant Onboarding")
-    parser.add_argument("--name", required=True, help="Full Name of tenant")
-    parser.add_argument("--email", required=True, help="Email address")
+    parser.add_argument("--name", default=None, help="Full Name of tenant")
+    parser.add_argument("--first-name", default=None, help="Tenant First Name")
+    parser.add_argument("--last-name", default=None, help="Tenant Last Name")
+    parser.add_argument("--email", default="", help="Email address")
     parser.add_argument("--phone", default="", help="Phone number")
     parser.add_argument("--room", required=True, choices=["KE1", "KE2", "KE3", "KE4"], help="Room Code")
-    parser.add_argument("--start", required=True, help="Start Date (YYYY-MM-DD)")
-    parser.add_argument("--end", default=None, help="End Date (YYYY-MM-DD)")
+    parser.add_argument("--start", required=True, help="Start Date (YYYY-MM-DD or YYYYMMDD)")
+    parser.add_argument("--end", default=None, help="End Date (YYYY-MM-DD or YYYYMMDD)")
     parser.add_argument("--duration", type=int, default=None, help="Duration in months (default 6)")
     parser.add_argument("--platform", default="Direct / Homelyo Portal", help="Booking channel")
     parser.add_argument("--rent", type=float, default=None, help="Monthly warm rent in EUR")
     parser.add_argument("--deposit", type=float, default=None, help="Security deposit in EUR")
+    parser.add_argument("--advance", type=float, default=None, help="Advance / Security deposit in EUR")
+    parser.add_argument("--purpose", default=None, help="Purpose of stay (e.g. 'temporary housing needs')")
 
     args = parser.parse_args()
+
+    tenant_name = args.name
+    if not tenant_name:
+        if args.first_name and args.last_name:
+            tenant_name = f"{args.first_name.strip()} {args.last_name.strip()}"
+        elif args.first_name:
+            tenant_name = args.first_name.strip()
+        elif args.last_name:
+            tenant_name = args.last_name.strip()
+        else:
+            parser.error("Either --name or (--first-name and --last-name) must be provided.")
+
+    deposit_val = args.deposit if args.deposit is not None else args.advance
+
     res = onboard_tenant(
-        name=args.name,
+        name=tenant_name,
         email=args.email,
         phone=args.phone,
         room=args.room,
@@ -830,6 +918,7 @@ if __name__ == "__main__":
         duration_months=args.duration,
         platform=args.platform,
         rent_amount=args.rent,
-        deposit_amount=args.deposit
+        deposit_amount=deposit_val,
+        purpose=args.purpose
     )
     print(json.dumps(res, indent=2))

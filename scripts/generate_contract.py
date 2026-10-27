@@ -36,6 +36,14 @@ from build_contract_templates import (
     HTML_TEMPLATE_PATH
 )
 
+def parse_date_flex(d_str):
+    if not d_str:
+        return ""
+    d_str = str(d_str).strip()
+    if len(d_str) == 8 and d_str.isdigit():
+        return f"{d_str[:4]}-{d_str[4:6]}-{d_str[6:8]}"
+    return d_str
+
 def get_gcloud_token():
     try:
         return subprocess.check_output(["gcloud", "auth", "print-access-token"]).decode().strip()
@@ -58,14 +66,34 @@ def generate_local_contract(
     reason_en=None,
     individual_de=None,
     individual_en=None,
-    output_dir=None
+    output_dir=None,
+    custom_filename=None,
+    purpose=None
 ):
     if not output_dir:
         output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "contracts_generated")
     os.makedirs(output_dir, exist_ok=True)
 
+    start_date = parse_date_flex(start_date)
+    end_date = parse_date_flex(end_date)
+
+    if purpose and not reason_de:
+        p_low = purpose.lower()
+        if "temporary" in p_low or "housing" in p_low or "wohnbedarf" in p_low:
+            reason_de = "Aufgrund des vorübergehenden Wohnbedarfs zum Zwecke des Aufenthalts in Berlin."
+            reason_en = "Due to temporary housing needs for residency in Berlin."
+        else:
+            reason_de = f"Aufgrund von: {purpose}"
+            reason_en = f"Due to: {purpose}"
+
     clean_name = "".join(c for c in name if c.isalnum() or c in (" ", "_", "-")).strip().replace(" ", "_")
-    base_filename = f"Rental_Contract_{clean_name}_{room}_{start_date.replace('-', '')}_{end_date.replace('-', '')}"
+    start_tag = start_date.replace("-", "")
+    end_tag = end_date.replace("-", "")
+    
+    if custom_filename:
+        base_filename = custom_filename
+    else:
+        base_filename = f"Rental_Contract_{clean_name}_{room}_{start_tag}_{end_tag}"
 
     data = render_contract_data(
         tenant_name=name,
@@ -104,6 +132,16 @@ def generate_local_contract(
         print(f"  ✓ PDF Contract generated:  {pdf_output}")
     except Exception as e:
         print(f"  ⚠ Could not render local PDF directly: {e}")
+
+    # Also generate secondary alias file if a custom filename was used
+    std_filename = f"Rental_Contract_{clean_name}_{room}_{start_tag}_{end_tag}"
+    if custom_filename and custom_filename != std_filename:
+        import shutil
+        for ext in [".pdf", ".docx", ".html"]:
+            src = os.path.join(output_dir, f"{base_filename}{ext}")
+            dst = os.path.join(output_dir, f"{std_filename}{ext}")
+            if os.path.exists(src):
+                shutil.copyfile(src, dst)
 
     return {
         "base_filename": base_filename,
@@ -209,14 +247,19 @@ def upload_and_export_pdf(token, folder_id, doc_name, docx_path, pdf_path=None):
 
 def main():
     parser = argparse.ArgumentParser(description="Homelyo Contract Generator")
-    parser.add_argument("--name", required=True, help="Full Tenant Name (e.g., 'Bhargavi Mangesh Ayare' or 'Naeem Ullah Khan')")
+    parser.add_argument("--name", default=None, help="Full Tenant Name (e.g., 'Umakant Yadav')")
+    parser.add_argument("--first-name", default=None, help="Tenant First Name")
+    parser.add_argument("--last-name", default=None, help="Tenant Last Name")
     parser.add_argument("--email", default="", help="Tenant Email")
     parser.add_argument("--phone", default="", help="Tenant Phone Number")
     parser.add_argument("--room", default="KE2", choices=["KE1", "KE2", "KE3", "KE4"], help="Room ID (KE1 to KE4)")
-    parser.add_argument("--start", default="2025-03-25", help="Start Date (YYYY-MM-DD)")
-    parser.add_argument("--end", default="2025-09-30", help="End Date (YYYY-MM-DD)")
+    parser.add_argument("--start", default="2025-03-25", help="Start Date (YYYY-MM-DD or YYYYMMDD)")
+    parser.add_argument("--end", default="2025-09-30", help="End Date (YYYY-MM-DD or YYYYMMDD)")
     parser.add_argument("--rent", type=float, default=None, help="Monthly Rent in EUR (default: standard room rate)")
-    parser.add_argument("--deposit", type=float, default=None, help="Security Deposit in EUR (default: 2 months rent)")
+    parser.add_argument("--deposit", type=float, default=None, help="Security Deposit in EUR")
+    parser.add_argument("--advance", type=float, default=None, help="Security Deposit / Advance in EUR (alias to --deposit)")
+    parser.add_argument("--purpose", default=None, help="Purpose of stay (e.g. 'temporary housing needs')")
+    parser.add_argument("--filename", default=None, help="Custom filename base (e.g. 'Umakant_yadav_ke1_20261101_20270430')")
     parser.add_argument("--address-de", default=None, help="Tenant Address in German")
     parser.add_argument("--address-en", default=None, help="Tenant Address in English")
     parser.add_argument("--reason-de", default=None, help="Reason for temporary stay in German")
@@ -229,29 +272,44 @@ def main():
 
     args = parser.parse_args()
 
+    tenant_name = args.name
+    if not tenant_name:
+        if args.first_name and args.last_name:
+            tenant_name = f"{args.first_name.strip()} {args.last_name.strip()}"
+        elif args.first_name:
+            tenant_name = args.first_name.strip()
+        elif args.last_name:
+            tenant_name = args.last_name.strip()
+        else:
+            parser.error("Either --name or (--first-name and --last-name) must be provided.")
+
+    deposit_val = args.deposit if args.deposit is not None else args.advance
+
     print(f"\n========================================================")
     print(f"🏠 HOMELYO CONTRACT GENERATOR (7-PAGE BILINGUAL FORMAT)")
     print(f"========================================================")
-    print(f"👤 Tenant: {args.name}")
-    print(f"🛏️  Room:   {args.room} ({ROOM_SPECS.get(args.room, {}).get('title', '')})")
+    print(f"👤 Tenant: {tenant_name}")
+    print(f"🛏️  Room:   {args.room} ({ROOM_SPECS.get(args.room, {}).get('title_en', '')})")
     print(f"📅 Dates:  {args.start} to {args.end}")
     
     gen_result = generate_local_contract(
-        name=args.name,
+        name=tenant_name,
         email=args.email,
         phone=args.phone,
         room=args.room,
         start_date=args.start,
         end_date=args.end,
         rent=args.rent,
-        deposit=args.deposit,
+        deposit=deposit_val,
         address_de=args.address_de,
         address_en=args.address_en,
         reason_de=args.reason_de,
         reason_en=args.reason_en,
         individual_de=args.individual_de,
         individual_en=args.individual_en,
-        output_dir=args.output_dir
+        output_dir=args.output_dir,
+        custom_filename=args.filename,
+        purpose=args.purpose
     )
 
     if args.upload_to_drive:
