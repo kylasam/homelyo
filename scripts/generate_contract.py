@@ -224,8 +224,8 @@ def main():
     parser.add_argument("--individual-de", default=None, help="Individual stipulations in German")
     parser.add_argument("--individual-en", default=None, help="Individual stipulations in English")
     parser.add_argument("--output-dir", default=None, help="Local directory to write output files")
-    parser.add_argument("--upload-to-drive", action="store_true", help="Upload to Google Drive & generate live Google Doc & PDF")
-    parser.add_argument("--drive-folder-id", default=None, help="Target Google Drive folder ID")
+    parser.add_argument("--upload-to-drive", action="store_true", default=True, help="Upload to Google Drive & generate live Google Doc & PDF")
+    parser.add_argument("--drive-folder-id", default="1CZcV4XWuY4pSpfNjkubdHsxprKg1f2xB", help="Target Google Drive folder ID (default: generated_contracts folder)")
 
     args = parser.parse_args()
 

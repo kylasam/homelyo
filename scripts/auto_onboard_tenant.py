@@ -142,7 +142,7 @@ def upload_contract_to_drive(token, folder_id, doc_name, tenant_name, tenant_ema
     metadata = {
         "name": doc_name,
         "mimeType": "application/vnd.google-apps.document",
-        "parents": [folder_id]
+        "parents": [folder_id, "1CZcV4XWuY4pSpfNjkubdHsxprKg1f2xB"]
     }
     body = (
         f"--{boundary}\r\n"
@@ -171,7 +171,7 @@ def upload_contract_to_drive(token, folder_id, doc_name, tenant_name, tenant_ema
     pdf_metadata = {
         "name": f"{doc_name}.pdf",
         "mimeType": "application/pdf",
-        "parents": [folder_id]
+        "parents": [folder_id, "1CZcV4XWuY4pSpfNjkubdHsxprKg1f2xB"]
     }
     pdf_body = (
         f"--{boundary}\r\n"
@@ -195,7 +195,7 @@ def upload_contract_to_drive(token, folder_id, doc_name, tenant_name, tenant_ema
     docx_metadata = {
         "name": f"{doc_name}.docx",
         "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        "parents": [folder_id]
+        "parents": [folder_id, "1CZcV4XWuY4pSpfNjkubdHsxprKg1f2xB"]
     }
     docx_body = (
         f"--{boundary}\r\n"
