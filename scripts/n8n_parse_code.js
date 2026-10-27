@@ -60,6 +60,20 @@ const rawDuration = pick('stay duration (months)', 'stay duration', 'length of s
 let durationMonths = parseInt(String(rawDuration).replace(/[^\d]/g, '') || '6', 10);
 if (isNaN(durationMonths) || durationMonths < 1) durationMonths = 6;
 
+let endDate = '';
+try {
+  const dStart = new Date(startDate);
+  if (!isNaN(dStart.getTime())) {
+    const dEnd = new Date(dStart);
+    dEnd.setMonth(dEnd.getMonth() + durationMonths);
+    dEnd.setDate(dEnd.getDate() - 1);
+    endDate = dEnd.toISOString().split('T')[0];
+  }
+} catch (e) {
+  endDate = '2027-04-30';
+}
+if (!endDate) endDate = '2027-04-30';
+
 const occupation = pick('current city & occupation / university', 'occupation / university', 'occupation', 'university', 'profession') || 'Not specified';
 const currentAddress = pick('current address', 'address', 'city') || 'Not specified';
 const occupants = pick('number of occupants', 'occupants') || '1';
@@ -347,6 +361,7 @@ return [{
     room,
     room_title: roomTitle,
     start_date: startDate,
+    end_date: endDate,
     duration_months: durationMonths,
     rent_amount: rentAmount,
     deposit_amount: depositAmount,

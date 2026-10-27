@@ -747,6 +747,89 @@ def render_contract_html(data):
     return tmpl
 
 def render_contract_docx(data, output_path):
+    # Check for master template first to preserve 100% visual formatting, tables, cards and logo
+    master_template = DOCX_TEMPLATE_PATH
+    if not os.path.exists(master_template):
+        alt_template = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "templates", "master_template_contract.docx")
+        if os.path.exists(alt_template):
+            master_template = alt_template
+
+    if os.path.exists(master_template):
+        import docx
+        import datetime
+        doc = docx.Document(master_template)
+
+        # Standardize deposit amount (German decimal format e.g. 1.000)
+        dep_raw = str(data.get("DEPOSIT_AMOUNT", data.get("ADVANCE_AMOUNT", "1000"))).replace("€", "").replace("EUR", "").strip()
+        if dep_raw == "1000" or dep_raw == "1000.0":
+            deposit_formatted = "1.000"
+        else:
+            deposit_formatted = dep_raw
+
+        replacements = {
+            "{{TENANT_NAME}}": str(data.get("TENANT_NAME", "")),
+            "{{TENANT_ROOM_ID}}": str(data.get("ROOM_CODE", data.get("TENANT_ROOM_ID", ""))),
+            "{{ROOM_TITLE}}": str(data.get("ROOM_TITLE_EN", data.get("ROOM_TITLE", ""))),
+            "{{ROOM_SIZE}}": str(data.get("ROOM_SIZE", "")),
+            "{{ROOM_NUMBER}}": str(data.get("ROOM_NUMBER", "1")),
+            "{{CONTRACT_START_DT}}": str(data.get("START_DATE_DE", data.get("CONTRACT_START_DT", ""))),
+            "{{CONTRACT_END_DT}}": str(data.get("END_DATE_DE", data.get("CONTRACT_END_DT", ""))),
+            "{{RENT_PER_MONTH}}": str(data.get("RENT_AMOUNT", data.get("RENT_PER_MONTH", ""))),
+            "{{DEPOSIT_AMOUNT}}": deposit_formatted,
+            "{{DEPOSIT_AMOUNT_PAY_BEFORE_DT}}": str(data.get("DEPOSIT_DUE_DATE_DE", data.get("DEPOSIT_AMOUNT_PAY_BEFORE_DT", data.get("START_DATE_DE", "")))),
+            "{{TENANT_EMAIL}}": str(data.get("TENANT_EMAIL", "")),
+            "{{TENANT_PHONE}}": str(data.get("TENANT_PHONE", "")),
+            "{{CONTRACT_CREATION_DATE}}": str(data.get("CONTRACT_CREATION_DATE_DE", data.get("CONTRACT_CREATION_DATE", datetime.date.today().strftime("%d.%m.%Y")))),
+            "{{LANDLORD_SIGN_DATE}}": str(data.get("LANDLORD_SIGN_DATE", datetime.date.today().strftime("%d.%m.%Y"))),
+            "{{TENANT_SIGN_DATE}}": str(data.get("TENANT_SIGN_DATE", datetime.date.today().strftime("%d.%m.%Y")))
+        }
+
+        def replace_text_in_paragraph(p, repls):
+            for k, v in repls.items():
+                if k in p.text:
+                    full_text = p.text.replace(k, str(v))
+                    if p.runs:
+                        p.runs[0].text = full_text
+                        for r in p.runs[1:]:
+                            r.text = ""
+                    else:
+                        p.text = full_text
+
+        # Replace in body paragraphs
+        for p in doc.paragraphs:
+            replace_text_in_paragraph(p, replacements)
+
+        # Replace in all table cells
+        for t in doc.tables:
+            for row in t.rows:
+                for cell in row.cells:
+                    for p in cell.paragraphs:
+                        replace_text_in_paragraph(p, replacements)
+
+        # In Table 2 (Contracting Parties), add tenant address if provided
+        addr_de = data.get("TENANT_ADDRESS_DE", data.get("TENANT_ADDRESS", ""))
+        addr_en = data.get("TENANT_ADDRESS_EN", data.get("TENANT_ADDRESS", ""))
+        tenant_email = str(data.get("TENANT_EMAIL", ""))
+
+        if len(doc.tables) > 2 and (addr_de or addr_en) and tenant_email:
+            t2 = doc.tables[2]
+            if len(t2.rows) > 0 and len(t2.rows[0].cells) >= 2:
+                de_cell = t2.rows[0].cells[0]
+                en_cell = t2.rows[0].cells[1]
+                if addr_de:
+                    for p in de_cell.paragraphs:
+                        if f"Email: {tenant_email}" in p.text and addr_de not in p.text:
+                            p.text = p.text.replace(f"Email: {tenant_email}", f"{addr_de}\nEmail: {tenant_email}")
+                if addr_en:
+                    for p in en_cell.paragraphs:
+                        if f"Email: {tenant_email}" in p.text and addr_en not in p.text:
+                            p.text = p.text.replace(f"Email: {tenant_email}", f"{addr_en}\nEmail: {tenant_email}")
+
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        doc.save(output_path)
+        return output_path
+
+    # Fallback to programmatic creation if template is missing
     doc = Document()
     sections = doc.sections
     for s in sections:
