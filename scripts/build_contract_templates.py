@@ -1,18 +1,42 @@
 #!/usr/bin/env python3
 """
-Homelyo Rental Contract Template Builder
-----------------------------------------
-Builds bilingual (German/English) contracts and complete AGB for Homelyo.
-Includes:
-- Full Premises Breakdown Table (Street, No, Floor, Flat, Room, Zip, Country, Shared amenities)
-- Custom clauses: Advance payment before move-in, Rent due before 4th + €5 late fee
-- Cleaning fee: €70.00
-- Deposit: €1,000.00
-- Key replacement fees: Haustür 680 €, Wohnung 120 €, Zimmer 90 €, Briefkasten 70 €
-- ARD / Rundfunkbeitrag coordinated & paid by tenants
-- Internet responsibility & full indemnity (P2P/torrents prohibited, immediate termination)
-- Complete AGB (§ 1 to § 8) in dual-column format
-- Clean signature fields without GMT timestamps
+Homelyo Master Bilingual Rental Contract Builder
+------------------------------------------------
+Creates the unified bilingual (German/English) rental contract template for Homelyo,
+faithfully combining:
+1. The 14-clause legal architecture of Wunderflats & GDrive samples:
+   - Hauptvertrag (Core Agreement):
+     * § 1 Mietdauer & Befristungszweck / Term of Lease & Temporary Purpose
+     * § 2 Miethöhe, Pauschale & Nebenkosten / Rent, All-Inclusive Utilities & License Fee
+     * § 3 Kaution & Mietsicherheit / Security Deposit & Escrow (§ 551 BGB)
+     * § 4 Zahlungsbedingungen, Fälligkeit & Verzug / Payment Terms, Due Dates & Late Fees
+     * § 5 Kündigung & Nachmieter / Notice & Replacement Tenant Release
+     * § 6 AGB & Anlagen / Terms & Attachments
+     * Hauptvertrag Signatures (Parties)
+   - Zahlungsmöglichkeiten / Payment Options & Bank Details (N26 Bank AG)
+   - Anlage 1 – Inventar der Mietsache / Attachment 1 – Inventory List & Upkeep Rules
+   - Anlage 2 – Allgemeine Geschäftsbedingungen (AGB / House Rules):
+     * Preamble / Präambel
+     * § 1 Zusammenleben in der WG / mit den Nachbarn / Cohabitation in Flat Share
+     * § 2 Regelungen zur Wohnung / Apartment Regulations (Heating, Ventilation, Internet, Waste)
+     * § 3 Zahlungsvereinbarungen / Payment Agreements (Punctuality, 30-day refund, Fair Use)
+     * § 4 Übergabe und Rückgabe / Handover and Return of the Property
+     * § 5 Schäden an der Wohnung / Damages to Property (Minor repairs schedule)
+     * § 6 Kündigungsbedingungen / Conditions of Termination (Tacit renewal exclusion § 545 BGB)
+     * § 7 Schriftform / Written Form
+     * § 8 Salvatorische Klausel & Gerichtsstand / Severability & Jurisdiction
+     * AGB Signatures (Parties)
+2. All agreed Homelyo rates:
+   - Key replacement fees: Haustür 680,00 €, Wohnung 120,00 €, Zimmer 90,00 €, Briefkasten 70,00 €
+   - One-time checkout cleaning fee: 70,00 €
+   - Security deposit: 1.000,00 €
+   - Overdue reminder fee: 5,00 €
+   - Minor repairs (Kleinreparaturklausel): 100,00 € per instance, max 8% of rent or 350,00 € per year
+   - Termination for unpaid damage threshold: > 50,00 €
+   - Deposit refund timeframe: within 30 days
+   - Replacement tenant notice: 3 months' notice to month-end
+   - Overnight guest limit: maximum 5 days per calendar month
+3. Flawless A4 formatting for PDF export (headless Chrome) and Word DOCX generation.
 """
 
 import os
@@ -20,6 +44,8 @@ import sys
 import datetime
 import base64
 import subprocess
+import urllib.request
+import json
 from docx import Document
 from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -29,6 +55,8 @@ LOGO_PATH = "/Users/jayashreesundarasamy/kylasam/PycharmProjects/homelyo/assista
 FALLBACK_LOGO_PATH = "/Users/jayashreesundarasamy/Downloads/Homelyo-logo.png"
 HTML_TEMPLATE_PATH = "/Users/jayashreesundarasamy/kylasam/PycharmProjects/homelyo/templates/contract_template.html"
 DOCX_TEMPLATE_PATH = "/Users/jayashreesundarasamy/kylasam/PycharmProjects/homelyo/template_contract.docx"
+FINAL_PDF_PATH = "/Users/jayashreesundarasamy/kylasam/PycharmProjects/homelyo/contracts_generated/Rental_Contract_Master_Final.pdf"
+GDRIVE_TEMPLATE_FILE_ID = "1Cj9E9nbcCbgV4HuT2ZLxdfNwiDLYVT5t"
 
 ROOM_SPECS = {
     "KE1": {
@@ -75,6 +103,23 @@ ROOM_SPECS = {
         "features_de": "Einzel-Boxspringbett, Einbauschrank, Arbeitsplatz, schnelles Internet",
         "features_en": "Single box spring bed, fitted wardrobe, study desk, high-speed WiFi"
     }
+}
+
+RATES = {
+    "KEY_BUILDING": 680.00,
+    "KEY_FLAT": 120.00,
+    "KEY_ROOM": 90.00,
+    "KEY_MAILBOX": 70.00,
+    "CLEANING_FEE": 70.00,
+    "LATE_FEE": 5.00,
+    "MINOR_REPAIR_SINGLE": 100.00,
+    "MINOR_REPAIR_CAP": 350.00,
+    "MINOR_REPAIR_PCT": 8,
+    "DAMAGE_TERMINATION": 50.00,
+    "DEPOSIT_REFUND_DAYS": 30,
+    "NOTICE_MONTHS": 3,
+    "MIN_TERM_MONTHS": 6,
+    "GUEST_DAYS": 5
 }
 
 def get_logo_base64():
@@ -184,896 +229,7 @@ def format_date_bilingual(date_str):
     year = dt.year
     m_idx = dt.month - 1
 
-    return f"{day} {de_months[m_idx]}, {year}", f"{day} {en_months[m_idx]}, {year}"
-
-def generate_html_template():
-    logo_b64 = get_logo_base64()
-    logo_img_tag = f'<img src="data:image/png;base64,{logo_b64}" alt="Homelyo Logo" style="height: 38px; width: auto; max-width: 140px; display: inline-block;">' if logo_b64 else '<div style="font-size: 16pt; font-weight: bold; color: #0f172a; letter-spacing: 1px;">HOMELYO</div>'
-    footer_logo_tag = f'<img src="data:image/png;base64,{logo_b64}" alt="Homelyo" style="height: 14px; width: auto; opacity: 0.85;">' if logo_b64 else '<span style="font-weight: 700; font-size: 8pt; color: #475569;">homelyo</span>'
-
-    html = f"""<!DOCTYPE html>
-<html lang="de">
-<head>
-<meta charset="utf-8">
-<title>Mietvertrag / Rental Agreement - Homelyo</title>
-<style>
-  @page {{
-    size: A4 portrait;
-    margin: 11mm 13mm 11mm 13mm;
-  }}
-  * {{
-    box-sizing: border-box;
-    -webkit-font-smoothing: antialiased;
-  }}
-  body {{
-    margin: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    color: #111827;
-    background-color: #ffffff;
-    font-size: 8.5pt;
-    line-height: 1.34;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }}
-  .page {{
-    width: 100%;
-    page-break-after: always;
-    position: relative;
-    padding-bottom: 12px;
-  }}
-  .page:last-child {{
-    page-break-after: avoid;
-  }}
-  .two-col {{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    width: 100%;
-    gap: 18px;
-  }}
-  .col {{
-    flex: 1;
-    width: 50%;
-  }}
-  .page-header {{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #e2e8f0;
-    padding-bottom: 8px;
-    margin-bottom: 12px;
-  }}
-  .header-left {{
-    font-size: 8pt;
-    color: #64748b;
-    font-weight: 500;
-  }}
-  .header-right {{
-    text-align: right;
-  }}
-  .page-footer {{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid #e2e8f0;
-    padding-top: 8px;
-    margin-top: 15px;
-    font-size: 7.5pt;
-    color: #64748b;
-  }}
-  .main-title {{
-    text-align: center;
-    margin: 15px 0 18px 0;
-  }}
-  .main-title h1 {{
-    font-size: 20pt;
-    font-weight: 800;
-    margin: 0 0 2px 0;
-    color: #0f172a;
-    letter-spacing: -0.5px;
-  }}
-  .main-title h2 {{
-    font-size: 13pt;
-    font-weight: 600;
-    color: #475569;
-    margin: 0;
-  }}
-  .party-header {{
-    font-size: 10.0pt;
-    color: #0f172a;
-    margin-bottom: 5px;
-    border-bottom: 1.5px solid #cbd5e1;
-    padding-bottom: 3px;
-  }}
-  .field-table {{
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 12px;
-  }}
-  .field-table td {{
-    padding: 3px 0;
-    font-size: 8.5pt;
-    vertical-align: top;
-  }}
-  .field-label {{
-    width: 38%;
-    color: #64748b;
-    font-weight: 600;
-  }}
-  .field-value {{
-    width: 62%;
-    color: #0f172a;
-    font-weight: 500;
-  }}
-  .premises-box {{
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    padding: 10px 14px;
-    margin: 12px 0;
-  }}
-  .premises-title {{
-    font-weight: 700;
-    font-size: 9.5pt;
-    color: #0f172a;
-    margin-bottom: 6px;
-  }}
-  .premises-grid {{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px 14px;
-    font-size: 8.5pt;
-  }}
-  .sec-title {{
-    font-size: 9.8pt;
-    font-weight: 700;
-    color: #0f172a;
-    margin-top: 10px;
-    margin-bottom: 4px;
-    line-height: 1.25;
-    border-left: 3px solid #3b82f6;
-    padding-left: 6px;
-  }}
-  .p-block {{
-    margin-bottom: 5px;
-    text-align: justify;
-    text-justify: inter-word;
-    font-size: 8.3pt;
-  }}
-  .highlight-badge {{
-    background: #eff6ff;
-    border: 1px solid #bfdbfe;
-    color: #1e40af;
-    padding: 1px 5px;
-    border-radius: 3px;
-    font-weight: 600;
-    display: inline-block;
-  }}
-  .bank-box {{
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 4px;
-    padding: 7px 10px;
-    margin: 6px 0;
-    font-size: 8.2pt;
-  }}
-  .bank-row {{
-    display: flex;
-    justify-content: space-between;
-    padding: 1.5px 0;
-  }}
-  .bank-label {{
-    color: #64748b;
-    font-weight: 600;
-  }}
-  .bank-val {{
-    font-weight: 600;
-    color: #0f172a;
-    font-family: monospace;
-  }}
-  .agb-header {{
-    text-align: center;
-    background: #0f172a;
-    color: #ffffff;
-    padding: 8px;
-    border-radius: 4px;
-    margin: 10px 0 12px 0;
-  }}
-  .agb-header h3 {{
-    margin: 0;
-    font-size: 11pt;
-    font-weight: 700;
-  }}
-  .agb-header h4 {{
-    margin: 2px 0 0 0;
-    font-size: 8.5pt;
-    font-weight: 400;
-    opacity: 0.9;
-  }}
-  .sig-block {{
-    margin-top: 25px;
-    padding-top: 10px;
-  }}
-  .sig-line {{
-    border-top: 1.5px solid #0f172a;
-    margin-top: 40px;
-    margin-bottom: 4px;
-  }}
-  .sig-title {{
-    font-weight: 700;
-    font-size: 8.5pt;
-    color: #0f172a;
-  }}
-  .sig-date {{
-    font-size: 8pt;
-    color: #475569;
-    margin-top: 3px;
-  }}
-</style>
-</head>
-<body>
-
-<!-- ==================== PART 1: MIETVERTRAG / LEASE AGREEMENT ==================== -->
-
-<!-- PAGE 1: Parties & Premises -->
-<div class="page" id="page-1">
-  <div class="page-header">
-    <div class="header-left">{logo_img_tag}</div>
-    <div class="header-right" style="font-size: 8pt; color: #64748b;">
-      <strong>Homelyo Co-Living</strong> &bull; Lichtenrader Damm 80, 12305 Berlin
-    </div>
-  </div>
-
-  <div class="main-title">
-    <h1>Mietvertrag</h1>
-    <h2>Residential Lease Agreement</h2>
-  </div>
-
-  <!-- Parties -->
-  <div class="two-col">
-    <!-- Landlord -->
-    <div class="col">
-      <div class="party-header">Zwischen <strong>Vermieter:</strong></div>
-      <table class="field-table">
-        <tr>
-          <td class="field-label">Name:</td>
-          <td class="field-value">{{{{LANDLORD_SIGN_NAME}}}}</td>
-        </tr>
-        <tr>
-          <td class="field-label">Anschrift:</td>
-          <td class="field-value">{{{{LANDLORD_ADDRESS_DE}}}}</td>
-        </tr>
-        <tr>
-          <td class="field-label">Kontakt:</td>
-          <td class="field-value">support@homelyo.eu | www.homelyo.eu</td>
-        </tr>
-      </table>
-    </div>
-    <div class="col">
-      <div class="party-header">The <strong>landlord:</strong></div>
-      <table class="field-table">
-        <tr>
-          <td class="field-label">Name:</td>
-          <td class="field-value">{{{{LANDLORD_SIGN_NAME}}}}</td>
-        </tr>
-        <tr>
-          <td class="field-label">Address:</td>
-          <td class="field-value">{{{{LANDLORD_ADDRESS_EN}}}}</td>
-        </tr>
-        <tr>
-          <td class="field-label">Contact:</td>
-          <td class="field-value">support@homelyo.eu | www.homelyo.eu</td>
-        </tr>
-      </table>
-    </div>
-  </div>
-
-  <!-- Tenant -->
-  <div class="two-col">
-    <div class="col">
-      <div class="party-header">Und <strong>Mieter:</strong></div>
-      <table class="field-table">
-        <tr>
-          <td class="field-label">Name:</td>
-          <td class="field-value"><strong>{{{{TENANT_NAME}}}}</strong></td>
-        </tr>
-        <tr>
-          <td class="field-label">Anschrift:</td>
-          <td class="field-value">{{{{TENANT_ADDRESS_DE}}}}</td>
-        </tr>
-        <tr>
-          <td class="field-label">E-Mail / Tel:</td>
-          <td class="field-value">{{{{TENANT_EMAIL}}}} | {{{{TENANT_PHONE}}}}</td>
-        </tr>
-      </table>
-    </div>
-    <div class="col">
-      <div class="party-header">And <strong>tenant:</strong></div>
-      <table class="field-table">
-        <tr>
-          <td class="field-label">Name:</td>
-          <td class="field-value"><strong>{{{{TENANT_NAME}}}}</strong></td>
-        </tr>
-        <tr>
-          <td class="field-label">Address:</td>
-          <td class="field-value">{{{{TENANT_ADDRESS_EN}}}}</td>
-        </tr>
-        <tr>
-          <td class="field-label">Email / Tel:</td>
-          <td class="field-value">{{{{TENANT_EMAIL}}}} | {{{{TENANT_PHONE}}}}</td>
-        </tr>
-      </table>
-    </div>
-  </div>
-
-  <!-- Specific Premises Breakdown Table -->
-  <div class="premises-box">
-    <div class="premises-title">
-      Betreffend folgende Mietsache / Concerning the following premises:
-    </div>
-    <div class="premises-grid">
-      <div><strong>Straße & Hausnummer / Street:</strong> Lichtenrader Damm 80</div>
-      <div><strong>Geschoss & Whg / Floor & Flat:</strong> {{{{FLOOR}}}}. OG / Whg. WE-11</div>
-      <div><strong>Zimmer-ID & Größe / Room:</strong> {{{{ROOM_CODE}}}} (ca. {{{{ROOM_SIZE}}}} m²)</div>
-      <div><strong>Postleitzahl & Land / Zip & Country:</strong> 12305 Berlin, Deutschland / Germany</div>
-      <div style="grid-column: span 2; margin-top: 3px; font-size: 8.2pt; color: #475569;">
-        <strong>Gemeinschaftliche Flächen / Communal Amenities:</strong> Flur, voll ausgestattete Einbauküche, renoviertes Badezimmer/WC sowie Gepäckabteil dürfen vom Mieter vollumfänglich mitbenutzt werden. / Any communal amenities such as hallway, kitchen, shower/WC, and luggage room may be used by the tenant.
-      </div>
-    </div>
-  </div>
-
-  <!-- Preamble -->
-  <div class="two-col">
-    <div class="col">
-      <div class="sec-title">Präambel</div>
-      <div class="p-block">
-        Der Vermieter vermietet möblierten Wohnraum zum vorübergehenden Gebrauch im Rahmen eines gemeinschaftlichen Co-Living-Konzepts. Der Mieter mietet das Zimmer zu befristeten Ausbildungs-, Studien- oder Arbeitszwecken in Berlin an.
-      </div>
-    </div>
-    <div class="col">
-      <div class="sec-title">Preamble</div>
-      <div class="p-block">
-        The landlord rents furnished living space for temporary use within a shared co-living arrangement. The tenant rents the room for a temporary educational, academic, or employment stay in Berlin.
-      </div>
-    </div>
-  </div>
-
-  <div class="page-footer">
-    <div>{footer_logo_tag} &bull; Homelyo Rental Agreement</div>
-    <div>Seite / Page 1</div>
-  </div>
-</div>
-
-<!-- PAGE 2: Mietdauer, Miete, Internet & Kaution -->
-<div class="page" id="page-2">
-  <div class="page-header">
-    <div class="header-left">{logo_img_tag}</div>
-    <div class="header-right">Mietvertrag &bull; {{{{TENANT_NAME}}}} ({{{{ROOM_CODE}}}})</div>
-  </div>
-
-  <!-- § 1 Mietdauer -->
-  <div class="two-col">
-    <div class="col">
-      <div class="sec-title">§ 1 Mietdauer & Befristung (§ 549 Abs. 2 BGB)</div>
-      <div class="p-block">
-        (1) Das Mietverhältnis beginnt am <strong>{{{{START_DATE_DE}}}}</strong> und endet am <strong>{{{{END_DATE_DE}}}}</strong>. Das Mietverhältnis ist fest befristet und verlängert sich nicht stillschweigend (§ 545 BGB ist abbedungen).
-      </div>
-      <div class="p-block">
-        (2) <strong>Zweck der Befristung:</strong> Die Vermietung erfolgt zum vorübergehenden Gebrauch gem. § 549 Abs. 2 Nr. 1 BGB (Aufenthalt in Berlin zu: <em>{{{{REASON_DE}}}}</em>).
-      </div>
-      <div class="p-block">
-        (3) <strong>Vorzeitige Entlassung / Nachmieter:</strong> Eine ordentliche Kündigung während der festen Vertragslaufzeit ist grundsätzlich ausgeschlossen. Der Mieter kann jedoch vorzeitig mit einer Frist von 3 Monaten zum Monatsende aus dem Vertrag entlassen werden, wenn er dem Vermieter einen geeigneten, solventen und für die WG zumutbaren Nachmieter stellt und dieser einen Mietvertrag abschließt.
-      </div>
-    </div>
-    <div class="col">
-      <div class="sec-title">§ 1 Rental Term & Temporary Purpose</div>
-      <div class="p-block">
-        (1) The tenancy commences on <strong>{{{{START_DATE_EN}}}}</strong> and terminates on <strong>{{{{END_DATE_EN}}}}</strong>. The lease is for a fixed term and tacit renewal is excluded (Section 545 BGB does not apply).
-      </div>
-      <div class="p-block">
-        (2) <strong>Temporary Purpose:</strong> Concluded strictly for temporary living pursuant to Section 549 (2) No. 1 German Civil Code (BGB) for: <em>{{{{REASON_EN}}}}</em>.
-      </div>
-      <div class="p-block">
-        (3) <strong>Early Release / Replacement Tenant:</strong> Ordinary early termination is excluded during the fixed lease. However, the tenant will be released early with 3 months' notice to month-end if they present an accepted, solvent, and compatible replacement tenant who enters into a formal binding lease.
-      </div>
-    </div>
-  </div>
-
-  <!-- § 2 Miete & Nebenkosten -->
-  <div class="two-col">
-    <div class="col">
-      <div class="sec-title">§ 2 Miete, Nebenkosten & ARD</div>
-      <div class="p-block">
-        (1) Die monatliche Warmmiete beträgt pauschal <strong>{{{{RENT_AMOUNT}}}} €</strong> (in Worten: <strong>{{{{RENT_WORDS_DE}}}} EURO</strong>).
-      </div>
-      <div class="p-block">
-        (2) In der Pauschalmiete enthalten sind alle kalten und warmen Betriebskosten (Heizung, Warm-/Kaltwasser, Strom, Müllabfuhr, Gebäudeversicherung) sowie Vodafone 1000 Mbit/s Highspeed WLAN. Eine jährliche Nebenkostenabrechnung findet nicht statt (Fair-Use-Regelung: Überschreitung &gt; 25% des Durchschnitts wird umgelegt).
-      </div>
-      <div class="p-block">
-        (3) <span class="highlight-badge">WICHTIG &ndash; ARD / Rundfunkbeitrag:</span> <strong>Der Rundfunkbeitrag (GEZ) ist NICHT in der Miete enthalten.</strong> Die Anmeldung und Entrichtung des Rundfunkbeitrags muss von den Bewohnern der Wohngemeinschaft eigenständig vorgenommen, koordiniert und gezahlt werden.
-      </div>
-      <div class="p-block">
-        (4) <strong>Einmalige Endreinigungspauschale:</strong> Für die professionelle Endreinigung des Zimmers und der anteiligen Gemeinschaftsräume bei Auszug wird eine einmalige Pauschale von <strong>70,00 €</strong> fällig.
-      </div>
-    </div>
-    <div class="col">
-      <div class="sec-title">§ 2 Rent, Utilities & Public License Fee</div>
-      <div class="p-block">
-        (1) The monthly all-inclusive warm rent is fixed at <strong>€{{{{RENT_AMOUNT}}}}</strong> (in words: <strong>{{{{RENT_WORDS_EN}}}} EURO</strong>).
-      </div>
-      <div class="p-block">
-        (2) This flat rate covers all operational utilities (heating, hot/cold water, electricity, trash disposal, building insurance) and 1000 Mbps Wi-Fi 6. No annual reconciliation is performed (Fair use rule: usage &gt; 25% above property average may be charged).
-      </div>
-      <div class="p-block">
-        (3) <span class="highlight-badge">IMPORTANT &ndash; ARD / TV-Radio License Fee:</span> <strong>The public broadcasting contribution (ARD / ZDF / GEZ) is NOT included in the rent.</strong> Registration and payment of the broadcasting license fee must be organized, coordinated, and paid directly by the tenants among themselves.
-      </div>
-      <div class="p-block">
-        (4) <strong>One-Time Final Cleaning Fee:</strong> A one-time final cleaning fee of <strong>€70.00</strong> is payable for professional end-of-stay room and shared area sanitization upon departure.
-      </div>
-    </div>
-  </div>
-
-  <!-- § 3 Kaution & Zahlungsbedingungen -->
-  <div class="two-col">
-    <div class="col">
-      <div class="sec-title">§ 3 Kaution & Zahlungsbedingungen</div>
-      <div class="p-block">
-        (1) <strong>Kaution:</strong> Der Mieter leistet eine Mietsicherheit in Höhe von <strong>{{{{DEPOSIT_AMOUNT}}}} €</strong> (in Worten: <strong>{{{{DEPOSIT_WORDS_DE}}}} EURO</strong>).
-      </div>
-      <div class="p-block">
-        (2) <strong>Zahlung vor Einzug:</strong> Die Kaution sowie die erste Monatsmiete müssen <strong>vor dem Einzugsdatum ({{{{START_DATE_DE}}}})</strong> vollständig auf dem Vermieterkonto eingegangen sein. Ohne fristgerechten Geldeingang erfolgt keine Schlüsselübergabe und der Vertrag gilt als vom Mieter storniert.
-      </div>
-      <div class="p-block">
-        (3) <strong>Mietfälligkeit:</strong> Die laufende Miete ist monatlich im Voraus <strong>bis spätestens zum 3. Werktag des Monats (vor dem 4.)</strong> kostenfrei auf das Vermieterkonto zu überweisen. Feiertage und Wochenenden sind bei der Überweisung im Voraus einzuplanen. Für jede verspätete Mietzahlung wird eine Mahngebühr von <strong>5,00 €</strong> fällig.
-      </div>
-    </div>
-    <div class="col">
-      <div class="sec-title">§ 3 Security Deposit & Payment Terms</div>
-      <div class="p-block">
-        (1) <strong>Security Deposit:</strong> The tenant pays a security deposit of <strong>€{{{{DEPOSIT_AMOUNT}}}}</strong> (in words: <strong>{{{{DEPOSIT_WORDS_EN}}}} EURO</strong>).
-      </div>
-      <div class="p-block">
-        (2) <strong>Payment Prior to Move-In:</strong> Both the deposit and the first month's rent must be <strong>fully credited to the landlord's account before the move-in date ({{{{START_DATE_EN}}}})</strong>. Key handover will be denied without prior funds receipt, and the booking shall be deemed cancelled.
-      </div>
-      <div class="p-block">
-        (3) <strong>Due Date:</strong> Ongoing rent is payable in advance <strong>on or before the 3rd business day of each month (before the 4th)</strong> via bank transfer. Bank holidays and weekends must be accounted for in advance. An overdue reminder fee of <strong>€5.00</strong> applies to each late payment notice.
-      </div>
-    </div>
-  </div>
-
-  <!-- Bank Details Box -->
-  <div class="bank-box">
-    <div class="bank-row">
-      <span class="bank-label">Bankverbindung / Bank Account:</span>
-      <span class="bank-val">N26 Bank AG, Berlin</span>
-    </div>
-    <div class="bank-row">
-      <span class="bank-label">Kontoinhaber / Account Holder:</span>
-      <span class="bank-val">{{{{RENT_ACCOUNT_HOLDER}}}}</span>
-    </div>
-    <div class="bank-row">
-      <span class="bank-label">IBAN:</span>
-      <span class="bank-val">{{{{RENT_IBAN}}}}</span>
-    </div>
-    <div class="bank-row">
-      <span class="bank-label">BIC / SWIFT:</span>
-      <span class="bank-val">{{{{RENT_BIC}}}}</span>
-    </div>
-    <div class="bank-row">
-      <span class="bank-label">Verwendungszweck / Reference:</span>
-      <span class="bank-val">{{{{TENANT_NAME}}}} - {{{{ROOM_CODE}}}} - Miete / Kaution</span>
-    </div>
-  </div>
-
-  <div class="page-footer">
-    <div>{footer_logo_tag} &bull; Homelyo Rental Agreement</div>
-    <div>Seite / Page 2</div>
-  </div>
-</div>
-
-<!-- PAGE 3: Internetverantwortung, Kleinreparaturen & Schlüsselgebühren -->
-<div class="page" id="page-3">
-  <div class="page-header">
-    <div class="header-left">{logo_img_tag}</div>
-    <div class="header-right">Mietvertrag &bull; {{{{TENANT_NAME}}}} ({{{{ROOM_CODE}}}})</div>
-  </div>
-
-  <!-- § 4 Internetverantwortung & Haftungsfreistellung -->
-  <div class="two-col">
-    <div class="col">
-      <div class="sec-title">§ 4 Internetnutzung & Haftungsfreistellung</div>
-      <div class="p-block">
-        (1) Der Vermieter stellt dem Mieter einen WLAN-Zugang zur Verfügung. Der Mieter trägt die <strong>alleinige rechtliche Verantwortung (zivil- und strafrechtlich)</strong> für alle Aktivitäten, Downloads und Abrufe über diesen Anschluss.
-      </div>
-      <div class="p-block">
-        (2) <strong>Verbot von Urheberrechtsverletzungen:</strong> Das Herunterladen, Anbieten oder Teilen von urheberrechtlich geschützten Inhalten über Peer-to-Peer-/Torrent-Netzwerke, illegale Streaming-Plattformen oder der Zugriff auf verbotene Webinhalte ist strengstens verboten.
-      </div>
-      <div class="p-block">
-        (3) <strong>Freistellung & Sperrung:</strong> Der Mieter stellt den Vermieter von jeglichen Schadensersatzansprüchen, Abmahnungen und Rechtsanwaltskosten Dritter infolge rechtswidriger Internetnutzung vollumfänglich frei. Bei Verdacht auf illegale Nutzung ist der Vermieter berechtigt, den Internetzugang des Mieters fristlos zu sperren und die Mieterdaten an die ermittelnden Behörden zu übergeben.
-      </div>
-    </div>
-    <div class="col">
-      <div class="sec-title">§ 4 Internet Policy & Full Indemnification</div>
-      <div class="p-block">
-        (1) The landlord provides wireless internet (WLAN). The tenant carries <strong>sole and exclusive legal liability (both civil and criminal)</strong> for all data, downloads, and activities executed through the provided network.
-      </div>
-      <div class="p-block">
-        (2) <strong>Copyright Infringement Prohibition:</strong> Downloading, uploading, or sharing copyrighted material via P2P/BitTorrent networks, unauthorized streaming portals, or visiting illicit sites is strictly forbidden.
-      </div>
-      <div class="p-block">
-        (3) <strong>Indemnification & Access Revocation:</strong> The tenant fully indemnifies the landlord against any third-party claims, statutory warnings, and legal defense costs. In case of illegal use, the landlord reserves the right to immediately terminate the tenant's internet access and provide full identity and log records to prosecuting authorities.
-      </div>
-    </div>
-  </div>
-
-  <!-- § 5 Kleinreparaturen & Schlüsselverlust -->
-  <div class="two-col">
-    <div class="col">
-      <div class="sec-title">§ 5 Kleinreparaturen & Schlüsselgebühren</div>
-      <div class="p-block">
-        (1) <strong>Kleinreparaturen (Bagatellschäden):</strong> Der Mieter trägt die Kosten für kleine Reparaturen an Gegenständen, die seinem häufigen und unmittelbaren Zugriff unterliegen (z.B. Wasserhähne, Lichtschalter, Steckdosen, Tür- und Fenstergriffe, WC-Spülung), sofern die Kosten im Einzelfall <strong>100,00 €</strong> nicht übersteigen. Die jährliche Gesamtbelastung ist auf 8% der Jahresmiete, maximal 350,00 € pro Kalenderjahr begrenzt.
-      </div>
-      <div class="p-block">
-        (2) <strong>Schlüsselverlust-Gebührensatz:</strong> Bei Verlust oder Beschädigung von Schlüsseln hat der Mieter die tatsächlichen Ersatzkosten zu tragen:
-      </div>
-      <div class="p-block" style="font-size: 8.0pt; margin-left: 8px;">
-        &bull; <strong>Haustürschlüssel (Gebäudeeingang): 680,00 €</strong><br>
-        &bull; <strong>Wohnungstürschlüssel: 120,00 €</strong><br>
-        &bull; <strong>Zimmertürschlüssel: 90,00 €</strong><br>
-        &bull; <strong>Briefkastenschlüssel: 70,00 €</strong><br>
-        Ist aus Sicherheitsgründen der Austausch von Schlössern oder der Schließanlage erforderlich, haftet der Mieter vollumfänglich für die Gesamtkosten.
-      </div>
-    </div>
-    <div class="col">
-      <div class="sec-title">§ 5 Minor Repairs & Key Replacement Schedule</div>
-      <div class="p-block">
-        (1) <strong>Minor Repairs Clause:</strong> The tenant pays for minor repairs to installations subject to frequent and direct use (e.g. water faucets, light switches, door/window handles, toilet flushes) up to <strong>€100.00</strong> per single repair. Annual liability is capped at 8% of the annual rent, up to a maximum of €350.00 per calendar year.
-      </div>
-      <div class="p-block">
-        (2) <strong>Key Replacement Fee Schedule:</strong> In the event of lost or damaged keys, the tenant compensates the actual replacement and administrative costs:
-      </div>
-      <div class="p-block" style="font-size: 8.0pt; margin-left: 8px;">
-        &bull; <strong>Building entrance door key: €680.00</strong><br>
-        &bull; <strong>Apartment entrance key: €120.00</strong><br>
-        &bull; <strong>Private room key: €90.00</strong><br>
-        &bull; <strong>Mailbox key: €70.00</strong><br>
-        If security requires replacing cylinder locks or the central master lock system, the tenant is liable for the full replacement expense.
-      </div>
-    </div>
-  </div>
-
-  <div class="page-footer">
-    <div>{footer_logo_tag} &bull; Homelyo Rental Agreement</div>
-    <div>Seite / Page 3</div>
-  </div>
-</div>
-
-<!-- ==================== PART 2: ALLGEMEINE GESCHÄFTSBEDINGUNGEN (AGB) ==================== -->
-
-<!-- PAGE 4: AGB § 1 Zusammenleben in der WG -->
-<div class="page" id="page-4">
-  <div class="page-header">
-    <div class="header-left">{logo_img_tag}</div>
-    <div class="header-right">Allgemeine Geschäftsbedingungen (AGB) &bull; Homelyo</div>
-  </div>
-
-  <div class="agb-header">
-    <h3>Allgemeine Geschäftsbedingungen (AGB) der Wohngemeinschaft</h3>
-    <h4>General Terms and Conditions (GTC) for Flat Share Cohabitation</h4>
-  </div>
-
-  <!-- AGB Preamble -->
-  <div class="two-col">
-    <div class="col">
-      <div class="p-block">
-        Der Mieter erkennt die Allgemeinen Geschäftsbedingungen (AGB) als für ihn verbindlich an. Ein Verstoß gegen die AGB ist ein vertragswidriger Gebrauch des Mietgegenstandes. Bei schwerwiegenden Fällen kann der Vermieter das Mietverhältnis ohne Einhaltung der Kündigungsfrist kündigen. Für alle Schäden, die dem Vermieter durch Verletzung oder Nichtbeachtung der AGB sowie durch Nichterfüllung der Meldepflichten entstehen, ist der Mieter ersatzpflichtig. Die AGB regeln das Zusammenleben aller Mitbewohner der Wohnung und des Hauses. Sie enthalten Rechte und Pflichten und gelten für alle Bewohner der Wohngemeinschaft gleichermaßen.
-      </div>
-    </div>
-    <div class="col">
-      <div class="p-block">
-        The tenant accepts these General Terms and Conditions (GTC) as obligatory. A violation of the terms is considered a breach of contract and misuse of the rented property. In severe cases the lessor is entitled to terminate the contract without notice. The tenant is obliged to financially compensate for any and all damage to the property caused by neglect or violation of the agreed terms as well as not upholding reporting requirements. The GTC regulates the cohabitation of all residents of the apartment and building equally.
-      </div>
-    </div>
-  </div>
-
-  <!-- § 1 Zusammenleben -->
-  <div class="two-col">
-    <div class="col">
-      <div class="sec-title">§ 1 Zusammenleben in der WG / mit den Nachbarn</div>
-      <div class="p-block">
-        <strong>1. Rücksicht:</strong> Die WG hat das Zusammenleben untereinander mit Rücksicht auf die Interessen und zur Zufriedenheit aller Beteiligten fair und eigenständig zu regeln.
-      </div>
-      <div class="p-block">
-        <strong>2. Lärm & Ruhezeiten:</strong> Jeder Mieter ist dafür verantwortlich, dass vermeidbarer Lärm unterbleibt. Besondere Rücksichtnahme gilt in der Mittagsruhe von <strong>13:00 bis 15:00 Uhr</strong> sowie zur Nachtruhe zwischen <strong>22:00 und 08:00 Uhr</strong>. An Sonn- und Feiertagen ist Lärm komplett zu unterlassen. TV, Soundanlagen etc. sind auf Zimmerlautstärke zu halten. Das Musizieren ist während der Ruhezeiten untersagt und außerhalb auf maximal 2 Stunden täglich beschränkt.
-      </div>
-      <div class="p-block">
-        <strong>3. Partys:</strong> Störende Partys sind komplett untersagt. Bei geselligem Beisammensein ist streng auf die Lautstärke zu achten, die spätestens um 22:00 Uhr auf Zimmerlautstärke zu senken ist.
-      </div>
-      <div class="p-block">
-        <strong>4. Reinigung:</strong> Die Mieter reinigen die Mieträume einschließlich der Gemeinschaftsräume (Küche, Bad, WC, Flur, Balkon) eigenverantwortlich und halten diese frei von Schmutz und Unrat. Erfolgt trotz Fristsetzung keine Reinigung, kann der Vermieter eine professionelle Reinigung auf Kosten aller Mieter (zu gleichen Teilen) beauftragen. Wiederholte Nichtbeteiligung berechtigt nach Abmahnung zur fristlosen Kündigung.
-      </div>
-      <div class="p-block">
-        <strong>5. Rauch- & Drogenverbot:</strong> Das Rauchen ist in der gesamten Wohnung, im Treppenhaus und auf den Balkonen strengstens verboten. Besitz und Konsum illegaler Drogen auf dem gesamten Grundstück sind verboten, werden ausnahmslos polizeilich zur Anzeige gebracht und berechtigen zur fristlosen Kündigung.
-      </div>
-      <div class="p-block">
-        <strong>6. Haustiere:</strong> Die Haltung von Haustieren ist grundsätzlich untersagt.
-      </div>
-      <div class="p-block">
-        <strong>7. Beherbergung Dritter:</strong> Eine Gebrauchsüberlassung an Dritte oder die dauerhafte Aufnahme von Lebensgefährten ist unzulässig. Der Besuch von Familie/Freunden ist auf normale Besuche beschränkt. Ein Aufenthalt von Besuchern an mehr als fünf (5) Tagen im Monat gilt als vertragswidrige Nutzung und berechtigt zur fristlosen Kündigung. Besuch ist nur bei persönlicher Anwesenheit des Mieters gestattet.
-      </div>
-    </div>
-    <div class="col">
-      <div class="sec-title">§ 1 Cohabitation in Flat Share / Neighbours</div>
-      <div class="p-block">
-        <strong>1. Regard & Consideration:</strong> Flatmates must organize cohabitation independently with mutual respect and fairness toward each other.
-      </div>
-      <div class="p-block">
-        <strong>2. Noise & Quiet Hours:</strong> Tenants must prevent unnecessary noise. Mandatory quiet hours are observed during midday from <strong>1:00pm to 3:00pm</strong> and at night between <strong>10:00pm and 8:00am</strong>. Excessive noise is strictly forbidden on Sundays and public holidays. Media devices must operate at room volume. Instrument practice is prohibited during quiet hours and limited to 2 hours daily otherwise.
-      </div>
-      <div class="p-block">
-        <strong>3. Parties:</strong> Disruptive parties are strictly prohibited. Social gatherings must be kept quiet and reduced to room volume by 10:00pm.
-      </div>
-      <div class="p-block">
-        <strong>4. Cleaning & Maintenance:</strong> Tenants clean their private rooms and all communal areas (kitchen, bath, WC, hall, balcony) under their own responsibility. If cleaning is neglected despite a warning deadline, the landlord will hire professional cleaners at the equal expense of all flatmates. Repeated refusal leads to lease termination.
-      </div>
-      <div class="p-block">
-        <strong>5. Smoking & Substance Ban:</strong> Smoking is strictly forbidden throughout the entire apartment and building. Possession or consumption of illegal narcotics is prohibited, reported to police immediately, and results in immediate lease cancellation.
-      </div>
-      <div class="p-block">
-        <strong>6. Pets:</strong> Keeping animals or pets of any kind is prohibited.
-      </div>
-      <div class="p-block">
-        <strong>7. Overnight Guests:</strong> Subletting or permanently lodging partners/spouses is prohibited. Visitors exceeding five (5) days in a single month constitute contract breach and permit termination without notice. Guests are only permitted while the tenant is personally present.
-      </div>
-    </div>
-  </div>
-
-  <div class="page-footer">
-    <div>{footer_logo_tag} &bull; Homelyo GTC / AGB</div>
-    <div>Seite / Page 4</div>
-  </div>
-</div>
-
-<!-- PAGE 5: AGB § 2 Regelungen zur Wohnung -->
-<div class="page" id="page-5">
-  <div class="page-header">
-    <div class="header-left">{logo_img_tag}</div>
-    <div class="header-right">Allgemeine Geschäftsbedingungen (AGB) &bull; Homelyo</div>
-  </div>
-
-  <div class="two-col">
-    <div class="col">
-      <div class="sec-title">§ 2 Regelungen zur Wohnung</div>
-      <div class="p-block">
-        <strong>1. Nutzung:</strong> Die Anmietung erfolgt ausschließlich zu Wohnzwecken. Gewerbliche Nutzung ist unzulässig.
-      </div>
-      <div class="p-block">
-        <strong>2. Lüften und Heizen:</strong> Die Wohnung ist auch in der kalten Jahreszeit mindestens zweimal täglich durch kurzes, vollständiges Öffnen der Fenster (Stoßlüften) zu lüften. Beim Lüften und bei längerer Abwesenheit sind die Heizkörperthermostate herunterzudrehen.
-      </div>
-      <div class="p-block">
-        <strong>3. Internet & Rundfunk:</strong> Eigene Telefonanschlüsse dürfen nicht installiert werden. W-LAN wird zur Verfügung gestellt. Der Mieter trägt die volle Verantwortung für sein Handeln im Netz; illegale Downloads führen zu strafrechtlicher Verfolgung mit Weitergabe der Mieterdaten. Der Rundfunkbeitrag (GEZ) ist von der WG selbstständig anzumelden und aufzuteilen.
-      </div>
-      <div class="p-block">
-        <strong>4. Bilder und Plakate:</strong> Das Anbringen von Bildern, Regalen etc. mit Nägeln, Schrauben oder Bohrungen (Dübeln) ist untersagt. Eigene Schilder oder Aufschriften an Haus- und Wohnungstüren sind verboten.
-      </div>
-      <div class="p-block">
-        <strong>5. Obhut & Sorgfalt:</strong> Fette, Speisereste und Hygieneartikel dürfen nicht in die Abflüsse (Küche, Bad, WC) gelangen. Böden sind pfleglich zu behandeln und vor Kratzern zu schützen.
-      </div>
-      <div class="p-block">
-        <strong>6. Müllentsorgung:</strong> Der Müll ist konsequent nach den Vorgaben der Berliner Stadtreinigung (BSR) zu trennen (Plastik/Wertstoffe, Papier, Bio, Restmüll). Sperrmüll und Sondermüll gehören nicht in die Hausmülltonnen.
-      </div>
-      <div class="p-block">
-        <strong>7. Bauliche Veränderungen:</strong> Bauliche Veränderungen und das Anbringen von Satellitenempfangsanlagen sind strengstens untersagt.
-      </div>
-      <div class="p-block">
-        <strong>8. Sicherheit:</strong> Haustüren, Hof- und Kellertüren sind zwischen 22:00 und 06:00 Uhr geschlossen zu halten. Fluchtwege (Flure, Treppen) sind stets freizuhalten. Das Grillen auf den Balkonen ist verboten.
-      </div>
-      <div class="p-block">
-        <strong>9. Betretungsrecht:</strong> Der Vermieter bzw. Beauftragte dürfen die Mieträume nach Vorankündigung werktags zwischen 09:00-12:00 Uhr und 15:00-20:00 Uhr zur Überprüfung, für Besichtigungen mit Mietinteressenten (in den letzten 4 Wochen mind. 5 Termine) sowie bei Gefahr im Verzug jederzeit betreten. Zur Überprüfung des Hygiene- und Reinigungszustands der Gemeinschaftsflächen darf ein externer Dienstleister beauftragt werden.
-      </div>
-    </div>
-    <div class="col">
-      <div class="sec-title">§ 2 Apartment Regulations</div>
-      <div class="p-block">
-        <strong>1. Residential Use:</strong> Strictly for private residential purposes. Commercial activity is prohibited.
-      </div>
-      <div class="p-block">
-        <strong>2. Ventilation & Heating:</strong> Air out rooms at least twice daily by opening windows fully for a brief period. Turn down radiators when airing or when absent.
-      </div>
-      <div class="p-block">
-        <strong>3. Internet & Broadcasting:</strong> Private phone lines may not be installed. WLAN is provided. The tenant carries full responsibility for lawful internet use. The public broadcasting license fee (ARD) must be registered and coordinated by tenants directly.
-      </div>
-      <div class="p-block">
-        <strong>4. Walls & Posters:</strong> Drilling, screws, nails, or wall plugs for shelves/pictures are strictly forbidden. Attaching personal exterior signs or stickers is prohibited.
-      </div>
-      <div class="p-block">
-        <strong>5. Care of Drains & Floors:</strong> No food waste, oils, grease, or solids down kitchen/bathroom drains. Parquet/laminate flooring must be protected from scratches.
-      </div>
-      <div class="p-block">
-        <strong>6. Waste Separation:</strong> Waste must be systematically sorted (packaging/plastics, paper, organic, residual waste) according to municipal regulations.
-      </div>
-      <div class="p-block">
-        <strong>7. Modifications:</strong> Structural modifications or installing exterior satellite dishes are prohibited.
-      </div>
-      <div class="p-block">
-        <strong>8. Security:</strong> Building and yard doors must remain locked between 10:00pm and 06:00am. Hallways and escape paths must remain unobstructed. Grilling on balconies is prohibited.
-      </div>
-      <div class="p-block">
-        <strong>9. Inspection & Entry:</strong> The landlord or designated contractors may enter on workdays between 09:00am-12:00pm and 3:00pm-8:00pm upon notice for evaluation, maintenance, and prospective tenant viewings (at least 5 viewings during the last 4 weeks of stay), and immediately in case of emergency. Cleaning condition inspections of common areas may be performed.
-      </div>
-    </div>
-  </div>
-
-  <div class="page-footer">
-    <div>{footer_logo_tag} &bull; Homelyo GTC / AGB</div>
-    <div>Seite / Page 5</div>
-  </div>
-</div>
-
-<!-- PAGE 6: AGB § 3 Zahlungen, § 4 Übergabe & § 5 Schäden -->
-<div class="page" id="page-6">
-  <div class="page-header">
-    <div class="header-left">{logo_img_tag}</div>
-    <div class="header-right">Allgemeine Geschäftsbedingungen (AGB) &bull; Homelyo</div>
-  </div>
-
-  <div class="two-col">
-    <!-- German Column -->
-    <div class="col">
-      <div class="sec-title">§ 3 Zahlungsvereinbarungen</div>
-      <div class="p-block">
-        <strong>1. Rechtzeitigkeit:</strong> Maßgeblich für die Rechtzeitigkeit von Miet- und Kautionszahlungen ist das Datum des Zahlungseingangs auf dem Vermieterkonto, nicht das Absendedatum.
-      </div>
-      <div class="p-block">
-        <strong>2. Kaution:</strong> Dient der Sicherung aller Ansprüche (Miete, Schäden, Schlüsselverlust). Sie ist vor Einzug per Überweisung zu zahlen. Eine Aufrechnung gegen laufende Miete vor Mietende ist ausgeschlossen.
-      </div>
-      <div class="p-block">
-        <strong>3. Rückerstattung:</strong> Nach Beendigung des Mietverhältnisses und ordnungsgemäßer Rückgabe der Mietsache wird die Kaution abzüglich berechtigter Forderungen innerhalb von maximal 30 Tagen per Banküberweisung erstattet.
-      </div>
-
-      <div class="sec-title">§ 4 Übergabe und Rückgabe</div>
-      <div class="p-block">
-        <strong>1. Zeitpunkt:</strong> Übergabe erfolgt erst nach vollständigem Eingang von Kaution und erster Miete.
-      </div>
-      <div class="p-block">
-        <strong>2. Übergabeprotokoll:</strong> Vor Einzug wird ein Protokoll angefertigt. Das Zimmer muss bei Auszug im selben Zustand besenrein und frei von persönlichen Gegenständen zurückgegeben werden.
-      </div>
-      <div class="p-block">
-        <strong>3. Schlüsselverlust:</strong> Bei Schlüsselverlust haftet der Mieter für: <strong>Haustür 680 €, Wohnung 120 €, Zimmer 90 €, Briefkasten 70 €</strong> sowie ggf. erforderliche Schlossänderungen der Schließanlage.
-      </div>
-
-      <div class="sec-title">§ 5 Schäden an der Wohnung</div>
-      <div class="p-block">
-        <strong>1. Anzeigepflicht:</strong> Mängel sind dem Vermieter unverzüglich anzuzeigen. Dem Vermieter ist eine Frist von 4 Wochen zur Abhilfe einzuräumen.
-      </div>
-      <div class="p-block">
-        <strong>2. Haftung & Beweislast:</strong> Der Mieter haftet für Schäden durch Verletzung seiner Sorgfaltspflichten sowie das Verschulden seiner Besucher. Im Zimmer und in den Gemeinschaftsräumen trägt der Mieter die Beweislast für fehlendes Verschulden.
-      </div>
-      <div class="p-block">
-        <strong>3. Schönheitsreparaturen & Kleinreparaturen:</strong> Mieter schuldet keine routinemäßigen Schönheitsreparaturen. Kleinreparaturen bis 100 € je Maßnahme (max. 8% Jahresmiete / 350 € jährlich) trägt der Mieter.
-      </div>
-    </div>
-
-    <!-- English Column -->
-    <div class="col">
-      <div class="sec-title">§ 3 Payment Agreements</div>
-      <div class="p-block">
-        <strong>1. Punctuality:</strong> Payment punctuality is determined exclusively by the date funds are credited to the landlord's account, not submission date.
-      </div>
-      <div class="p-block">
-        <strong>2. Deposit:</strong> Secures all claims (rent, damages, lost keys). Must be paid prior to handover. Setting off the deposit against ongoing rent is prohibited.
-      </div>
-      <div class="p-block">
-        <strong>3. Refund:</strong> Returned within 30 days after lease expiry, property return, and signed checkout protocol, less proven damages or claims.
-      </div>
-
-      <div class="sec-title">§ 4 Handover and Return</div>
-      <div class="p-block">
-        <strong>1. Handover Timing:</strong> Carried out only after verified receipt of security deposit and first rent.
-      </div>
-      <div class="p-block">
-        <strong>2. Protocol:</strong> An inventory handover protocol is signed at check-in. The room must be returned swept clean and cleared of all belongings at departure.
-      </div>
-      <div class="p-block">
-        <strong>3. Keys:</strong> Tenant compensates lost keys at: <strong>Building entrance €680, Apartment €120, Room €90, Mailbox €70</strong>, plus master cylinder lock changes.
-      </div>
-
-      <div class="sec-title">§ 5 Damages to Property</div>
-      <div class="p-block">
-        <strong>1. Notification:</strong> Defects must be reported immediately; landlord has 4 weeks to arrange remediation.
-      </div>
-      <div class="p-block">
-        <strong>2. Liability:</strong> The tenant is liable for neglect and visitor damage. The burden of proof rests with the tenant for damage arising within their rooms.
-      </div>
-      <div class="p-block">
-        <strong>3. Maintenance & Minor Repairs:</strong> No general cosmetic renovation required. Minor repairs under €100 per instance (up to 8% annual rent / €350 cap) are tenant's responsibility.
-      </div>
-    </div>
-  </div>
-
-  <div class="page-footer">
-    <div>{footer_logo_tag} &bull; Homelyo GTC / AGB</div>
-    <div>Seite / Page 6</div>
-  </div>
-</div>
-
-<!-- PAGE 7: AGB § 6 Kündigung, § 7 Schriftform, § 8 Salvatorische Klausel & Signatures -->
-<div class="page" id="page-7">
-  <div class="page-header">
-    <div class="header-left">{logo_img_tag}</div>
-    <div class="header-right">Allgemeine Geschäftsbedingungen (AGB) &amp; Unterschriften</div>
-  </div>
-
-  <div class="two-col">
-    <!-- German Column -->
-    <div class="col">
-      <div class="sec-title">§ 6 Kündigungsbedingungen</div>
-      <div class="p-block">
-        <strong>1. Nachmieterstellung:</strong> Schlägt der Mieter mit einer Frist von 3 Monaten zum Monatsende einen geeigneten Nachmieter vor und wird dieser vom Vermieter akzeptiert, wird der Mieter ab Übergabe an den Nachmieter von seiner Zahlungspflicht befreit. Andernfalls haftet der Mieter bis zum regulären Ablauf der vereinbarten Mietzeit.
-      </div>
-      <div class="p-block">
-        <strong>2. Fristlose Kündigung:</strong> Der Vermieter behält sich die fristlose Kündigung vor bei: Verstoß gegen AGB trotz Abmahnung, vom Mieter verursachten Schäden &gt; 50 €, unbefugter Gebrauchsüberlassung an Dritte, beharrlicher Reinigungsverweigerung, Erhalt von 2 Abmahnungen oder Zahlungsverzug von zwei Monatsmieten (§ 543 Abs. 2 BGB).
-      </div>
-      <div class="p-block">
-        <strong>3. Ausschluss stillschweigender Verlängerung:</strong> § 545 BGB wird ausdrücklich ausgeschlossen.
-      </div>
-
-      <div class="sec-title">§ 7 Schriftform &amp; § 8 Salvatorische Klausel</div>
-      <div class="p-block">
-        Mündliche Nebenabreden bestehen nicht. Änderungen bedürfen der Schriftform. Sollten einzelne Bestimmungen unwirksam sein, berührt dies die Wirksamkeit der übrigen AGB nicht. Anstelle der unwirksamen Regelung gilt diejenige Bestimmung, die dem wirtschaftlichen Zweck am nächsten kommt.
-      </div>
-    </div>
-
-    <!-- English Column -->
-    <div class="col">
-      <div class="sec-title">§ 6 Termination Conditions</div>
-      <div class="p-block">
-        <strong>1. Replacement Tenant:</strong> If the tenant presents an accepted solvent replacement tenant with 3 months' notice to month-end who executes a contract, the tenant is released from rent obligations from the replacement move-in date. Otherwise, the tenant remains fully liable for the rent until the scheduled lease end.
-      </div>
-      <div class="p-block">
-        <strong>2. Termination Without Notice:</strong> Landlord may terminate immediately for: persistent breach of GTC despite warning, damages &gt; €50 unpaid, unauthorized third-party lodging, failure to maintain cleanliness after warning, receiving 2 written warnings, or 2 months rent default (§ 543 (2) BGB).
-      </div>
-      <div class="p-block">
-        <strong>3. Exclusion of Tacit Renewal:</strong> Section 545 BGB is strictly excluded.
-      </div>
-
-      <div class="sec-title">§ 7 Written Form &amp; § 8 Severability Clause</div>
-      <div class="p-block">
-        No oral side agreements exist. Amendments must be in writing. If any provision is deemed invalid, the remaining terms retain full force. The invalid clause will be replaced with a provision closest to the intended economic purpose.
-      </div>
-    </div>
-  </div>
-
-  <!-- Signatures Section with NO timestamps -->
-  <div class="sig-block">
-    <div class="two-col">
-      <!-- Landlord -->
-      <div class="col">
-        <div class="sig-line"></div>
-        <div class="sig-title">{{{{LANDLORD_SIGN_NAME}}}}</div>
-        <div class="sig-date">Vermieter / Landlord &bull; Datum / Date: ____________________</div>
-      </div>
-
-      <!-- Tenant -->
-      <div class="col">
-        <div class="sig-line"></div>
-        <div class="sig-title">{{{{TENANT_SIGN_NAME}}}}</div>
-        <div class="sig-date">Mieter / Tenant &bull; Datum / Date: ____________________</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="page-footer">
-    <div>{footer_logo_tag} &bull; Homelyo GTC &amp; Signatures</div>
-    <div>Seite / Page 7</div>
-  </div>
-</div>
-
-</body>
-</html>
-"""
-    return html
+    return f"{day:02d}.{dt.month:02d}.{year}", f"{day} {en_months[m_idx]}, {year}"
 
 def render_contract_data(
     tenant_name,
@@ -1088,14 +244,15 @@ def render_contract_data(
     tenant_address_en=None,
     reason_de=None,
     reason_en=None,
+    landlord_sign_date=None,
+    tenant_sign_date=None,
     individual_de=None,
     individual_en=None,
-    landlord_sign_date=None,
-    tenant_sign_date=None
+    **kwargs
 ):
     spec = ROOM_SPECS.get(room_code, ROOM_SPECS["KE2"])
     rent = float(rent_amount) if rent_amount is not None else spec["rent"]
-    deposit = float(deposit_amount) if deposit_amount is not None else 1000.00
+    deposit = float(deposit_amount) if deposit_amount is not None else spec["deposit"]
 
     rent_str = f"{int(rent)}" if rent.is_integer() else f"{rent:.2f}".replace(".", ",")
     deposit_str = f"{int(deposit):,}".replace(",", ".") if deposit.is_integer() else f"{deposit:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
@@ -1108,6 +265,12 @@ def render_contract_data(
     start_de, start_en = format_date_bilingual(start_date)
     end_de, end_en = format_date_bilingual(end_date)
 
+    today = datetime.date.today().strftime("%Y-%m-%d")
+    today_de, today_en = format_date_bilingual(today)
+
+    dep_due_dt = (datetime.datetime.strptime(start_date, "%Y-%m-%d") - datetime.timedelta(days=5)).strftime("%Y-%m-%d")
+    dep_due_de, dep_due_en = format_date_bilingual(dep_due_dt)
+
     if not tenant_address_de:
         tenant_address_de = "Gemäß Personalausweis / Passdokument"
     if not tenant_address_en:
@@ -1118,15 +281,19 @@ def render_contract_data(
     if not reason_en:
         reason_en = "Due to an academic, internship, or professional stay in Berlin"
 
-    return {
+    sign_dt_de = landlord_sign_date or today_de
+    sign_dt_en = tenant_sign_date or today_en
+
+    data = {
         "LANDLORD_NAME": "Kylasam NA",
         "LANDLORD_SIGN_NAME": "Kylasam Nallagoundanpalayam Arruchamy",
         "LANDLORD_ADDRESS_DE": "Forckenbeckstraße 64, 14199 Berlin, Deutschland",
         "LANDLORD_ADDRESS_EN": "Forckenbeckstraße 64, 14199 Berlin, Germany",
+        "LANDLORD_CONTACT": "support@homelyo.eu | Tel: +49 176 8332 9439",
         "PROPERTY_ADDRESS_DE": "Lichtenrader Damm 80, 12305 Berlin, Deutschland",
         "PROPERTY_ADDRESS_EN": "Lichtenrader Damm 80, 12305 Berlin, Germany",
         "FLOOR": spec.get("floor", "2"),
-        "ROOM_COUNT": spec.get("room_num", "1"),
+        "ROOM_COUNT": spec.get("room_num", "2"),
         "ROOM_SIZE": spec.get("size", "23.92"),
         "ROOM_CODE": room_code,
         "ROOM_TITLE_DE": spec.get("title_de", "Sonnige Balkon-Suite"),
@@ -1143,20 +310,1124 @@ def render_contract_data(
         "START_DATE_EN": start_en,
         "END_DATE_DE": end_de,
         "END_DATE_EN": end_en,
+        "CONTRACT_CREATION_DATE": today_de,
+        "CONTRACT_DATE": today_de,
         "REASON_DE": reason_de,
         "REASON_EN": reason_en,
         "RENT_AMOUNT": rent_str,
+        "RENT_AMOUNT_DE": f"{rent_str} €",
+        "RENT_AMOUNT_EN": f"€{rent_str}",
         "RENT_WORDS_DE": rent_words_de,
         "RENT_WORDS_EN": rent_words_en,
         "DEPOSIT_AMOUNT": deposit_str,
+        "DEPOSIT_AMOUNT_DE": f"{deposit_str} €",
+        "DEPOSIT_AMOUNT_EN": f"€{deposit_str}",
         "DEPOSIT_WORDS_DE": deposit_words_de,
         "DEPOSIT_WORDS_EN": deposit_words_en,
+        "DEPOSIT_DUE_DE": dep_due_de,
+        "DEPOSIT_DUE_EN": dep_due_en,
         "FIRST_RENT_AMOUNT": rent_str,
-        "CLEANING_FEE": "70",
+        "CLEANING_FEE": "70,00",
+        "LATE_FEE": "5,00",
         "RENT_ACCOUNT_HOLDER": "Kylasam Nallagoundanpalayam Arruchamy",
         "RENT_IBAN": "DE87100110012624542768",
-        "RENT_BIC": "NTSBDEB1XXX"
+        "RENT_BIC": "NTSBDEB1XXX",
+        "RENT_BANK": "N26 Bank AG, Berlin",
+        "LANDLORD_SIGN_DATE": sign_dt_de,
+        "TENANT_SIGN_DATE": sign_dt_en,
+        "INDIVIDUAL_AGREEMENTS_DE": individual_de or "Keine gesonderten Vereinbarungen.",
+        "INDIVIDUAL_AGREEMENTS_EN": individual_en or "None.",
+        # GDrive sample aliases for full backwards-compatibility
+        "TENANT_ROOM_ID": room_code,
+        "ROOM_TITLE": spec.get("title_de", "Sonnige Balkon-Suite"),
+        "ROOM_NUMBER": spec.get("room_num", "2"),
+        "CONTRACT_START_DT": start_de,
+        "CONTRACT_END_DT": end_de,
+        "RENT_PER_MONTH": rent_str,
+        "DEPOSIT_AMOUNT_PAY_BEFORE_DT": dep_due_de
     }
+    return data
+
+def generate_html_template():
+    logo_b64 = get_logo_base64()
+    logo_img = f'<img src="data:image/png;base64,{logo_b64}" alt="Homelyo Logo" style="height: 30px; width: auto; max-width: 140px; display: inline-block;">' if logo_b64 else '<div style="font-size: 15pt; font-weight: 800; color: #0f172a; letter-spacing: 0.5px;">HOMELYO</div>'
+    footer_logo = f'<img src="data:image/png;base64,{logo_b64}" alt="Homelyo" style="height: 12px; width: auto; opacity: 0.85;">' if logo_b64 else '<span style="font-weight: 700; font-size: 7.5pt; color: #475569;">homelyo</span>'
+
+    css = """
+@page {
+    size: A4 portrait;
+    margin: 9mm 12mm 9mm 12mm;
+}
+* {
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+}
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #0f172a;
+    background-color: #ffffff;
+    font-size: 7.8pt;
+    line-height: 1.28;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+.page {
+    width: 100%;
+    page-break-after: always;
+    height: 279mm;
+    max-height: 279mm;
+    position: relative;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+}
+.page:last-child {
+    page-break-after: avoid;
+}
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1.5px solid #cbd5e1;
+    padding-bottom: 5px;
+    margin-bottom: 6px;
+    flex-shrink: 0;
+}
+.header-meta {
+    text-align: right;
+    font-size: 7.5pt;
+    color: #64748b;
+    line-height: 1.2;
+}
+.page-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 5px;
+    margin-top: 5px;
+    font-size: 7.0pt;
+    color: #64748b;
+    flex-shrink: 0;
+}
+.page-body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+.main-title-block {
+    text-align: center;
+    margin: 6px 0 10px 0;
+}
+.main-title-block h1 {
+    font-size: 18pt;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 2px 0;
+    letter-spacing: -0.3px;
+}
+.main-title-block h2 {
+    font-size: 11pt;
+    font-weight: 600;
+    color: #475569;
+    margin: 0;
+}
+.summary-card {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+}
+.summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 14px;
+    font-size: 8.0pt;
+}
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 1.5px 0;
+}
+.summary-label {
+    color: #475569;
+    font-weight: 600;
+}
+.summary-val {
+    color: #0f172a;
+    font-weight: 700;
+    text-align: right;
+}
+.two-col {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    gap: 12px;
+}
+.col {
+    flex: 1;
+    width: 50%;
+}
+.sec-title {
+    font-size: 8.6pt;
+    font-weight: 700;
+    color: #0f172a;
+    margin-top: 6px;
+    margin-bottom: 2px;
+    line-height: 1.2;
+    border-left: 3px solid #2563eb;
+    padding-left: 5px;
+}
+.col-en .sec-title {
+    color: #334155;
+    border-left: 3px solid #94a3b8;
+}
+.p-block {
+    margin-bottom: 3.5px;
+    text-align: justify;
+    font-size: 7.7pt;
+    color: #1e293b;
+    line-height: 1.26;
+}
+.col-en .p-block {
+    color: #475569;
+}
+.party-box {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    padding: 6px 8px;
+    margin-bottom: 6px;
+    font-size: 7.7pt;
+}
+.party-title {
+    font-weight: 700;
+    color: #0f172a;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 2px;
+    margin-bottom: 3px;
+}
+.bank-box {
+    background: #f8fafc;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 5px;
+    padding: 8px 12px;
+    margin: 8px 0;
+}
+.bank-title {
+    font-weight: 700;
+    font-size: 9.0pt;
+    color: #0f172a;
+    margin-bottom: 4px;
+    border-bottom: 1px solid #cbd5e1;
+    padding-bottom: 2px;
+}
+.inventory-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 6px 0;
+    font-size: 7.6pt;
+}
+.inventory-table th, .inventory-table td {
+    border: 1px solid #cbd5e1;
+    padding: 4px 6px;
+    vertical-align: top;
+    text-align: left;
+}
+.inventory-table th {
+    background: #f1f5f9;
+    font-weight: 700;
+    color: #0f172a;
+}
+.sig-box {
+    margin-top: 10px;
+    padding-top: 6px;
+    border-top: 1px dashed #cbd5e1;
+}
+.sig-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 7.6pt;
+}
+.sig-table td {
+    width: 50%;
+    vertical-align: top;
+    padding: 0 8px;
+}
+.sig-line {
+    border-top: 1.5px solid #0f172a;
+    margin-top: 28px;
+    margin-bottom: 3px;
+}
+.badge {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1d4ed8;
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-size: 7.2pt;
+    font-weight: 600;
+}
+.legal-banner {
+    font-style: italic;
+    font-size: 7.2pt;
+    color: #64748b;
+    text-align: center;
+    margin-top: 4px;
+}
+"""
+
+    html = f"""<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Mietvertrag / Residential Lease Agreement – Homelyo</title>
+<style>{css}</style>
+</head>
+<body>
+
+<!-- ==================== PAGE 1: COVER & WELCOME OVERVIEW ==================== -->
+<div class="page" id="page-1">
+  <div class="page-header">
+    <div>{logo_img}</div>
+    <div class="header-meta">
+      <strong>Homelyo Co-Living Berlin</strong><br>
+      Lichtenrader Damm 80, 12305 Berlin
+    </div>
+  </div>
+
+  <div class="page-body">
+    <div class="main-title-block">
+      <h1>Mietvertrag</h1>
+      <h2>Residential Lease Agreement &bull; Co-Living Tenancy</h2>
+    </div>
+
+    <!-- Executive Summary Card -->
+    <div class="summary-card">
+      <div class="summary-grid">
+        <div class="summary-row">
+          <span class="summary-label">Mieter / Tenant:</span>
+          <span class="summary-val">{{{{TENANT_NAME}}}}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Mietobjekt / Room:</span>
+          <span class="summary-val">Zimmer {{{{ROOM_CODE}}}} ({{{{ROOM_TITLE_DE}}}})</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Liegenschaft / Address:</span>
+          <span class="summary-val">Lichtenrader Damm 80, 12305 Berlin</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Geschoss & Whg:</span>
+          <span class="summary-val">{{{{FLOOR}}}}. OG, Whg. WE-11 (Zimmer {{{{ROOM_COUNT}}}})</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Mietzeit / Rental Term:</span>
+          <span class="summary-val">{{{{START_DATE_DE}}}} &ndash; {{{{END_DATE_DE}}}}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Warmmiete / Warm Rent:</span>
+          <span class="summary-val">{{{{RENT_AMOUNT}}}} &euro; / Monat (Pauschalmiete)</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Kaution / Deposit:</span>
+          <span class="summary-val">{{{{DEPOSIT_AMOUNT}}}} &euro; (F&auml;llig vor Einzug)</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Endreinigung / Cleaning:</span>
+          <span class="summary-val">{{{{CLEANING_FEE}}}} &euro; (Einmalig bei Auszug)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Welcome Letter (Wunderflats & GDrive standard) -->
+    <div class="two-col">
+      <div class="col col-de">
+        <div class="sec-title">Willkommen bei Homelyo</div>
+        <div class="p-block">
+          <strong>Liebe/r Mieter/in {{{{TENANT_NAME}}}},</strong><br>
+          im Folgenden erh&auml;ltst Du alle wichtigen Informationen rund um Deinen Mietvertrag sowie Deine ersten Schritte zur erfolgreichen Anmietung Deines Zimmers in der Liegenschaft Lichtenrader Damm 80, 12305 Berlin.
+        </div>
+        <div class="p-block">
+          <strong>Bestandteile dieser Vereinbarung:</strong><br>
+          &bull; <strong>Hauptvertrag:</strong> Mietgegenstand, Mietdauer, Konditionen (&sect; 1 &ndash; &sect; 6)<br>
+          &bull; <strong>Zahlungsm&ouml;glichkeiten:</strong> N26 Bankverbindung &amp; Kautionsabwicklung<br>
+          &bull; <strong>Anlage 1:</strong> Inventar der Mietsache &amp; Kleinreparaturregelungen<br>
+          &bull; <strong>Anlage 2:</strong> Allgemeine Gesch&auml;ftsbedingungen (&sect; 1 &ndash; &sect; 8 AGB)
+        </div>
+        <div class="p-block">
+          <span class="badge">Rechtlicher Hinweis</span> Die deutsche Sprachfassung dieses Mietvertrages ist rechtlich allein verbindlich. Die englische Fassung dient als unverbindliche Lesehilfe.
+        </div>
+      </div>
+
+      <div class="col col-en">
+        <div class="sec-title">Welcome to Homelyo</div>
+        <div class="p-block">
+          <strong>Dear Tenant {{{{TENANT_NAME}}}},</strong><br>
+          Below you will find all essential information regarding your lease agreement and key steps for moving into your co-living room at Lichtenrader Damm 80, 12305 Berlin.
+        </div>
+        <div class="p-block">
+          <strong>Structure of this Lease Document:</strong><br>
+          &bull; <strong>Core Agreement:</strong> Premises, term, rent &amp; deposit (&sect; 1 &ndash; &sect; 6)<br>
+          &bull; <strong>Payment Options:</strong> N26 Bank wire transfer &amp; escrow processing<br>
+          &bull; <strong>Attachment 1:</strong> Inventory schedule &amp; maintenance rules<br>
+          &bull; <strong>Attachment 2:</strong> General Terms &amp; House Rules (&sect; 1 &ndash; &sect; 8 GTC)
+        </div>
+        <div class="p-block">
+          <span class="badge">Legal Notice</span> Only the German language version of this agreement is legally binding. The English translation is provided solely as an informational convenience.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <div>{footer_logo} &bull; Homelyo Co-Living Berlin</div>
+    <div>Seite / Page 1 von 8</div>
+  </div>
+</div>
+
+<!-- ==================== PAGE 2: HAUPTVERTRAG TEIL 1 (§ 1 & § 2) ==================== -->
+<div class="page" id="page-2">
+  <div class="page-header">
+    <div>{logo_img}</div>
+    <div class="header-meta">
+      <strong>Mietvertrag (Hauptvertrag)</strong> &bull; {{{{TENANT_NAME}}}} ({{{{ROOM_CODE}}}})
+    </div>
+  </div>
+
+  <div class="page-body">
+    <!-- Parties & Premises Box -->
+    <div class="two-col">
+      <div class="col col-de">
+        <div class="party-box">
+          <div class="party-title">Vermieter / Landlord</div>
+          <strong>{{{{LANDLORD_SIGN_NAME}}}}</strong><br>
+          {{{{LANDLORD_ADDRESS_DE}}}}<br>
+          {{{{LANDLORD_CONTACT}}}}
+        </div>
+      </div>
+      <div class="col col-en">
+        <div class="party-box">
+          <div class="party-title">Mieter / Tenant</div>
+          <strong>{{{{TENANT_NAME}}}}</strong><br>
+          {{{{TENANT_ADDRESS_DE}}}}<br>
+          {{{{TENANT_EMAIL}}}} | {{{{TENANT_PHONE}}}}
+        </div>
+      </div>
+    </div>
+
+    <!-- Mietgegenstand -->
+    <div class="two-col">
+      <div class="col col-de">
+        <div class="p-block">
+          <strong>Mietgegenstand:</strong> Vermietet wird das Zimmer <strong>{{{{ROOM_CODE}}}} ({{{{ROOM_TITLE_DE}}}})</strong> mit ca. <strong>{{{{ROOM_SIZE}}}} m&sup2;</strong> in der Wohnung Lichtenrader Damm 80, 12305 Berlin (2. OG, WE-11). Gemeinschaftliche Bereiche wie Flur, K&uuml;che, Badezimmer, Balkon/Terrasse und Gep&auml;ckraum d&uuml;rfen mitbenutzt werden.
+        </div>
+      </div>
+      <div class="col col-en">
+        <div class="p-block">
+          <strong>Rental Premises:</strong> Private room <strong>{{{{ROOM_CODE}}}} ({{{{ROOM_TITLE_EN}}}})</strong> with approx. <strong>{{{{ROOM_SIZE}}}} m&sup2;</strong> in apartment Lichtenrader Damm 80, 12305 Berlin (2nd floor, WE-11). Communal amenities including hallway, kitchen, bathroom, balcony/terrace, and luggage room are shared.
+        </div>
+      </div>
+    </div>
+
+    <!-- § 1 Mietdauer -->
+    <div class="two-col">
+      <div class="col col-de">
+        <div class="sec-title">&sect; 1 Mietdauer &amp; Befristungszweck (&sect; 549 Abs. 2 / &sect; 575 BGB)</div>
+        <div class="p-block">
+          (1) <strong>Mietzeit:</strong> Das Mietverh&auml;ltnis beginnt am <strong>{{{{START_DATE_DE}}}}</strong> und ist bis zum <strong>{{{{END_DATE_DE}}}}</strong> fest befristet. Die Mindestmietdauer betr&auml;gt sechs (6) Monate.
+        </div>
+        <div class="p-block">
+          (2) <strong>Zweck der Befristung:</strong> Die Vermietung erfolgt zum vor&uuml;bergehenden Gebrauch gem. &sect; 549 Abs. 2 Nr. 1 BGB (<em>{{{{REASON_DE}}}}</em>).
+        </div>
+        <div class="p-block">
+          (3) <strong>Ausschluss Verl&auml;ngerung:</strong> Eine stillschweigende Verl&auml;ngerung des Mietverh&auml;ltnisses gem. &sect; 545 BGB ist ausdr&uuml;cklich ausgeschlossen.
+        </div>
+      </div>
+
+      <div class="col col-en">
+        <div class="sec-title">&sect; 1 Lease Term &amp; Temporary Purpose (&sect; 549 (2) / &sect; 575 BGB)</div>
+        <div class="p-block">
+          (1) <strong>Tenancy Term:</strong> Begins on <strong>{{{{START_DATE_EN}}}}</strong> and terminates on <strong>{{{{END_DATE_EN}}}}</strong>. Minimum lease term is six (6) months.
+        </div>
+        <div class="p-block">
+          (2) <strong>Temporary Purpose:</strong> Let strictly for temporary accommodation under Section 549 (2) No. 1 BGB (<em>{{{{REASON_EN}}}}</em>).
+        </div>
+        <div class="p-block">
+          (3) <strong>No Tacit Renewal:</strong> Tacit renewal beyond the fixed term pursuant to Section 545 BGB is strictly excluded.
+        </div>
+      </div>
+    </div>
+
+    <!-- § 2 Miethöhe -->
+    <div class="two-col">
+      <div class="col col-de">
+        <div class="sec-title">&sect; 2 Mieth&ouml;he, Pauschale &amp; Nebenkosten</div>
+        <div class="p-block">
+          (1) <strong>Warmmiete:</strong> Die monatliche Pauschalmiete betr&auml;gt <strong>{{{{RENT_AMOUNT}}}} &euro;</strong> (in Worten: <strong>{{{{RENT_WORDS_DE}}}} Euro</strong>).
+        </div>
+        <div class="p-block">
+          (2) <strong>Inklusivleistungen:</strong> Die Miete deckt alle kalten und warmen Betriebskosten (Heizung, Warm-/Kaltwasser, Strom, M&uuml;ll, Geb&auml;udeversicherung) sowie Vodafone 1000 Mbit/s WLAN in verbrauchs&uuml;blichem Ma&szlig;e ab (Fair-Use-Klausel gem. AGB &sect; 3 Nr. 6).
+        </div>
+        <div class="p-block">
+          (3) <strong>ARD-Rundfunkbeitrag:</strong> Der Rundfunkbeitrag (GEZ) ist <strong>nicht</strong> in der Miete enthalten. Die WG meldet den Beitrag eigenst&auml;ndig an und teilt die Kosten untereinander auf.
+        </div>
+        <div class="p-block">
+          (4) <strong>Endreinigungspauschale:</strong> Bei Auszug f&auml;llt eine einmalige Pauschale von <strong>{{{{CLEANING_FEE}}}} &euro;</strong> f&uuml;r die professionelle Endreinigung an.
+        </div>
+      </div>
+
+      <div class="col col-en">
+        <div class="sec-title">&sect; 2 Rent, Utilities &amp; License Fee</div>
+        <div class="p-block">
+          (1) <strong>Warm Rent:</strong> The monthly all-inclusive flat rent is <strong>&euro;{{{{RENT_AMOUNT}}}}</strong> (in words: <strong>{{{{RENT_WORDS_EN}}}} euros</strong>).
+        </div>
+        <div class="p-block">
+          (2) <strong>Inclusions:</strong> Includes all operating utilities (heating, hot/cold water, electricity, waste disposal, insurance) and Vodafone 1000 Mbps Wi-Fi based on customary fair use (GTC &sect; 3 no. 6).
+        </div>
+        <div class="p-block">
+          (3) <strong>Broadcasting Fee (ARD):</strong> The public broadcasting fee (GEZ) is <strong>not</strong> included; registration and payment are coordinated directly by flatmates.
+        </div>
+        <div class="p-block">
+          (4) <strong>Final Cleaning:</strong> A one-time checkout cleaning fee of <strong>&euro;{{{{CLEANING_FEE}}}}</strong> applies upon departure.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <div>{footer_logo} &bull; Homelyo Hauptvertrag</div>
+    <div>Seite / Page 2 von 8</div>
+  </div>
+</div>
+
+<!-- ==================== PAGE 3: HAUPTVERTRAG TEIL 2 (§ 3, § 4, § 5, § 6 & SIGNATURES) ==================== -->
+<div class="page" id="page-3">
+  <div class="page-header">
+    <div>{logo_img}</div>
+    <div class="header-meta">
+      <strong>Mietvertrag (Hauptvertrag)</strong> &bull; Unterschriften / Signatures
+    </div>
+  </div>
+
+  <div class="page-body">
+    <!-- § 3 Kaution & § 4 Zahlungsbedingungen -->
+    <div class="two-col">
+      <div class="col col-de">
+        <div class="sec-title">&sect; 3 Kaution &amp; Mietsicherheit (&sect; 551 BGB)</div>
+        <div class="p-block">
+          (1) <strong>Kautionsh&ouml;he:</strong> Der Mieter leistet eine Kaution von <strong>{{{{DEPOSIT_AMOUNT}}}} &euro;</strong> (in Worten: <strong>{{{{DEPOSIT_WORDS_DE}}}} Euro</strong>).
+        </div>
+        <div class="p-block">
+          (2) <strong>F&auml;lligkeit vor Einzug:</strong> Kaution und erste Monatsmiete m&uuml;ssen vor dem Einzugstermin (<strong>{{{{START_DATE_DE}}}}</strong>) vollst&auml;ndig eingegangen sein. Ohne Geldeingang erfolgt keine Schl&uuml;ssel&uuml;bergabe.
+        </div>
+        <div class="p-block">
+          (3) <strong>R&uuml;ckerstattung:</strong> Treuh&auml;nderische Verwahrung gem. &sect; 551 BGB. Die Auszahlung erfolgt binnen <strong>30 Tagen</strong> nach Auszug und R&uuml;ckgabeprotokoll abz&uuml;glich berechtigter Forderungen. Aufrechnung gegen laufende Miete ist unzul&auml;ssig.
+        </div>
+
+        <div class="sec-title">&sect; 4 Zahlungsbedingungen &amp; F&auml;lligkeit</div>
+        <div class="p-block">
+          (1) <strong>F&auml;lligkeit:</strong> Die laufende Miete ist monatlich im Voraus bis sp&auml;testens zum <strong>3. Werktag</strong> eines jeden Monats kostenfrei per Bank&uuml;berweisung zu zahlen.
+        </div>
+        <div class="p-block">
+          (2) <strong>Mahngeb&uuml;hren:</strong> F&uuml;r jede Mahnung wird eine Geb&uuml;hr von <strong>{{{{LATE_FEE}}}} &euro;</strong> erhoben. Verzug mit zwei Monatsmieten berechtigt zur fristlosen K&uuml;ndigung gem. &sect; 543 Abs. 2 BGB.
+        </div>
+      </div>
+
+      <div class="col col-en">
+        <div class="sec-title">&sect; 3 Security Deposit &amp; Escrow (&sect; 551 BGB)</div>
+        <div class="p-block">
+          (1) <strong>Deposit Sum:</strong> Tenant renders a deposit of <strong>&euro;{{{{DEPOSIT_AMOUNT}}}}</strong> (in words: <strong>{{{{DEPOSIT_WORDS_EN}}}} euros</strong>).
+        </div>
+        <div class="p-block">
+          (2) <strong>Due Before Move-In:</strong> Deposit and 1st month rent must be credited before move-in (<strong>{{{{START_DATE_EN}}}}</strong>). Key handover is denied without prior funds receipt.
+        </div>
+        <div class="p-block">
+          (3) <strong>Escrow &amp; Refund:</strong> Held in escrow per Section 551 BGB and refunded within <strong>30 days</strong> after departure and signed checkout protocol, less proven claims. Setting off deposit against ongoing rent is prohibited.
+        </div>
+
+        <div class="sec-title">&sect; 4 Payment Terms &amp; Due Dates</div>
+        <div class="p-block">
+          (1) <strong>Due Date:</strong> Monthly rent is payable in advance on or before the <strong>3rd business day</strong> of each calendar month via wire transfer.
+        </div>
+        <div class="p-block">
+          (2) <strong>Late Charges:</strong> A fee of <strong>&euro;{{{{LATE_FEE}}}}</strong> applies per reminder notice. Arrears of two months rent entitle landlord to terminate without notice under &sect; 543 (2) BGB.
+        </div>
+      </div>
+    </div>
+
+    <!-- § 5 Kündigung & § 6 AGB/Anlagen -->
+    <div class="two-col">
+      <div class="col col-de">
+        <div class="sec-title">&sect; 5 K&uuml;ndigung &amp; Vorzeitige Entlassung</div>
+        <div class="p-block">
+          (1) <strong>Ordentliche K&uuml;ndigung:</strong> W&auml;hrend der festen Vertragslaufzeit ist die ordentliche K&uuml;ndigung ausgeschlossen.
+        </div>
+        <div class="p-block">
+          (2) <strong>Nachmieterstellung:</strong> Der Mieter kann mit einer Frist von <strong>3 Monaten zum Monatsende</strong> vorzeitig aus dem Vertrag entlassen werden, wenn er einen solventen, zumutbaren Nachmieter stellt, der einen verbindlichen Mietvertrag abschlie&szlig;t.
+        </div>
+        <div class="p-block">
+          (3) <strong>Au&szlig;erordentliche K&uuml;ndigung:</strong> Das gesetzliche Recht zur K&uuml;ndigung aus wichtigem Grund (&sect;&sect; 543, 569 BGB) bleibt unber&uuml;hrt.
+        </div>
+
+        <div class="sec-title">&sect; 6 AGB &amp; Anlagen als Vertragsbestandteil</div>
+        <div class="p-block">
+          Die Anlagen &ndash; <strong>Anlage 1 (Inventar)</strong> und <strong>Anlage 2 (AGB)</strong> &ndash; sind wesentlicher Vertragsbestandteil. &Uuml;bergabeprotokoll und Wohnungsgeberbest&auml;tigung (&sect; 19 BMG) werden bei Einzug ausgeh&auml;ndigt.
+        </div>
+      </div>
+
+      <div class="col col-en">
+        <div class="sec-title">&sect; 5 Termination &amp; Replacement Tenant</div>
+        <div class="p-block">
+          (1) <strong>Ordinary Termination:</strong> Excluded during the fixed rental term.
+        </div>
+        <div class="p-block">
+          (2) <strong>Replacement Tenant:</strong> Tenant may be released early with <strong>3 months notice to month-end</strong> upon providing an accepted, solvent replacement tenant who signs a binding lease.
+        </div>
+        <div class="p-block">
+          (3) <strong>Termination for Cause:</strong> Statutory right to extraordinary termination for good cause (&sect;&sect; 543, 569 BGB) remains unaffected.
+        </div>
+
+        <div class="sec-title">&sect; 6 Terms &amp; Attachments</div>
+        <div class="p-block">
+          The attachments &ndash; <strong>Attachment 1 (Inventory)</strong> and <strong>Attachment 2 (GTC)</strong> &ndash; form an integral binding part of this agreement. Handover protocol and landlord confirmation (&sect; 19 BMG) are provided upon move-in.
+        </div>
+      </div>
+    </div>
+
+    <!-- Signatures Block 1 (Hauptvertrag) -->
+    <div class="sig-box">
+      <table class="sig-table">
+        <tr>
+          <td>
+            Ort, Datum / Place, Date: Berlin, {{{{LANDLORD_SIGN_DATE}}}}
+            <div class="sig-line"></div>
+            <strong>{{{{LANDLORD_SIGN_NAME}}}}</strong><br>
+            Vermieter / Landlord
+          </td>
+          <td>
+            Ort, Datum / Place, Date: {{{{TENANT_SIGN_DATE}}}}
+            <div class="sig-line"></div>
+            <strong>{{{{TENANT_SIGN_NAME}}}}</strong><br>
+            Mieter / Tenant
+          </td>
+        </tr>
+      </table>
+      <div class="legal-banner">Hinweis: Die deutsche Fassung ist rechtlich allein verbindlich. / Notice: The German text is solely legally binding.</div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <div>{footer_logo} &bull; Homelyo Hauptvertrag &bull; Unterschriften</div>
+    <div>Seite / Page 3 von 8</div>
+  </div>
+</div>
+
+<!-- ==================== PAGE 4: ZAHLUNGSMÖGLICHKEITEN & ANLAGE 1 INVENTAR ==================== -->
+<div class="page" id="page-4">
+  <div class="page-header">
+    <div>{logo_img}</div>
+    <div class="header-meta">
+      <strong>Zahlungsm&ouml;glichkeiten &amp; Anlage 1 (Inventar)</strong> &bull; {{{{ROOM_CODE}}}}
+    </div>
+  </div>
+
+  <div class="page-body">
+    <!-- Zahlungsmöglichkeiten Box -->
+    <div class="bank-box">
+      <div class="bank-title">Zahlungsm&ouml;glichkeiten / Payment Options &bull; N26 Bank AG</div>
+      <div class="two-col" style="font-size: 7.7pt;">
+        <div class="col">
+          <strong>Bankverbindung f&uuml;r Miete &amp; Kaution:</strong><br>
+          Kontoinhaber: <strong>{{{{RENT_ACCOUNT_HOLDER}}}}</strong><br>
+          IBAN: <strong>{{{{RENT_IBAN}}}}</strong><br>
+          BIC / SWIFT: <strong>{{{{RENT_BIC}}}}</strong> &bull; Bank: {{{{RENT_BANK}}}}<br>
+          <em>Verwendungszweck Miete:</em> Miete [Monat Jahr] {{{{TENANT_NAME}}}}<br>
+          <em>Verwendungszweck Kaution:</em> Kaution {{{{TENANT_NAME}}}} Zimmer {{{{ROOM_CODE}}}}
+        </div>
+        <div class="col col-en">
+          <strong>Bank Details for Rent &amp; Deposit:</strong><br>
+          Account Holder: <strong>{{{{RENT_ACCOUNT_HOLDER}}}}</strong><br>
+          IBAN: <strong>{{{{RENT_IBAN}}}}</strong><br>
+          BIC / SWIFT: <strong>{{{{RENT_BIC}}}}</strong> &bull; Bank: {{{{RENT_BANK}}}}<br>
+          <em>Rent Reference:</em> Rent [Month Year] {{{{TENANT_NAME}}}}<br>
+          <em>Deposit Reference:</em> Deposit {{{{TENANT_NAME}}}} Room {{{{ROOM_CODE}}}}
+        </div>
+      </div>
+    </div>
+
+    <!-- Anlage 1 - Inventar der Mietsache -->
+    <div class="sec-title" style="margin-top: 4px;">Anlage 1 &ndash; Inventar der Mietsache / Attachment 1 &ndash; Inventory</div>
+
+    <table class="inventory-table">
+      <thead>
+        <tr>
+          <th style="width: 50%;">Ausstattung &amp; Regelungen (Deutsch)</th>
+          <th style="width: 50%; color: #475569;">Furnishings &amp; Terms (English)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <strong>1. Ausstattung im privaten Zimmer ({{{{ROOM_CODE}}}}):</strong><br>
+            &bull; Komfortables Boxspringbett mit Qualit&auml;tsmatratze, Lattenrost &amp; Schoner<br>
+            &bull; Gro&szlig;er Kleiderschrank / Kommode mit ausreichend B&uuml;geln<br>
+            &bull; Ergonomischer Schreibtisch &amp; B&uuml;rostuhl f&uuml;r Home-Office / Studium<br>
+            &bull; Spiegel, Deckenbeleuchtung, blickdichte Vorh&auml;nge / Rollos<br>
+            &bull; Erstausstattung Bettw&auml;scheset (Kissen, Bettdecke, Bez&uuml;ge, Laken)<br>
+            &bull; <em>Zimmerspezifisch:</em> {{{{ROOM_FEATURES_DE}}}}
+          </td>
+          <td style="color: #475569;">
+            <strong>1. Private Room Inventory ({{{{ROOM_CODE}}}}):</strong><br>
+            &bull; Quality box spring bed with mattress, slatted frame &amp; protector<br>
+            &bull; Spacious wardrobe / dresser with hangers<br>
+            &bull; Ergonomic study desk &amp; chair for productive work/study<br>
+            &bull; Mirror, room lighting, blackout curtains / blinds<br>
+            &bull; Starter bedding set (pillow, duvet, linen covers, bedsheet)<br>
+            &bull; <em>Room specifics:</em> {{{{ROOM_FEATURES_EN}}}}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <strong>2. Gemeinschaftsausstattung (K&uuml;che, Bad, Flur, Balkon):</strong><br>
+            &bull; Waschmaschine, K&uuml;hl-/Gefrierkombination, Induktionskochfeld, Backofen<br>
+            &bull; Mikrowelle, Kaffeemaschine, Wasserkocher, Toaster, Staubsauger<br>
+            &bull; Vollst&auml;ndiges Geschirr-, Besteck- und Kochutensilienset<br>
+            &bull; Highspeed WLAN-Router (Vodafone Gigabit-Kabel)
+          </td>
+          <td style="color: #475569;">
+            <strong>2. Shared Amenities (Kitchen, Bath, Hall, Balcony):</strong><br>
+            &bull; Washing machine, fridge/freezer, induction hob, oven<br>
+            &bull; Microwave, coffee maker, kettle, toaster, vacuum cleaner<br>
+            &bull; Full set of crockery, cutlery, pots and cookware<br>
+            &bull; Highspeed Wi-Fi router (Vodafone Gigabit connection)
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <strong>3. Wichtige Obhuts- &amp; Reparaturhinweise:</strong><br>
+            &bull; Sch&auml;den an der Mietsache sind gem. &sect; 5 Nr. 1 AGB unverz&uuml;glich zu melden.<br>
+            &bull; Durch den Mieter verursachte Sch&auml;den tr&auml;gt dieser gem. &sect; 5 Nr. 2 AGB in vollem Ma&szlig;e.<br>
+            &bull; Kleinreparaturen an h&auml;ufig genutzten Teilen (u.a. Leuchtmittel, Griffe) bis <strong>100,00 &euro;</strong> je Einzelfall tr&auml;gt der Mieter gem. &sect; 5 Nr. 5 AGB selbst.<br>
+            &bull; Ersatzanspr&uuml;che f&uuml;r nicht mitvermietete Gegenst&auml;nde sind ausgeschlossen.
+          </td>
+          <td style="color: #475569;">
+            <strong>3. Important Custody &amp; Repair Regulations:</strong><br>
+            &bull; Defects must be reported immediately per GTC &sect; 5 no. 1.<br>
+            &bull; Damage caused by tenant is fully compensated per GTC &sect; 5 no. 2.<br>
+            &bull; Minor repairs on frequent-use items (light bulbs, handles) up to <strong>&euro;100.00</strong> per repair are borne by tenant per GTC &sect; 5 no. 5.<br>
+            &bull; No compensation claims for items not included in the lease.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="page-footer">
+    <div>{footer_logo} &bull; Homelyo Zahlungsoptionen &amp; Anlage 1 (Inventar)</div>
+    <div>Seite / Page 4 von 8</div>
+  </div>
+</div>
+
+<!-- ==================== PAGE 5: ANLAGE 2 AGB TEIL 1 (PRÄAMBEL & § 1) ==================== -->
+<div class="page" id="page-5">
+  <div class="page-header">
+    <div>{logo_img}</div>
+    <div class="header-meta">
+      <strong>Anlage 2 &ndash; AGB (Teil 1)</strong> &bull; Zusammenleben in der WG
+    </div>
+  </div>
+
+  <div class="page-body">
+    <!-- AGB Preamble -->
+    <div class="summary-card" style="margin-bottom: 6px; padding: 6px 10px;">
+      <div class="two-col" style="font-size: 7.5pt;">
+        <div class="col">
+          <strong>Allgemeine Gesch&auml;ftsbedingungen der Wohngemeinschaft (Pr&auml;ambel):</strong><br>
+          Der Mieter erkennt die AGB als f&uuml;r ihn verbindlich an. Ein Versto&szlig; ist ein vertragswidriger Gebrauch der Mietsache und berechtigt bei schwerwiegenden F&auml;llen zur fristlosen K&uuml;ndigung. F&uuml;r Sch&auml;den aus Nichtbeachtung haftet der Mieter ersatzpflichtig.
+        </div>
+        <div class="col col-en">
+          <strong>General Terms and Conditions for Co-Living Flatshare (Preamble):</strong><br>
+          The tenant accepts the GTC as legally binding. A breach represents contract misuse and entitles the landlord to termination without notice in severe cases. The tenant compensates for all damages resulting from non-compliance.
+        </div>
+      </div>
+    </div>
+
+    <!-- § 1 Zusammenleben in der WG -->
+    <div class="two-col">
+      <div class="col col-de">
+        <div class="sec-title">&sect; 1 Zusammenleben in der WG / mit den Nachbarn</div>
+        <div class="p-block">
+          <strong>1. R&uuml;cksichtnahme:</strong> Die Bewohner der WG haben das Zusammenleben partnerschaftlich mit R&uuml;cksicht auf die Interessen und zur Zufriedenheit aller Beteiligten fair und eigenverantwortlich zu regeln.
+        </div>
+        <div class="p-block">
+          <strong>2. L&auml;rm &amp; Ruhezeiten:</strong> Jeder Mieter vermeidet unzumutbaren L&auml;rm. Gesetzliche Ruhezeiten sind strikt einzuhalten: <strong>13:00 bis 15:00 Uhr</strong> sowie <strong>22:00 bis 08:00 Uhr</strong>. An Sonn- und Feiertagen ist Ruhest&ouml;rung komplett zu unterlassen. TV, Audio- und Soundanlagen sind auf Zimmerlautst&auml;rke zu betreiben. Das Spielen von Instrumenten ist w&auml;hrend der Ruhezeiten verboten und au&szlig;erhalb auf max. 2 Stunden t&auml;glich beschr&auml;nkt.
+        </div>
+        <div class="p-block">
+          <strong>3. Partys:</strong> St&ouml;rende Partys und laute Feiern sind im gesamten Haus und im Zimmer untersagt. Geselliges Beisammensein ist sp&auml;testens ab 22:00 Uhr auf Zimmerlautst&auml;rke zu beschr&auml;nken.
+        </div>
+        <div class="p-block">
+          <strong>4. Reinigung:</strong> Die Mieter reinigen die Mietr&auml;ume und die Gemeinschaftsfl&auml;chen (K&uuml;che, Bad, WC, Flur, Balkon) eigenverantwortlich nach gemeinsamem Putzplan. Erfolgt trotz Fristsetzung keine Reinigung, kann der Vermieter eine gewerbliche Reinigung auf Kosten aller Mieter zu gleichen Teilen beauftragen. Wiederholte Reinigungsverweigerung berechtigt nach Abmahnung zur fristlosen K&uuml;ndigung.
+        </div>
+        <div class="p-block">
+          <strong>5. Rauch- &amp; Drogenverbot:</strong> In der gesamten Wohnung, im Treppenhaus und auf den Balkonen gilt ein striktes Rauchverbot (inkl. E-Zigaretten &amp; Shishas). Besitz, Konsum oder Handel illegaler Bet&auml;ubungsmittel f&uuml;hrt zur sofortigen Strafanzeige bei der Polizei und zur au&szlig;erordentlichen fristlosen K&uuml;ndigung.
+        </div>
+        <div class="p-block">
+          <strong>6. Haustiere:</strong> Die Haltung von Haustieren jeglicher Art ist grunds&auml;tzlich verboten.
+        </div>
+        <div class="p-block">
+          <strong>7. Beherbergung Dritter:</strong> Eine Gebrauchs&uuml;berlassung oder Untervermietung an Dritte sowie die dauerhafte Aufnahme von Lebensgef&auml;hrten ist unzul&auml;ssig. &Uuml;bernachtungsbesuch ist nur bei Anwesenheit des Mieters und an h&ouml;chstens <strong>f&uuml;nf (5) Tagen im Monat</strong> gestattet.
+        </div>
+      </div>
+
+      <div class="col col-en">
+        <div class="sec-title">&sect; 1 Cohabitation in Flat Share / Neighbours</div>
+        <div class="p-block">
+          <strong>1. Mutual Courtesy:</strong> Flatmates must independently organise everyday co-living with fairness, courtesy, and respect for all co-tenants' interests.
+        </div>
+        <div class="p-block">
+          <strong>2. Quiet Hours:</strong> Prevent loud or unnecessary noise. Mandatory quiet hours: <strong>1:00pm to 3:00pm</strong> and <strong>10:00pm to 8:00am</strong>. Absolute silence on Sundays and public holidays. Media devices must operate at room volume. Instrument playing is prohibited during quiet periods and capped at 2 hours daily otherwise.
+        </div>
+        <div class="p-block">
+          <strong>3. Parties:</strong> Disruptive parties are strictly forbidden on premises. Social gatherings must be reduced to quiet room volume by 10:00pm.
+        </div>
+        <div class="p-block">
+          <strong>4. Maintenance &amp; Cleaning:</strong> Tenants clean their room and all shared areas (kitchen, bath, WC, corridor, balcony) on a weekly rota. If neglected despite warning, professional cleaners will be hired at equal shared cost. Persistent refusal warrants lease termination.
+        </div>
+        <div class="p-block">
+          <strong>5. Non-Smoking &amp; Narcotics Ban:</strong> Smoking of any kind (including vapes) is strictly prohibited in all rooms, hallways, and balconies. Possession or use of illegal substances results in immediate police report and lease termination without notice.
+        </div>
+        <div class="p-block">
+          <strong>6. Pets:</strong> Keeping animals or pets of any kind is strictly forbidden.
+        </div>
+        <div class="p-block">
+          <strong>7. Overnight Guests:</strong> Subletting or permanently lodging partners/guests is barred. Overnight visitors are permitted only while tenant is present, capped at maximum <strong>five (5) days per calendar month</strong>.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <div>{footer_logo} &bull; Homelyo AGB &bull; &sect; 1 Zusammenleben in der WG</div>
+    <div>Seite / Page 5 von 8</div>
+  </div>
+</div>
+
+<!-- ==================== PAGE 6: ANLAGE 2 AGB TEIL 2 (§ 2 REGELUNGEN ZUR WOHNUNG) ==================== -->
+<div class="page" id="page-6">
+  <div class="page-header">
+    <div>{logo_img}</div>
+    <div class="header-meta">
+      <strong>Anlage 2 &ndash; AGB (Teil 2)</strong> &bull; Regelungen zur Wohnung
+    </div>
+  </div>
+
+  <div class="page-body">
+    <!-- § 2 Regelungen zur Wohnung -->
+    <div class="two-col">
+      <div class="col col-de">
+        <div class="sec-title">&sect; 2 Regelungen zur Wohnung</div>
+        <div class="p-block">
+          <strong>1. Wohnzweck:</strong> Die Anmietung erfolgt ausschlie&szlig;lich zu Wohnzwecken. Gewerbliche Nutzung ist untersagt.
+        </div>
+        <div class="p-block">
+          <strong>2. L&uuml;ften &amp; Heizen:</strong> Zur Schimmelvermeidung ist die Wohnung auch im Winter mindestens 2x t&auml;glich f&uuml;r 5&ndash;10 Minuten durch Sto&szlig;l&uuml;ften zu bel&uuml;ften (Dauerkippen unzul&auml;ssig). Heizk&ouml;rper beim L&uuml;ften und bei Abwesenheit herunterdrehen.
+        </div>
+        <div class="p-block">
+          <strong>3. Internet &amp; Telefon:</strong> Eigene Telefonanschl&uuml;sse d&uuml;rfen nicht verlegt werden. WLAN wird bereitgestellt. Der Mieter haftet vollumf&auml;nglich f&uuml;r seine Internetnutzung. Filesharing (Torrents, P2P) ist verboten; bei Verst&ouml;&szlig;en haftet der Mieter f&uuml;r alle Abmahnkosten und Daten werden an Ermittler weitergegeben. Der Rundfunkbeitrag wird von der WG selbst koordiniert.
+        </div>
+        <div class="p-block">
+          <strong>4. Bilder &amp; Bohren:</strong> N&auml;gel, Schrauben, D&uuml;belbohrungen oder klebende Folien an W&auml;nden und Fliesen sind untersagt. Schilder in Gemeinschaftsr&auml;umen sind verboten; das Klingelschild wird einheitlich beschriftet.
+        </div>
+        <div class="p-block">
+          <strong>5. Obhut &amp; Abfl&uuml;sse:</strong> Keine Speisereste, Fette, &Ouml;le oder Hygieneartikel in Abfl&uuml;sse leeren. Fu&szlig;b&ouml;den (Parkett/Laminat) sind vor Kratzern zu sch&uuml;tzen.
+        </div>
+        <div class="p-block">
+          <strong>6. M&uuml;lltrennung:</strong> M&uuml;ll ist konsequent nach BSR-Vorgaben zu trennen (Gelbe Tonne/Wertstoffe, Papier, Bio, Restm&uuml;ll). Sperrm&uuml;ll und Glas geh&ouml;ren in &ouml;ffentliche Beh&auml;lter.
+        </div>
+        <div class="p-block">
+          <strong>7. Bauliche Ver&auml;nderungen:</strong> Verboten. Satellitenantennen nur nach schriftlicher Genehmigung. Notwendige Erhaltungsarbeiten sind nach Ank&uuml;ndigung zu dulden.
+        </div>
+        <div class="p-block">
+          <strong>8. Sicherheitsbestimmungen:</strong> Haust&uuml;ren und Hoftore sind 22:00&ndash;06:00 Uhr geschlossen zu halten. Fluchtwege sind freizuhalten. Grillen auf Balkonen ist untersagt. Bei Gasgeruch kein Licht/Schalter bet&auml;tigen, Fenster &ouml;ffnen, Haupthahn schlie&szlig;en und Versorger informieren.
+        </div>
+        <div class="p-block">
+          <strong>9. Betreten durch den Vermieter:</strong> Zutritt werktags (09:00&ndash;12:00 und 15:00&ndash;20:00 Uhr) nach Ank&uuml;ndigung f&uuml;r Pr&uuml;fungen oder Handwerker gestattet; in den letzten 4 Wochen vor Auszug mind. 5 Besichtigungstermine. Bei Gefahr im Verzug jederzeitiger Zutritt.
+        </div>
+      </div>
+
+      <div class="col col-en">
+        <div class="sec-title">&sect; 2 Apartment Regulations</div>
+        <div class="p-block">
+          <strong>1. Residential Use:</strong> Strictly for private residential accommodation. Commercial activities are prohibited.
+        </div>
+        <div class="p-block">
+          <strong>2. Ventilation &amp; Heating:</strong> Cross-ventilate room minimum 2x daily (5&ndash;10 min) to avoid humidity and mold. Tilt windows forbidden in winter. Shut off radiators when airing or away.
+        </div>
+        <div class="p-block">
+          <strong>3. Internet &amp; Telecom:</strong> Individual phone lines may not be installed. Wi-Fi is provided. Tenant bears full liability for internet traffic; torrenting/P2P is banned. Tenant indemnifies landlord against statutory warnings; logs forwarded to police upon breach. Broadcasting fee is organized by tenants.
+        </div>
+        <div class="p-block">
+          <strong>4. Wall Protection:</strong> Drilling holes, nails, screws, or wall plugs are forbidden. Adhesive posters damaging paint are barred. Doorbell nameplate is labelled uniformly.
+        </div>
+        <div class="p-block">
+          <strong>5. Drains &amp; Floors:</strong> No food waste, oil, grease, or solids down sinks, shower, or toilets. Laminate flooring must be protected from scratch damage.
+        </div>
+        <div class="p-block">
+          <strong>6. Waste Separation:</strong> Systematically separate waste per Berlin BSR statutes (packaging, paper, bio, residual). Bulky waste and glass bottles must be taken to public depots.
+        </div>
+        <div class="p-block">
+          <strong>7. Modifications:</strong> Structural modifications barred. Satellite dishes require written consent. Necessary repairs must be tolerated after notice.
+        </div>
+        <div class="p-block">
+          <strong>8. Safety Measures:</strong> Building and yard doors closed 10:00pm&ndash;6:00am. Hallways/escape paths kept unobstructed. Balcony grilling forbidden. If gas smelled: no sparks/switches, open windows, close main valve, alert provider.
+        </div>
+        <div class="p-block">
+          <strong>9. Landlord Access:</strong> Access on workdays (9:00am&ndash;12:00pm &amp; 3:00pm&ndash;8:00pm) with advance notice for repairs/inspections; at least 5 viewings in the final 4 weeks of lease. Unannounced access permitted during emergencies.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <div>{footer_logo} &bull; Homelyo AGB &bull; &sect; 2 Regelungen zur Wohnung</div>
+    <div>Seite / Page 6 von 8</div>
+  </div>
+</div>
+
+<!-- ==================== PAGE 7: ANLAGE 2 AGB TEIL 3 (§ 3 & § 4) ==================== -->
+<div class="page" id="page-7">
+  <div class="page-header">
+    <div>{logo_img}</div>
+    <div class="header-meta">
+      <strong>Anlage 2 &ndash; AGB (Teil 3)</strong> &bull; Zahlungen, &Uuml;bergabe &amp; Schl&uuml;ssel
+    </div>
+  </div>
+
+  <div class="page-body">
+    <!-- § 3 Zahlungsvereinbarungen -->
+    <div class="two-col">
+      <div class="col col-de">
+        <div class="sec-title">&sect; 3 Zahlungsvereinbarungen</div>
+        <div class="p-block">
+          <strong>1. Rechtzeitigkeit:</strong> Ma&szlig;geblich ist das Datum des Eingangs auf dem Konto des Vermieters, nicht das Absendedatum.
+        </div>
+        <div class="p-block">
+          <strong>2. Kaution:</strong> Sichert alle Anspr&uuml;che des Vermieters. Zahlung per Bank&uuml;berweisung. Aufrechnung gegen Mietforderungen vor Mietende ist ausgeschlossen.
+        </div>
+        <div class="p-block">
+          <strong>3. Mietzahlung:</strong> Miete im Voraus bis zum 3. Werktag des Monats kostenfrei &uuml;berweisen mit Verwendungszweck &bdquo;Miete [Monat] [Name]&ldquo;.
+        </div>
+        <div class="p-block">
+          <strong>4. Zahlungsarten:</strong> &Uuml;berweisung auf das Vermieterkonto; anfallende Bank- oder Zahlungsgeb&uuml;hren tr&auml;gt der Mieter.
+        </div>
+        <div class="p-block">
+          <strong>5. R&uuml;ckerstattung:</strong> Abrechnung binnen <strong>30 Tagen</strong> nach Auszug und R&uuml;ckgabe per Bank&uuml;berweisung. Kontodaten sind sp&auml;testens beim Auszug mitzuteilen.
+        </div>
+        <div class="p-block">
+          <strong>6. Fair Usage Nebenkosten:</strong> Pauschalmiete ohne j&auml;hrliche Abrechnung. &Uuml;bersteigen die Betriebskosten den Durchschnitt um mehr als 25 %, kann der Mehrbetrag nach billigem Ermessen umgelegt werden (Gesamtschuldnerhaftung). Ger&auml;te mit hohem Energiebedarf sind anzuzeigen.
+        </div>
+        <div class="p-block">
+          <strong>7. Mahngeb&uuml;hren:</strong> F&uuml;r jede Mahnung wird eine Geb&uuml;hr von <strong>{{{{LATE_FEE}}}} &euro;</strong> berechnet.
+        </div>
+        <div class="p-block">
+          <strong>8. Mieterh&ouml;hung &amp; Aufrechnung:</strong> Mieterh&ouml;hung nach gesetzlichen Regeln. Aufrechnung nur nach Anzeige mindestens einen Monat vor F&auml;lligkeit zul&auml;ssig (&sect;&sect; 536, 536a BGB unber&uuml;hrt).
+        </div>
+      </div>
+
+      <div class="col col-en">
+        <div class="sec-title">&sect; 3 Payment Agreements</div>
+        <div class="p-block">
+          <strong>1. Punctuality:</strong> Payment timeliness is judged strictly by credit date on landlord's account, not wire date.
+        </div>
+        <div class="p-block">
+          <strong>2. Deposit:</strong> Secures all claims. Wire payment. Offsetting deposit against rent before departure is prohibited.
+        </div>
+        <div class="p-block">
+          <strong>3. Rent:</strong> Transferred in advance by the 3rd working day with reference "Rent [Month] [Name]".
+        </div>
+        <div class="p-block">
+          <strong>4. Methods:</strong> Wire transfer; transaction/banking charges are covered by tenant.
+        </div>
+        <div class="p-block">
+          <strong>5. Refund:</strong> Returned within <strong>30 days</strong> after departure and return protocol via wire. Bank details must be supplied upon departure.
+        </div>
+        <div class="p-block">
+          <strong>6. Fair Usage:</strong> Flat rent without annual utility settlement. If operating consumption exceeds average by > 25%, excess may be charged at fair discretion (joint liability). Heavy appliances must be declared.
+        </div>
+        <div class="p-block">
+          <strong>7. Late Fees:</strong> Reminder notice fine of <strong>&euro;{{{{LATE_FEE}}}}</strong> per issuance.
+        </div>
+        <div class="p-block">
+          <strong>8. Increase &amp; Set-Off:</strong> Rent adjustments under legal rules. Set-off permitted only with 1 month prior written notice (&sect;&sect; 536, 536a BGB unaffected).
+        </div>
+      </div>
+    </div>
+
+    <!-- § 4 Übergabe und Rückgabe -->
+    <div class="two-col">
+      <div class="col col-de">
+        <div class="sec-title">&sect; 4 &Uuml;bergabe und R&uuml;ckgabe der Mietsache</div>
+        <div class="p-block">
+          <strong>1. Zeitpunkt:</strong> &Uuml;bergabe erfolgt nach Eingang von Kaution und 1. Miete, fr&uuml;hestens zum Mietbeginn.
+        </div>
+        <div class="p-block">
+          <strong>2. Zustand bei Einzug:</strong> Es wird ein &Uuml;bergabeprotokoll angefertigt; dokumentierte M&auml;ngel sind bei Auszug im selben Zustand zu &uuml;bergeben.
+        </div>
+        <div class="p-block">
+          <strong>3. Schl&uuml;sselsatz &amp; Ersatzgeb&uuml;hren:</strong> Bei Verlust oder Besch&auml;digung von Schl&uuml;sseln tr&auml;gt der Mieter folgende Pauschalen:<br>
+          &bull; <strong>Haust&uuml;rschl&uuml;ssel (Schlie&szlig;anlage): 680,00 &euro;</strong><br>
+          &bull; <strong>Wohnungst&uuml;rschl&uuml;ssel: 120,00 &euro;</strong><br>
+          &bull; <strong>Zimmert&uuml;rschl&uuml;ssel: 90,00 &euro;</strong><br>
+          &bull; <strong>Briefkastenschl&uuml;ssel: 70,00 &euro;</strong><br>
+          Der Mieter haftet erg&auml;nzend f&uuml;r den Austausch von Schl&ouml;ssern der Zentralschlie&szlig;anlage.
+        </div>
+        <div class="p-block">
+          <strong>4. R&uuml;ckgabe bei Auszug:</strong> Am letzten Miettag bis 11:00 Uhr ger&auml;umt, besenrein mit allen Schl&uuml;sseln zur&uuml;ckzugeben. Zur&uuml;ckgelassene Sachen werden auf Mieterkosten entsorgt.
+        </div>
+      </div>
+
+      <div class="col col-en">
+        <div class="sec-title">&sect; 4 Handover and Return of the Property</div>
+        <div class="p-block">
+          <strong>1. Handover:</strong> Takes place after confirmed deposit and 1st rent receipt, at earliest on start date.
+        </div>
+        <div class="p-block">
+          <strong>2. Check-In Protocol:</strong> Handover protocol is signed; documented condition must be returned upon departure.
+        </div>
+        <div class="p-block">
+          <strong>3. Key Schedule &amp; Replacement:</strong> If keys are lost or broken, tenant compensates the scheduled expenses:<br>
+          &bull; <strong>Building entrance key (master lock): &euro;680.00</strong><br>
+          &bull; <strong>Apartment key: &euro;120.00</strong><br>
+          &bull; <strong>Room key: &euro;90.00</strong><br>
+          &bull; <strong>Mailbox key: &euro;70.00</strong><br>
+          Tenant remains liable for replacing master cylinders if required for safety.
+        </div>
+        <div class="p-block">
+          <strong>4. Departure:</strong> By 11:00am on final lease day, completely cleared, swept-clean with all keys. Leftover belongings disposed of at tenant's expense.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <div>{footer_logo} &bull; Homelyo AGB &bull; &sect; 3 Zahlungen &amp; &sect; 4 &Uuml;bergabe</div>
+    <div>Seite / Page 7 von 8</div>
+  </div>
+</div>
+
+<!-- ==================== PAGE 8: ANLAGE 2 AGB TEIL 4 (§ 5, § 6, § 7, § 8 & FINAL SIGNATURES) ==================== -->
+<div class="page" id="page-8">
+  <div class="page-header">
+    <div>{logo_img}</div>
+    <div class="header-meta">
+      <strong>Anlage 2 &ndash; AGB (Teil 4)</strong> &bull; Sch&auml;den, K&uuml;ndigung &amp; Unterschriften
+    </div>
+  </div>
+
+  <div class="page-body">
+    <!-- § 5 Schäden an der Wohnung -->
+    <div class="two-col">
+      <div class="col col-de">
+        <div class="sec-title">&sect; 5 Sch&auml;den an der Wohnung &amp; Kleinreparaturen</div>
+        <div class="p-block">
+          <strong>1. Meldepflicht:</strong> M&auml;ngel sind unverz&uuml;glich mitzuteilen; dem Vermieter ist eine Frist von 4 Wochen zur Abhilfe einzur&auml;umen.
+        </div>
+        <div class="p-block">
+          <strong>2. Haftung &amp; Beweislast:</strong> Der Mieter haftet f&uuml;r Sch&auml;den durch Pflichtverletzung (unzureichendes L&uuml;ften/Heizen) und Besucher. Beweislast f&uuml;r Sch&auml;den im Zimmer und WG-R&auml;umen liegt beim Mieter. Vermieter haftet nur f&uuml;r Vorsatz und grobe Fahrl&auml;ssigkeit.
+        </div>
+        <div class="p-block">
+          <strong>3. Sch&ouml;nheitsreparaturen:</strong> Nicht geschuldet, au&szlig;er bei &uuml;berm&auml;&szlig;iger Abnutzung.
+        </div>
+        <div class="p-block">
+          <strong>4. Kleinreparaturen:</strong> Reparaturen an Teilen im st&auml;ndigen Mieterzugriff (Leuchtmittel, Griffe, Armaturen) tr&auml;gt der Mieter bis <strong>100,00 &euro;</strong> je Einzelfall (j&auml;hrlich max. 8% der Miete bzw. <strong>350,00 &euro;</strong>).
+        </div>
+      </div>
+
+      <div class="col col-en">
+        <div class="sec-title">&sect; 5 Damages to Property &amp; Minor Repairs</div>
+        <div class="p-block">
+          <strong>1. Reporting:</strong> Inform landlord immediately of defects; landlord is granted 4 weeks to remediate.
+        </div>
+        <div class="p-block">
+          <strong>2. Liability:</strong> Tenant is liable for neglect (poor airing/heating) and visitor actions. Burden of proof rests with tenant for room damages. Landlord liability limited to intent and gross negligence.
+        </div>
+        <div class="p-block">
+          <strong>3. Cosmetic Repairs:</strong> Not required except in case of excessive deterioration.
+        </div>
+        <div class="p-block">
+          <strong>4. Minor Repairs:</strong> Upkeep on direct-use fixtures (bulbs, handles, faucets) borne by tenant up to <strong>&euro;100.00</strong> per incident (annual cap: 8% rent or <strong>&euro;350.00</strong>).
+        </div>
+      </div>
+    </div>
+
+    <!-- § 6 Kündigung, § 7 Schriftform, § 8 Salvatorische Klausel -->
+    <div class="two-col">
+      <div class="col col-de">
+        <div class="sec-title">&sect; 6 K&uuml;ndigung, &sect; 7 Schriftform &amp; &sect; 8 Salvatorische Klausel</div>
+        <div class="p-block">
+          <strong>1. K&uuml;ndigung &amp; Nachmieter:</strong> K&uuml;ndigungsfrist 3 Monate zum Monatsende gem. &sect; 5 Hauptvertrag. Bei Gestellung eines akzeptierten Nachmieters wird der Mieter ab dessen &Uuml;bergabe freigestellt. &sect; 545 BGB wird ausgeschlossen.
+        </div>
+        <div class="p-block">
+          <strong>2. Fristlose K&uuml;ndigung (&sect; 543 BGB):</strong> Zul&auml;ssig bei: Verzug von 2 Monatsmieten, AGB-Versto&szlig; trotz Abmahnung, Sch&auml;den &gt; <strong>50,00 &euro;</strong> unbeglichen, unbefugter Dritter, Drogen oder Reinigungsverweigerung.
+        </div>
+        <div class="p-block">
+          <strong>3. Schriftform &amp; Salvatorische Klausel:</strong> M&uuml;ndliche Nebenabreden ung&uuml;ltig; &Auml;nderungen nur schriftlich. Sollten Klauseln unwirksam sein, bleibt der Restvertrag wirksam. Erf&uuml;llungsort und Gerichtsstand ist Berlin.
+        </div>
+      </div>
+
+      <div class="col col-en">
+        <div class="sec-title">&sect; 6 Termination, &sect; 7 Form &amp; &sect; 8 Severability</div>
+        <div class="p-block">
+          <strong>1. Notice &amp; Replacement:</strong> 3 months notice to month-end per &sect; 5 Core Agreement. Tenant is released early upon move-in of accepted replacement. Section 545 BGB is excluded.
+        </div>
+        <div class="p-block">
+          <strong>2. Cancellation for Cause (&sect; 543 BGB):</strong> For 2 months rent arrears, GTC breach after warning, damages &gt; <strong>&euro;50.00</strong> unpaid, unauthorized lodging, drugs, or persistent cleaning refusal.
+        </div>
+        <div class="p-block">
+          <strong>3. Written Form &amp; Severability:</strong> No oral agreements. Invalid provisions do not invalidate the rest. Governing law is German BGB. Place of jurisdiction is Berlin.
+        </div>
+      </div>
+    </div>
+
+    <!-- Signatures Block 2 (AGB) -->
+    <div class="sig-box">
+      <table class="sig-table">
+        <tr>
+          <td>
+            Ort, Datum / Place, Date: Berlin, {{{{LANDLORD_SIGN_DATE}}}}
+            <div class="sig-line"></div>
+            <strong>{{{{LANDLORD_SIGN_NAME}}}}</strong><br>
+            Vermieter / Landlord
+          </td>
+          <td>
+            Ort, Datum / Place, Date: {{{{TENANT_SIGN_DATE}}}}
+            <div class="sig-line"></div>
+            <strong>{{{{TENANT_SIGN_NAME}}}}</strong><br>
+            Mieter / Tenant
+          </td>
+        </tr>
+      </table>
+      <div class="legal-banner">Anlage 2 akzeptiert und vollst&auml;ndig anerkannt. / Attachment 2 accepted and agreed in full.</div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <div>{footer_logo} &bull; Homelyo AGB &bull; Unterschriften &amp; Best&auml;tigung</div>
+    <div>Seite / Page 8 von 8</div>
+  </div>
+</div>
+
+</body>
+</html>
+"""
+    return html
 
 def render_contract_html(data):
     html = generate_html_template()
@@ -1167,10 +1438,10 @@ def render_contract_html(data):
 def render_contract_docx(data, output_path):
     doc = Document()
     for section in doc.sections:
-        section.top_margin = Inches(0.5)
-        section.bottom_margin = Inches(0.5)
-        section.left_margin = Inches(0.55)
-        section.right_margin = Inches(0.55)
+        section.top_margin = Inches(0.4)
+        section.bottom_margin = Inches(0.4)
+        section.left_margin = Inches(0.5)
+        section.right_margin = Inches(0.5)
         section.page_width = Inches(8.27)
         section.page_height = Inches(11.69)
 
@@ -1183,231 +1454,195 @@ def render_contract_docx(data, output_path):
     p_title = doc.add_paragraph()
     p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
     r_de = p_title.add_run("Mietvertrag\n")
-    r_de.font.size = Pt(24)
+    r_de.font.size = Pt(22)
     r_de.font.bold = True
     r_en = p_title.add_run("Residential Lease Agreement & House Rules (AGB)")
-    r_en.font.size = Pt(13)
+    r_en.font.size = Pt(12)
     r_en.font.color.rgb = RGBColor(71, 85, 105)
-
-    doc.add_paragraph().paragraph_format.space_after = Pt(10)
-
-    # Parties Table
-    t_parties = doc.add_table(rows=4, cols=2)
-    t_parties.alignment = WD_TABLE_ALIGNMENT.CENTER
-    for r in t_parties.rows:
-        r.cells[0].width = Inches(3.5)
-        r.cells[1].width = Inches(3.5)
-
-    t_parties.rows[0].cells[0].paragraphs[0].add_run("Vermieter / Landlord: ").font.bold = True
-    t_parties.rows[0].cells[0].paragraphs[0].add_run(f"{data['LANDLORD_SIGN_NAME']}\n{data['LANDLORD_ADDRESS_DE']}")
-    t_parties.rows[0].cells[1].paragraphs[0].add_run("Mieter / Tenant: ").font.bold = True
-    t_parties.rows[0].cells[1].paragraphs[0].add_run(f"{data['TENANT_NAME']}\n{data['TENANT_ADDRESS_DE']}\n{data['TENANT_EMAIL']} | {data['TENANT_PHONE']}")
-
-    t_parties.rows[1].cells[0].paragraphs[0].add_run("Mietsache / Premises:\n").font.bold = True
-    t_parties.rows[1].cells[0].paragraphs[0].add_run(f"Zimmer {data['ROOM_CODE']} (ca. {data['ROOM_SIZE']} m²)\nLichtenrader Damm 80, 12305 Berlin\nGeschoss: {data['FLOOR']}. OG, Whg. WE-11")
-    t_parties.rows[1].cells[1].paragraphs[0].add_run("Mietdauer & Zweck / Term:\n").font.bold = True
-    t_parties.rows[1].cells[1].paragraphs[0].add_run(f"{data['START_DATE_DE']} bis {data['END_DATE_DE']}\nBefristet gem. § 549 Abs. 2 BGB:\n{data['REASON_DE']}")
-
-    t_parties.rows[2].cells[0].paragraphs[0].add_run("Miete & Nebenkosten:\n").font.bold = True
-    t_parties.rows[2].cells[0].paragraphs[0].add_run(f"Monatlich {data['RENT_AMOUNT']} € ({data['RENT_WORDS_DE']} EURO)\nInkl. Nebenkosten & 1000 Mbit/s WLAN\nEndreinigung: {data['CLEANING_FEE']} €\nARD-Rundfunkbeitrag: Von WG zu tragen")
-    t_parties.rows[2].cells[1].paragraphs[0].add_run("Rent & Utilities:\n").font.bold = True
-    t_parties.rows[2].cells[1].paragraphs[0].add_run(f"Monthly €{data['RENT_AMOUNT']} ({data['RENT_WORDS_EN']} EURO)\nIncl. utilities & 1000 Mbps Wi-Fi\nFinal cleaning: €{data['CLEANING_FEE']}\nARD public license fee: Paid by flatmates")
-
-    t_parties.rows[3].cells[0].paragraphs[0].add_run("Kaution & Bankkonto:\n").font.bold = True
-    t_parties.rows[3].cells[0].paragraphs[0].add_run(f"Kaution: {data['DEPOSIT_AMOUNT']} € (Zahlung vor Einzug)\nIBAN: {data['RENT_IBAN']}\nBIC: {data['RENT_BIC']}\nInhaber: {data['RENT_ACCOUNT_HOLDER']}")
-    t_parties.rows[3].cells[1].paragraphs[0].add_run("Deposit & Bank Account:\n").font.bold = True
-    t_parties.rows[3].cells[1].paragraphs[0].add_run(f"Deposit: €{data['DEPOSIT_AMOUNT']} (credited prior to move-in)\nIBAN: {data['RENT_IBAN']}\nBIC: {data['RENT_BIC']}\nHolder: {data['RENT_ACCOUNT_HOLDER']}")
-
-    doc.add_page_break()
-
-    p_agb_title = doc.add_paragraph()
-    p_agb_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    r_agb_de = p_agb_title.add_run("Allgemeine Mietvertragsbestimmungen & Hausordnung (§ 1 – § 14)\n")
-    r_agb_de.font.size = Pt(14)
-    r_agb_de.font.bold = True
-    r_agb_en = p_agb_title.add_run("General Lease Terms & House Rules (AGB § 1 – § 14)")
-    r_agb_en.font.size = Pt(11)
-    r_agb_en.font.color.rgb = RGBColor(71, 85, 105)
 
     doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
-    # 14 Full Clauses Table (§ 1 to § 14)
-    clauses_data = [
+    # Executive Overview Table
+    t_overview = doc.add_table(rows=5, cols=2)
+    t_overview.alignment = WD_TABLE_ALIGNMENT.CENTER
+    for r in t_overview.rows:
+        r.cells[0].width = Inches(3.6)
+        r.cells[1].width = Inches(3.6)
+
+    t_overview.rows[0].cells[0].paragraphs[0].add_run("Mieter / Tenant: ").font.bold = True
+    t_overview.rows[0].cells[0].paragraphs[0].add_run(f"{data['TENANT_NAME']}")
+    t_overview.rows[0].cells[1].paragraphs[0].add_run("Mietobjekt / Room: ").font.bold = True
+    t_overview.rows[0].cells[1].paragraphs[0].add_run(f"Zimmer {data['ROOM_CODE']} ({data['ROOM_TITLE_DE']} / {data['ROOM_TITLE_EN']})")
+
+    t_overview.rows[1].cells[0].paragraphs[0].add_run("Liegenschaft / Address: ").font.bold = True
+    t_overview.rows[1].cells[0].paragraphs[0].add_run("Lichtenrader Damm 80, 12305 Berlin (2. OG, WE-11)")
+    t_overview.rows[1].cells[1].paragraphs[0].add_run("Mietzeit / Rental Term: ").font.bold = True
+    t_overview.rows[1].cells[1].paragraphs[0].add_run(f"{data['START_DATE_DE']} bis {data['END_DATE_DE']}")
+
+    t_overview.rows[2].cells[0].paragraphs[0].add_run("Warmmiete / Warm Rent: ").font.bold = True
+    t_overview.rows[2].cells[0].paragraphs[0].add_run(f"{data['RENT_AMOUNT']} € / Monat ({data['RENT_WORDS_DE']} Euro)")
+    t_overview.rows[2].cells[1].paragraphs[0].add_run("Rent & Inclusions: ").font.bold = True
+    t_overview.rows[2].cells[1].paragraphs[0].add_run(f"€{data['RENT_AMOUNT']} / month (incl. utilities & 1000 Mbps Wi-Fi)")
+
+    t_overview.rows[3].cells[0].paragraphs[0].add_run("Kaution / Security Deposit: ").font.bold = True
+    t_overview.rows[3].cells[0].paragraphs[0].add_run(f"{data['DEPOSIT_AMOUNT']} € (vor Einzug fällig)")
+    t_overview.rows[3].cells[1].paragraphs[0].add_run("Deposit Terms: ").font.bold = True
+    t_overview.rows[3].cells[1].paragraphs[0].add_run(f"€{data['DEPOSIT_AMOUNT']} (held in escrow, payable prior to move-in)")
+
+    t_overview.rows[4].cells[0].paragraphs[0].add_run("Endreinigung / Cleaning: ").font.bold = True
+    t_overview.rows[4].cells[0].paragraphs[0].add_run(f"{data['CLEANING_FEE']} € einmalig bei Auszug")
+    t_overview.rows[4].cells[1].paragraphs[0].add_run("Final Cleaning Fee: ").font.bold = True
+    t_overview.rows[4].cells[1].paragraphs[0].add_run(f"€{data['CLEANING_FEE']} one-time checkout fee")
+
+    doc.add_page_break()
+
+    # 14 Full Clauses Table (§ 1 to § 6 Hauptvertrag + § 1 to § 8 AGB)
+    clauses = [
         (
             "§ 1 Mietdauer & Befristungszweck (§ 549 Abs. 2 / § 575 BGB)\n",
-            f"(1) Mietzeitraum: Das Mietverhältnis beginnt am {data['START_DATE_DE']} und endet am {data['END_DATE_DE']}. Das Mietverhältnis ist befristet. Eine stillschweigende Verlängerung nach § 545 BGB ist ausdrücklich ausgeschlossen.\n"
-            f"(2) Zweck der Befristung: Die Vermietung erfolgt zum vorübergehenden Gebrauch gem. § 549 Abs. 2 Nr. 1 BGB ({data['REASON_DE']}).\n"
-            "(3) Mindestmietdauer: Die Mindestmietdauer beträgt sechs (6) Monate (bzw. die vereinbarte feste Vertragslaufzeit).",
+            f"(1) Mietzeit: Beginn am {data['START_DATE_DE']}, befristetes Ende am {data['END_DATE_DE']}. Mindestmietdauer beträgt sechs (6) Monate.\n"
+            f"(2) Zweck: Vorübergehender Gebrauch gem. § 549 Abs. 2 Nr. 1 BGB ({data['REASON_DE']}).\n"
+            "(3) Ausschluss: Stillschweigende Verlängerung (§ 545 BGB) ist ausgeschlossen.",
             "§ 1 Lease Term & Temporary Purpose (§ 549 (2) / § 575 BGB)\n",
-            f"(1) Rental Term: Tenancy commences on {data['START_DATE_EN']} and terminates on {data['END_DATE_EN']}. The lease is for a fixed term. Tacit renewal pursuant to Section 545 BGB is expressly excluded.\n"
-            f"(2) Purpose of Limitation: Concluded strictly for temporary living pursuant to Section 549 (2) No. 1 BGB ({data['REASON_EN']}).\n"
-            "(3) Minimum Term: The minimum rental term is six (6) months (or the agreed contract period)."
+            f"(1) Term: Commences on {data['START_DATE_EN']}, terminates on {data['END_DATE_EN']}. Minimum lease term is six (6) months.\n"
+            f"(2) Purpose: Temporary living pursuant to Section 549 (2) No. 1 BGB ({data['REASON_EN']}).\n"
+            "(3) Tacit Renewal: Section 545 BGB is strictly excluded."
         ),
         (
             "§ 2 Miethöhe, Pauschale & Nebenkosten\n",
-            f"(1) Monatliche Gesamtmiete: Die monatliche Warmmiete beträgt pauschal {data['RENT_AMOUNT']} € ({data['RENT_WORDS_DE']} EURO).\n"
-            "(2) Inklusivleistungen: In der Pauschalmiete enthalten sind alle kalten und warmen Betriebskosten (Heizung, Warm-/Kaltwasser, Strom, Müllabfuhr, Gebäudeversicherung) sowie Vodafone 1000 Mbit/s Highspeed-WLAN in verbrauchsüblichem Maße (Fair-Use-Regelung).\n"
-            f"(3) ARD-Rundfunkbeitrag & Endreinigung: Der Rundfunkbeitrag (GEZ) ist NICHT in der Miete enthalten und wird von der WG eigenständig getragen. Für die Endreinigung bei Auszug wird eine einmalige Pauschale von {data['CLEANING_FEE']} € fällig.",
+            f"(1) Warmmiete: {data['RENT_AMOUNT']} € monatlich ({data['RENT_WORDS_DE']} Euro).\n"
+            "(2) Inklusivleistungen: Kalte & warme Betriebskosten, Strom, Heizung und Vodafone 1000 Mbit/s WLAN in verbrauchsüblichem Maße (Fair Use).\n"
+            f"(3) ARD-Beitrag & Endreinigung: GEZ ist nicht enthalten (von WG eigenständig getragen). Endreinigungspauschale bei Auszug: {data['CLEANING_FEE']} €.",
             "§ 2 Rent, Utilities & Public License Fee\n",
-            f"(1) Monthly Flat Rent: Monthly warm rent is an all-inclusive flat rate of €{data['RENT_AMOUNT']} ({data['RENT_WORDS_EN']} EURO).\n"
-            "(2) Inclusions: Includes all operating costs (heating, hot/cold water, electricity, waste disposal, insurance) and Vodafone 1000 Mbps Wi-Fi subject to customary fair use.\n"
-            f"(3) ARD License & Cleaning: Public broadcasting license (GEZ) is NOT included and must be settled by tenants. A one-time final checkout cleaning fee of €{data['CLEANING_FEE']} applies upon departure."
+            f"(1) Rent: Flat monthly rate of €{data['RENT_AMOUNT']} ({data['RENT_WORDS_EN']} euros).\n"
+            "(2) Inclusions: Heating, water, electricity, operating costs and Vodafone 1000 Mbps Wi-Fi based on customary fair use.\n"
+            f"(3) ARD License & Cleaning: Broadcasting fee (GEZ) settled directly by WG. Final cleaning fee upon checkout: €{data['CLEANING_FEE']}."
         ),
         (
             "§ 3 Kaution & Mietsicherheit (§ 551 BGB)\n",
-            f"(1) Kaution: Der Mieter leistet eine Kaution von {data['DEPOSIT_AMOUNT']} € ({data['DEPOSIT_WORDS_DE']} EURO) zur Sicherung aller Ansprüche.\n"
-            f"(2) Fälligkeit vor Einzug: Kaution und 1. Monatsmiete müssen vor dem Einzugstermin ({data['START_DATE_DE']}) vollständig auf dem Vermieterkonto eingegangen sein. Ohne Geldeingang erfolgt keine Schlüsselübergabe.\n"
-            "(3) Rückerstattung: Treuhänderische Verwahrung gem. § 551 BGB. Erstattung innerhalb von 30 Tagen nach Auszug und unterzeichnetem Protokoll abzüglich berechtigter Forderungen. Aufrechnung gegen die letzte Miete ist ausgeschlossen.",
+            f"(1) Kaution: {data['DEPOSIT_AMOUNT']} € ({data['DEPOSIT_WORDS_DE']} Euro).\n"
+            f"(2) Fälligkeit: Vor Einzug am {data['START_DATE_DE']} vollständig auf das Vermieterkonto zu zahlen. Keine Schlüssel ohne Geldeingang.\n"
+            "(3) Erstattung: Treuhandverwahrung gem. § 551 BGB; Erstattung innerhalb von 30 Tagen nach Auszug abzüglich berechtigter Forderungen. Kein Aufrechnen gegen Miete.",
             "§ 3 Security Deposit & Escrow (§ 551 BGB)\n",
-            f"(1) Deposit: Tenant renders a deposit of €{data['DEPOSIT_AMOUNT']} ({data['DEPOSIT_WORDS_EN']} EURO) to secure all landlord claims.\n"
-            f"(2) Due Prior to Move-In: Deposit and 1st month's rent must be fully credited before move-in date ({data['START_DATE_EN']}). Handover of keys is denied without full receipt.\n"
-            "(3) Escrow & Refund: Held in escrow pursuant to Section 551 BGB. Refunded within 30 days after checkout protocol less verified claims. Setting off deposit against ongoing rent is prohibited."
+            f"(1) Deposit: €{data['DEPOSIT_AMOUNT']} ({data['DEPOSIT_WORDS_EN']} euros).\n"
+            f"(2) Due Date: Payable in full before move-in on {data['START_DATE_EN']}. Key handover denied without receipt.\n"
+            "(3) Refund: Escrow under § 551 BGB; refunded within 30 days after move-out protocol less proven claims. No set-off against ongoing rent."
         ),
         (
             "§ 4 Zahlungsbedingungen, Fälligkeit & Verzug\n",
-            f"(1) Fälligkeit: Miete ist monatlich im Voraus bis spätestens zum 3. Werktag kostenfrei zu überweisen.\n"
-            f"(2) Bankverbindung: Inhaber: {data['RENT_ACCOUNT_HOLDER']} | IBAN: {data['RENT_IBAN']} | BIC: {data['RENT_BIC']}.\n"
-            "(3) Verzug: Mahngebühr von 5,00 € je Mahnung. Rückstand von zwei Monatsmieten berechtigt zur fristlosen Kündigung gem. § 543 Abs. 2 BGB.",
+            f"(1) Fälligkeit: Bis spätestens zum 3. Werktag des Monats im Voraus kostenfrei zu überweisen.\n"
+            f"(2) Bank: {data['RENT_BANK']} | Inhaber: {data['RENT_ACCOUNT_HOLDER']} | IBAN: {data['RENT_IBAN']} | BIC: {data['RENT_BIC']}.\n"
+            f"(3) Verzug: Mahngebühr {data['LATE_FEE']} € je Mahnung. Kündigung gem. § 543 Abs. 2 BGB bei Verzug von 2 Monatsmieten.",
             "§ 4 Payment Terms, Due Dates & Late Fees\n",
-            "(1) Due Date: Rent is due in advance on or before the 3rd business day of each month via wire transfer.\n"
-            f"(2) Account: Holder: {data['RENT_ACCOUNT_HOLDER']} | IBAN: {data['RENT_IBAN']} | BIC: {data['RENT_BIC']}.\n"
-            "(3) Default: Overdue reminder fee of €5.00 per notice. Rent arrears of two months permit immediate cancellation under § 543 (2) BGB."
+            "(1) Due Date: Payable in advance on or before the 3rd business day of each month via wire transfer.\n"
+            f"(2) Account: {data['RENT_BANK']} | Holder: {data['RENT_ACCOUNT_HOLDER']} | IBAN: {data['RENT_IBAN']} | BIC: {data['RENT_BIC']}.\n"
+            f"(3) Default: Reminder charge of €{data['LATE_FEE']} per notice. Cancellation under § 543 (2) BGB for 2 months arrears."
         ),
         (
-            "§ 5 Zusammenleben in der WG, Lärm & Ruhezeiten\n",
-            "(1) Gegenseitige Rücksichtnahme: Die WG regelt das Zusammenleben partnerschaftlich und eigenverantwortlich.\n"
-            "(2) Ruhezeiten: Gesetzliche Ruhezeiten sind strikt einzuhalten: 13:00–15:00 Uhr sowie 22:00–08:00 Uhr. An Sonn- und Feiertagen absolute Ruhe. Audiogeräte nur auf Zimmerlautstärke.\n"
-            "(3) Partys: Störende Partys sind verboten. Geselliges Beisammensein ist ab 22:00 Uhr auf Zimmerlautstärke zu senken.",
-            "§ 5 Flatshare Cohabitation, Quiet Hours & Noise Control\n",
-            "(1) Mutual Courtesy: Flatmates manage everyday co-living respectfully and independently.\n"
-            "(2) Quiet Hours: Mandatory quiet hours: 1:00pm–3:00pm and 10:00pm–8:00am. Full silence on Sundays and public holidays. Media devices at room volume only.\n"
-            "(3) Parties: Disruptive parties are prohibited. Gatherings must be quiet by 10:00pm."
+            "§ 5 Kündigung & Nachmieterstellung\n",
+            "(1) Ordentliche Kündigung: Während der festen Mietdauer ausgeschlossen.\n"
+            "(2) Nachmieter: Vorzeitige Entlassung mit 3 Monaten Frist zum Monatsende bei Gestellung eines solventen, für die WG zumutbaren Nachmieters.\n"
+            "(3) Außerordentliche Kündigung: Gesetzliche Kündigung aus wichtigem Grund (§§ 543, 569 BGB) bleibt unberührt.",
+            "§ 5 Termination & Replacement Tenant Release\n",
+            "(1) Ordinary Notice: Excluded during the fixed lease term.\n"
+            "(2) Replacement Tenant: Early release with 3 months' notice to month-end upon presenting an accepted solvent replacement tenant who executes a contract.\n"
+            "(3) Cause: Extraordinary termination for good cause (§§ 543, 569 BGB) unaffected."
         ),
         (
-            "§ 6 Wohnungsnutzung, Lüften & Heizen\n",
-            "(1) Wohnzweck: Ausschließlich zu privaten Wohnzwecken gestattet. Keine gewerbliche Untervermietung.\n"
-            "(2) Lüften & Schimmelschutz: Zur Vermeidung von Schimmel ist die Wohnung ganzjährig mind. 2x täglich für 5–10 Min. per Stoßlüften zu lüften. Dauerkippstellung im Winter ist unzulässig.\n"
-            "(3) Heizen: Thermostate beim Lüften herunterdrehen; in der Heizperiode ausreichende Mindesttemperatur halten.",
-            "§ 6 Apartment Care, Ventilation & Heating\n",
-            "(1) Residential Use: Exclusively for living purposes. Commercial activity or short-term subletting prohibited.\n"
-            "(2) Ventilation: To prevent mold, cross-ventilate windows fully 2x daily for 5–10 minutes. Leaving windows tilted continuously in winter is forbidden.\n"
-            "(3) Heating: Turn down thermostats during airing; keep adequate baseline warmth in cold months."
+            "§ 6 AGB & Anlagen als Vertragsbestandteil\n",
+            "Anlage 1 (Inventar) und Anlage 2 (AGB § 1 bis § 8) werden mit Unterschrift anerkannt. Übergabeprotokoll, Schlüsselquittung und Wohnungsgeberbestätigung (§ 19 BMG) werden bei Einzug ausgehändigt.",
+            "§ 6 Terms & Attachments\n",
+            "Attachment 1 (Inventory) and Attachment 2 (GTC § 1 to § 8) are integral binding parts. Handover protocol, keys acknowledgement, and landlord confirmation (§ 19 BMG) provided upon move-in."
         ),
         (
-            "§ 7 Rauchverbot, Drogenverbot & Brandschutz\n",
-            "(1) Rauchverbot: Absolutes Rauchverbot in allen Innenräumen, Fluren und auf den Balkonen (inkl. E-Zigaretten).\n"
-            "(2) Drogenverbot: Besitz, Konsum oder Handel illegaler Betäubungsmittel führt zur sofortigen Anzeige und fristlosen Kündigung.\n"
-            "(3) Brandschutz: Offenes Feuer, unbeaufsichtigte Kerzen und Grillen auf dem Balkon sind untersagt.",
-            "§ 7 Strict Non-Smoking, Drug Ban & Fire Safety\n",
-            "(1) Non-Smoking: Strictly forbidden throughout all interior rooms, corridors, and balconies (including vapes).\n"
-            "(2) Narcotics Ban: Illegal substances result in immediate police report and termination without notice.\n"
-            "(3) Fire Safety: Open flames, unattended candles, and balcony barbecues are forbidden."
+            "AGB § 1 Zusammenleben in der WG / mit den Nachbarn\n",
+            "Rücksichtnahme in der WG. Ruhezeiten: 13:00–15:00 Uhr sowie 22:00–08:00 Uhr (Sonn-/Feiertage ganztägig). TV/Audio auf Zimmerlautstärke. Störende Partys verboten. Reinigung eigenverantwortlich nach Putzplan; bei Säumnis Vergabe an Fremdfirma auf WG-Kosten. Striktes Rauch- und Drogenverbot (Strafanzeige). Keine Haustiere. Gäste max. 5 Tage/Monat.",
+            "GTC § 1 Cohabitation in Flat Share / Neighbours\n",
+            "Mutual courtesy. Quiet hours: 1:00pm–3:00pm and 10:00pm–8:00am (Sundays/holidays full quiet). Media at room volume. Disruptive parties prohibited. Shared cleaning rota; default results in professional cleaning at tenants' equal cost. Strict non-smoking and drug ban (police report). No pets. Overnight guests max 5 days/month."
         ),
         (
-            "§ 8 Haustiere & Beherbergung von Gästen\n",
-            "(1) Haustiere: Die Haltung von Haustieren jeglicher Art ist nicht gestattet.\n"
-            "(2) Gäste: Übernachtungsbesuch ist nur bei Anwesenheit des Mieters und maximal 5 Tage pro Kalendermonat zulässig. Dauerhafte Aufnahme dritter Personen gilt als unzulässige Gebrauchsüberlassung.",
-            "§ 8 Pets Prohibition & Overnight Guest Policy\n",
-            "(1) Pets: Keeping pets of any kind is prohibited.\n"
-            "(2) Guests: Overnight visitors allowed only while tenant is present, capped at maximum 5 days per calendar month. Permanent third-party accommodation is unauthorized subletting."
+            "AGB § 2 Regelungen zur Wohnung\n",
+            "Ausschließlich Wohnzwecke. Stoßlüften mind. 2x täglich für 5–10 Min. (kein Dauerkippen im Winter). WLAN bereitgestellt; P2P/Torrents verboten; Mieter haftet und stellt Vermieter frei. Wandbohrungen, Nägel, Dübel und klebende Folien untersagt. Abflüsse vor Fett/Abfall schützen. Mülltrennung nach BSR (Gelb, Papier, Bio, Rest). Türen 22:00–06:00 Uhr geschlossen. Zutrittsrecht des Vermieters werktags 09–12 & 15–20h nach Vorankündigung (letzte 4 Wochen mind. 5 Termine) und bei Gefahr im Verzug.",
+            "GTC § 2 Apartment Regulations\n",
+            "Residential use only. Air out 2x daily 5–10 min (no tilting in winter). Wi-Fi provided; P2P/torrents prohibited; tenant fully indemnifies landlord. No drilling, nails, screws or wall plugs. Drains kept free of grease/solids. Waste sorting per Berlin BSR. Doors closed 10:00pm–6:00am. Landlord access workdays 9am–12pm & 3pm–8pm upon notice (at least 5 viewings in last 4 weeks) and anytime during emergencies."
         ),
         (
-            "§ 9 Internetnutzung, Haftungsfreistellung & Urheberrecht\n",
-            "(1) Bereitstellung: Highspeed-WLAN wird bereitgestellt. Mieter trägt alleinige zivil- und strafrechtliche Verantwortung für jegliche Online-Aktivitäten.\n"
-            "(2) Urheberrecht: Peer-to-Peer, BitTorrent und illegale Downloads sind strengstens verboten.\n"
-            "(3) Freistellung: Mieter stellt Vermieter von Abmahn- und Anwaltskosten vollumfänglich frei. Bei Missbrauch erfolgt sofortige Internetsperre und Weitergabe der Mieterdaten an Behörden.",
-            "§ 9 Internet Policy, Torrent Ban & Indemnification\n",
-            "(1) Access: Highspeed Wi-Fi provided. Tenant assumes sole civil and criminal liability for all online traffic.\n"
-            "(2) Copyright Ban: BitTorrent, P2P file-sharing, and illegal downloads are strictly prohibited.\n"
-            "(3) Indemnification: Tenant fully indemnifies landlord against legal claims. Access is revoked upon violation and logs forwarded to police."
+            "AGB § 3 Zahlungsvereinbarungen\n",
+            "Rechtzeitigkeit nach Geldeingang. Kaution sichert alle Ansprüche; kein Aufrechnen vor Mietende. Miete im Voraus bis 3. Werktag. Kautionsabrechnung binnen 30 Tagen nach Auszug. Fair Usage der Nebenkosten (> 25% Mehraufwand wird umgelegt). Mahngebühr 5,00 € je Mahnung. Mieterhöhung nach BGB. Aufrechnung nur mit 1 Monat Vorankündigung.",
+            "GTC § 3 Payment Agreements\n",
+            "Punctuality determined by account credit date. Deposit secures all claims; no set-off against ongoing rent. Rent in advance by 3rd business day. Deposit refund within 30 days after move-out. Fair usage (> 25% excess billed). Overdue fine €5.00 per notice. Rent adjustments per statutory law. Set-off requires 1 month notice."
         ),
         (
-            "§ 10 Obhutspflichten, Wände & Mülltrennung\n",
-            "(1) Wände: Wandbohrungen, Dübel, Nägel und klebende Folien, die den Putz beschädigen, sind untersagt.\n"
-            "(2) Abflüsse: Keine Speisereste, Fette, Öle oder Hygieneartikel in Spülbecken, Dusche oder WC entsorgen.\n"
-            "(3) Mülltrennung: Konsequente Mülltrennung gem. Berliner Stadtreinigung (BSR) (Gelbe Tonne, Papier, Bio, Restmüll).",
-            "§ 10 Duty of Care, Wall Treatment & Waste Sorting\n",
-            "(1) Walls: Drilling holes, inserting wall plugs/nails, or adhesive tapes damaging plaster is prohibited.\n"
-            "(2) Plumbing: No food scraps, cooking grease, oils, or sanitary items down kitchen or bathroom drains.\n"
-            "(3) Waste Sorting: Systematic recycling per Berlin BSR standards (packaging, paper, bio, residual)."
+            "AGB § 4 Übergabe und Rückgabe & Schlüsselgebühren\n",
+            "Übergabe nach Zahlungseingang per Protokoll. Bei Auszug geräumt und besenrein bis 11:00 Uhr mit allen Schlüsseln. Schlüsselersatzpauschalen:\n"
+            "• Haustür (Schließanlage): 680,00 € | Wohnung: 120,00 €\n"
+            "• Zimmer: 90,00 € | Briefkasten: 70,00 €\n"
+            "Zusätzliche Haftung für Schlossaustausch der Schließanlage.",
+            "GTC § 4 Handover, Departure & Key Replacement Schedule\n",
+            "Handover after payment receipt with protocol. Departure by 11:00am cleared, swept-clean with all keys. Key replacement schedule:\n"
+            "• Building entrance (master system): €680.00 | Flat: €120.00\n"
+            "• Room: €90.00 | Mailbox: €70.00\n"
+            "Tenant additionally liable for lock cylinder replacement."
         ),
         (
-            "§ 11 Übergabe und Rückgabe der Mietsache\n",
-            "(1) Einzug: Übergabe erfolgt nach Geldeingang von Kaution und 1. Miete anhand eines detaillierten Übergabeprotokolls.\n"
-            "(2) Auszug: Rückgabe am letzten Vertragstag bis spätestens 11:00 Uhr im geräumten, besenreinen Zustand samt aller Schlüssel.\n"
-            "(3) Hinterlassene Sachen: Zurückgelassene Gegenstände werden auf Mieterkosten entsorgt oder eingelagert.",
-            "§ 11 Handover Protocol & Return of Premises\n",
-            "(1) Move-In: Keys transferred after full receipt of deposit and 1st rent via signed handover protocol.\n"
-            "(2) Move-Out: Room returned swept clean, fully cleared, and with all keys by 11:00am on final lease day.\n"
-            "(3) Left Belongings: Disposed of or stored at tenant's expense."
+            "AGB § 5 Schäden an der Wohnung & Kleinreparaturen\n",
+            "Schäden unverzüglich melden (4 Wochen Abhilfefrist). Mieter haftet für Sorgfaltspflichtverletzung und Besucher; Beweislast beim Mieter. Keine Schönheitsreparaturen geschuldet. Kleinreparaturen bis 100,00 € je Einzelfall (max. 8% der Jahresmiete bzw. 350,00 € jährlich) trägt der Mieter.",
+            "GTC § 5 Damages to Property & Minor Repairs\n",
+            "Report defects immediately (4 weeks remedy period). Tenant liable for neglect and visitors; burden of proof rests with tenant. No general cosmetic repairs. Minor repairs up to €100.00 per instance (annual cap: 8% of rent or €350.00) borne by tenant."
         ),
         (
-            "§ 12 Schäden, Kleinreparaturen & Schlüsselersatz\n",
-            "(1) Mängelmeldung: Schäden sind dem Vermieter unverzüglich anzuzeigen.\n"
-            "(2) Kleinreparaturen: Kleinere Instandhaltungen bis 100,00 € im Einzelfall (max. 8% der Jahresmiete bzw. 350,00 € jährlich) trägt der Mieter.\n"
-            "(3) Schlüsselverlust-Pauschalen: Haustür: 680,00 € | Wohnung: 120,00 € | Zimmer: 90,00 € | Briefkasten: 70,00 € zzgl. ggf. Austausch der Zentralschließanlage.",
-            "§ 12 Damages, Minor Repairs & Lost Keys Schedule\n",
-            "(1) Defect Notice: Damages must be reported immediately.\n"
-            "(2) Minor Repairs: Repairs on fixtures up to €100.00 per instance (annual cap: 8% of rent or €350.00) borne by tenant.\n"
-            "(3) Lost Keys Schedule: Building door: €680.00 | Apartment: €120.00 | Room: €90.00 | Mailbox: €70.00 plus master lock system replacement if required."
+            "AGB § 6 Kündigungsbedingungen\n",
+            "Kündigungsfrist 3 Monate zum Monatsende. Vorzeitiges Ausscheiden bei akzeptiertem Nachmieter ab Übergabe. Stillschweigende Verlängerung gem. § 545 BGB ausgeschlossen. Fristlose Kündigung gem. § 543 BGB zulässig bei: Verzug von 2 Monatsmieten, AGB-Verstoß nach Abmahnung, Schäden > 50,00 € unbeglichen, unerlaubter Dritter, Drogen oder Reinigungsverweigerung.",
+            "GTC § 6 Conditions of Termination\n",
+            "Notice period 3 months to month-end. Early release upon accepted replacement tenant. Tacit renewal excluded under § 545 BGB. Termination without notice under § 543 BGB for: 2 months rent arrears, GTC breach after warning, damages > €50.00 unpaid, unauthorized guests, drugs, or persistent cleaning refusal."
         ),
         (
-            "§ 13 Betretungsrecht des Vermieters\n",
-            "(1) Vorankündigung: Zutritt werktags (09:00–12:00 und 15:00–20:00 Uhr) nach angemessener Ankündigung (24–48 Std.) zur Prüfung des Zustands oder für Handwerker.\n"
-            "(2) Nachmieterbesichtigungen: In den letzten 4 Wochen der Mietzeit hat der Mieter bis zu 5 Besichtigungstermine nach Vorankündigung zu dulden.\n"
-            "(3) Notfälle: Bei Gefahr im Verzug ist der Zutritt jederzeit ohne Vorankündigung gestattet.",
-            "§ 13 Landlord Right of Inspection & Access\n",
-            "(1) Advance Notice: Access on workdays (9:00am–12:00pm & 3:00pm–8:00pm) upon 24–48h notice for inspections or maintenance.\n"
-            "(2) Viewings: Tenant permits up to 5 prospective tenant viewings during the final 4 weeks of stay.\n"
-            "(3) Emergencies: Immediate access permitted anytime in case of imminent danger."
+            "AGB § 7 Schriftform\n",
+            "Mündliche Nebenabreden bestehen nicht. Änderungen und Ergänzungen bedürfen der Schriftform; dies gilt auch für die Aufhebung dieses Schriftformerfordernisses.",
+            "GTC § 7 Written Form\n",
+            "No oral side agreements exist. Modifications and amendments must be executed in writing; this also applies to waiving this written-form requirement."
         ),
         (
-            "§ 14 Kündigung, Vorzeitige Entlassung, Schriftform & Salvatorische Klausel\n",
-            "(1) Ausschluss ordentlicher Kündigung: Während der festen Mietdauer ist die ordentliche Kündigung ausgeschlossen.\n"
-            "(2) Nachmieterstellung: Vorzeitige Entlassung mit 3 Monaten Frist zum Monatsende bei Gestellung eines akzeptierten, solventen Nachmieters.\n"
-            "(3) Fristlose Kündigung (§ 543 BGB): Zulässig bei Verzug von 2 Monatsmieten, schwerer Pflichtverletzung, Drogen, Reinigungssäumung oder Erhalt von 2 Abmahnungen.\n"
-            "(4) Schriftform & Salvatorische Klausel: Mündliche Nebenabreden ungültig. Änderungen nur schriftlich. Sollten Klauseln unwirksam sein, bleibt Restvertrag gültig. Erfüllungsort Berlin.",
-            "§ 14 Termination, Replacement Tenant, Written Form & Severability\n",
-            "(1) No Ordinary Notice: Ordinary early termination excluded during the fixed lease.\n"
-            "(2) Replacement Tenant: Early release with 3 months' notice to month-end upon providing an accepted solvent successor tenant.\n"
-            "(3) Extraordinary Cancellation (§ 543 BGB): Applicable for 2 months rent arrears, severe contract breach, drugs, cleaning neglect, or 2 written warnings.\n"
-            "(4) Written Form & Severability: No verbal side agreements. Invalid provisions do not invalidate agreement. Jurisdiction Berlin."
+            "AGB § 8 Salvatorische Klausel & Gerichtsstand\n",
+            "Unwirksamkeit einzelner Bestimmungen berührt die übrigen Klauseln nicht. Es gilt das Recht der Bundesrepublik Deutschland (BGB). Erfüllungsort und ausschließlicher Gerichtsstand ist Berlin. Die deutsche Fassung ist rechtlich allein verbindlich.",
+            "GTC § 8 Severability & Jurisdiction\n",
+            "Invalidity of individual clauses does not affect remaining provisions. German Civil Code (BGB) governs. Place of performance and sole legal jurisdiction is Berlin. Only the German language version is legally binding."
         )
     ]
 
-    t_agb = doc.add_table(rows=len(clauses_data), cols=2)
-    t_agb.alignment = WD_TABLE_ALIGNMENT.CENTER
-    for i, (title_de, text_de, title_en, text_en) in enumerate(clauses_data):
-        row = t_agb.rows[i]
+    t_clauses = doc.add_table(rows=len(clauses), cols=2)
+    t_clauses.alignment = WD_TABLE_ALIGNMENT.CENTER
+    for i, (title_de, text_de, title_en, text_en) in enumerate(clauses):
+        row = t_clauses.rows[i]
         row.cells[0].width = Inches(3.6)
         row.cells[1].width = Inches(3.6)
 
         p_de = row.cells[0].paragraphs[0]
         r_de = p_de.add_run(title_de)
         r_de.font.bold = True
-        r_de.font.size = Pt(9.5)
+        r_de.font.size = Pt(9.0)
         r_de_txt = p_de.add_run(text_de)
-        r_de_txt.font.size = Pt(8.5)
+        r_de_txt.font.size = Pt(8.0)
 
         p_en = row.cells[1].paragraphs[0]
         r_en = p_en.add_run(title_en)
         r_en.font.bold = True
-        r_en.font.size = Pt(9.5)
+        r_en.font.size = Pt(9.0)
         r_en.font.color.rgb = RGBColor(71, 85, 105)
         r_en_txt = p_en.add_run(text_en)
-        r_en_txt.font.size = Pt(8.5)
+        r_en_txt.font.size = Pt(8.0)
 
-    doc.add_paragraph().paragraph_format.space_after = Pt(25)
+    doc.add_paragraph().paragraph_format.space_after = Pt(20)
 
-    # Signatures Table (NO timestamps)
+    # Signatures Table
     t_sig = doc.add_table(rows=1, cols=2)
     t_sig.alignment = WD_TABLE_ALIGNMENT.CENTER
     for r in t_sig.rows:
         r.cells[0].width = Inches(3.6)
         r.cells[1].width = Inches(3.6)
 
-    t_sig.rows[0].cells[0].paragraphs[0].add_run(f"_____________________________________\n{data['LANDLORD_SIGN_NAME']}\nVermieter / Landlord\nDatum / Date: ____________________")
-    t_sig.rows[0].cells[1].paragraphs[0].add_run(f"_____________________________________\n{data['TENANT_SIGN_NAME']}\nMieter / Tenant\nDatum / Date: ____________________")
+    t_sig.rows[0].cells[0].paragraphs[0].add_run(f"Ort, Datum: Berlin, {data['LANDLORD_SIGN_DATE']}\n\n\n_____________________________________\n{data['LANDLORD_SIGN_NAME']}\nVermieter / Landlord")
+    t_sig.rows[0].cells[1].paragraphs[0].add_run(f"Ort, Datum: {data['TENANT_SIGN_DATE']}\n\n\n_____________________________________\n{data['TENANT_SIGN_NAME']}\nMieter / Tenant")
 
     doc.save(output_path)
     return output_path
@@ -1417,6 +1652,7 @@ def convert_html_to_pdf(html_path, pdf_path):
     if not os.path.exists(chrome_bin):
         raise FileNotFoundError(f"Chrome not found at {chrome_bin}")
 
+    os.makedirs(os.path.dirname(os.path.abspath(pdf_path)), exist_ok=True)
     cmd = [
         chrome_bin,
         "--headless=new",
@@ -1429,15 +1665,42 @@ def convert_html_to_pdf(html_path, pdf_path):
     subprocess.check_call(cmd)
     return pdf_path
 
-def main():
-    print("Building official Homelyo Rental Contract Templates with comprehensive AGB...")
-    os.makedirs(os.path.dirname(HTML_TEMPLATE_PATH), exist_ok=True)
+def update_gdrive_template(docx_path):
+    try:
+        token = subprocess.check_output(["gcloud", "auth", "print-access-token"]).decode().strip()
+        with open(docx_path, "rb") as f:
+            docx_bytes = f.read()
 
+        url = f"https://www.googleapis.com/upload/drive/v3/files/{GDRIVE_TEMPLATE_FILE_ID}?uploadType=media"
+        req = urllib.request.Request(
+            url,
+            data=docx_bytes,
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            },
+            method="PATCH"
+        )
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read().decode())
+            print(f"✓ Updated Google Drive template_contract.docx (ID: {GDRIVE_TEMPLATE_FILE_ID})")
+            return data
+    except Exception as e:
+        print(f"⚠ Notice: GDrive template update skipped or requires auth: {e}")
+        return None
+
+def main():
+    print("Building official Homelyo Rental Contract Templates (14 Clauses, Wunderflats + GDrive Standard)...")
+    os.makedirs(os.path.dirname(HTML_TEMPLATE_PATH), exist_ok=True)
+    os.makedirs(os.path.dirname(FINAL_PDF_PATH), exist_ok=True)
+
+    # 1. Master HTML Template
     html = generate_html_template()
     with open(HTML_TEMPLATE_PATH, "w", encoding="utf-8") as f:
         f.write(html)
     print(f"✓ Master HTML template saved: {HTML_TEMPLATE_PATH}")
 
+    # 2. Master DOCX Template
     default_data = render_contract_data(
         tenant_name="Ajithkumar Velasseril Sreenivasan",
         tenant_email="ajithkmvs123@gmail.com",
@@ -1450,6 +1713,19 @@ def main():
     )
     render_contract_docx(default_data, DOCX_TEMPLATE_PATH)
     print(f"✓ Master DOCX template saved: {DOCX_TEMPLATE_PATH}")
+
+    # 3. Render Sample HTML and Convert to Final PDF
+    rendered_html = render_contract_html(default_data)
+    temp_html_path = "/tmp/homelyo_contract_render.html"
+    with open(temp_html_path, "w", encoding="utf-8") as f:
+        f.write(rendered_html)
+
+    convert_html_to_pdf(temp_html_path, FINAL_PDF_PATH)
+    print(f"✓ Final Master PDF generated: {FINAL_PDF_PATH}")
+
+    # 4. Update Google Drive Cloud Template
+    update_gdrive_template(DOCX_TEMPLATE_PATH)
+    print("✓ All templates and PDF synchronized successfully!")
 
 if __name__ == "__main__":
     main()
