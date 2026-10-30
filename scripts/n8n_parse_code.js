@@ -80,7 +80,7 @@ const occupants = pick('number of occupants', 'occupants') || '1';
 const hearAbout = pick('how did you hear about us', 'source') || 'Direct Website';
 const notes = pick('notes or questions for owner', 'additional requests or question', 'notes', 'inquiries') || 'None';
 
-const rentMap = { KE1: 640, KE2: 649, KE3: 615, KE4: 569 };
+const rentMap = { KE1: 640, KE2: 629, KE3: 615, KE4: 569 };
 const depositAmount = 1000;
 const roomTitles = {
   KE1: 'Master Bedroom',
@@ -89,7 +89,7 @@ const roomTitles = {
   KE4: 'Cozy Studio Room'
 };
 
-const rentAmount = rentMap[room] || 649;
+const rentAmount = rentMap[room] || 629;
 const roomTitle = roomTitles[room] || 'Coliving Suite';
 
 const emailSubject = `Homelyo Berlin — Booking Request for Room ${room} (${roomTitle}) & Document Verification`;

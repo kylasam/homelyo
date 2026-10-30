@@ -18,7 +18,7 @@ cockpit_md = """# 🚀 Homelyo Executive Cockpit — Quick Glance
 | Room | Feature | Size | Warm Rent (All-inclusive) | Current Status | Available From |
 | :--- | :--- | :---: | :---: | :---: | :---: |
 | **KE1** | Master Bedroom | 21 m² | **€629 / mo** | 🟢 **Available** | **Nov 1, 2026** |
-| **KE2** | Private Balcony Suite | ~18 m² | **€649 / mo** | 🟢 **Available** | **Nov 1, 2026** |
+| **KE2** | Private Balcony Suite | ~18 m² | **€629 / mo** | 🟢 **Available** | **Nov 1, 2026** |
 | **KE3** | Quiet Garden View | ~16 m² | **€619 / mo** | 🟡 Occupied | **Apr 1, 2027** |
 | **KE4** | Cozy Calm (Thick Mattress) | ~14 m² | **€569 / mo** | 🟡 Occupied | **Aug 1, 2027** |
 

@@ -315,7 +315,7 @@ create_task_if_not_exists(l1_id, {
 # Room KE2
 create_task_if_not_exists(l1_id, {
     "name": "Room KE2 – Private Balcony Suite (Garden View)",
-    "description": "📍 Lichtenrader Damm 80, 12305 Berlin\n\n• Feature: Private balcony with tranquil garden view\n• Warm Rent: €649/month (All-inclusive: bills, Wi-Fi 6, heating, electricity)\n• Security Deposit: €1,298\n• Availability: Free from 2026-11-01\n• Furnishing: Bed, outdoor balcony seating, wardrobe, work desk & chair, blackout curtains.\n• Anmeldung: Provided.",
+    "description": "📍 Lichtenrader Damm 80, 12305 Berlin\n\n• Feature: Private balcony with tranquil garden view\n• Warm Rent: €629/month (All-inclusive: bills, Wi-Fi 6, heating, electricity)\n• Security Deposit: €1,258\n• Availability: Free from 2026-11-01\n• Furnishing: Bed, outdoor balcony seating, wardrobe, work desk & chair, blackout curtains.\n• Anmeldung: Provided.",
     "priority": 2
 })
 

@@ -40,8 +40,8 @@ ROOM_SPECS = {
     "KE2": {
         "title": "Private Balcony Suite",
         "size": 24,
-        "rent": 649.00,
-        "deposit": 1298.00,
+        "rent": 629.00,
+        "deposit": 1258.00,
         "features": "Sunny balcony suite (24 m²), private walk-out garden balcony, queen bed, study workstation, wardrobe"
     },
     "KE3": {
@@ -356,6 +356,8 @@ def sync_to_clickup(tenant_name, tenant_email, tenant_phone, room_code, start_da
     start_ts_ms = int(d_start_dt.timestamp() * 1000)
     due_ts_ms = int(d_end_dt.timestamp() * 1000)
 
+    linktree_url = f"https://linktr.ee/lichtenraderdamm_80_{room_code.lower()}"
+
     # ClickUp Task in Tenants & Room Occupancy
     desc = f"""### 🏠 New Tenant Onboarding Profile — {tenant_name} ({room_code})
 * **Room:** {room_code} ({ROOM_SPECS.get(room_code, {}).get('title', 'Bedroom')})
@@ -364,6 +366,7 @@ def sync_to_clickup(tenant_name, tenant_email, tenant_phone, room_code, start_da
 * **Lease Term:** {start_date} → {end_date}
 * **Warm Rent:** €{rent_amount:,.2f} / month
 * **Deposit Held (Kaution):** €{deposit_amount:,.2f}
+* **Mobile Tenant Portal (Linktree):** [{linktree_url}]({linktree_url})
 
 ---
 ### 📁 Document Links (Google Drive)
@@ -372,11 +375,12 @@ def sync_to_clickup(tenant_name, tenant_email, tenant_phone, room_code, start_da
 * 📑 [Download PDF Rental Contract](https://drive.google.com/file/d/{pdf_id}/view)
 
 ---
-### ✅ Onboarding Package Included
-* [x] Google Drive dedicated folder created
+### ✅ Onboarding & Digital Portal Checklist
+* [x] Google Drive dedicated folder created (PDF-only)
 * [x] Dual-language German & English Mietvertrag generated (with mandatory 3-month notice clause)
-* [x] House Rules (Hausordnung) attached
-* [x] Apartment Handover Protocol (Übergabeprotokoll) prepared
+* [x] Linktree Room Portal Managed ({linktree_url})
+* [x] High-Resolution QR Codes generated for Linktree & GDrive
+* [x] Executive 2-page Welcome Kit PDF generated with embedded clickable QR codes
 * [x] Keys Acknowledgment sheet prepared
 * [x] Official Wohnungsgeberbestätigung (Anmeldung) template ready
 * [x] Google Sheet tenant_details & rent_log synchronized
@@ -403,6 +407,38 @@ def sync_to_clickup(tenant_name, tenant_email, tenant_phone, room_code, start_da
             task_id = data.get("id")
     except Exception as e:
         print(f"ClickUp task creation note: {e}")
+
+    # Add native ClickUp checklist
+    if task_id:
+        try:
+            req_cl = urllib.request.Request(
+                f"https://api.clickup.com/api/v2/task/{task_id}/checklist",
+                data=json.dumps({"name": "📋 Tenant Onboarding, Linktree & QR Code Checklist"}).encode("utf-8"),
+                headers=CLICKUP_HEADERS,
+                method="POST"
+            )
+            with urllib.request.urlopen(req_cl) as cl_resp:
+                cl_id = json.loads(cl_resp.read().decode())["checklist"]["id"]
+                cl_items = [
+                    (f"Manage Linktree Room Portal ({linktree_url})", True),
+                    (f"Add Tenant Personal Document Vault Link to Linktree ({gdrive_url})", True),
+                    ("Generate High-Resolution QR Codes for Linktree & Google Drive Vault", True),
+                    ("Render Executive 2-Page Welcome Kit PDF with Embedded Clickable QR Codes", True),
+                    ("Upload Clean Welcome Kit PDF to Tenant GDrive Folder", True),
+                    (f"Verify First Month Rent Payout (€{rent_amount:,.2f}) & Deposit Transfer (€{deposit_amount:,.2f})", False),
+                    (f"In-Person 4-Key Handover (Main, Apt, Mailbox, Room {room_code}) on {start_date}", False)
+                ]
+                for item_text, resolved in cl_items:
+                    req_item = urllib.request.Request(
+                        f"https://api.clickup.com/api/v2/checklist/{cl_id}/checklist_item",
+                        data=json.dumps({"name": item_text, "resolved": resolved}).encode("utf-8"),
+                        headers=CLICKUP_HEADERS,
+                        method="POST"
+                    )
+                    with urllib.request.urlopen(req_item):
+                        pass
+        except Exception as ex:
+            print(f"Checklist creation note: {ex}")
 
     # Also log in Tenant Expenses & Deposit Settlement
     settle_desc = f"""### 🔐 Deposit Escrow & Settlement Ledger — {tenant_name} ({room_code})
@@ -524,116 +560,96 @@ def upload_prefilled_wohnungsgeberbestaetigung(token, folder_id, tenant_name, ro
         res = json.loads(resp.read().decode())
         return res["id"]
 
-def upload_personalized_welcome_kit(token, folder_id, tenant_name, room_code, start_date, end_date, contract_doc_id, contract_pdf_id):
+def upload_personalized_welcome_kit(token, folder_id, tenant_name, room_code, start_date, end_date, contract_doc_id, contract_pdf_id, anmeldung_pdf_id="", keys_pdf_id="", custom_drive_url=None):
     """
-    Renders and uploads a personalized Welcome Kit (Google Doc, PDF, and DOCX)
-    with WiFi details, quiet hours, room specifics, emergency numbers, and contract links.
+    Renders and uploads an executive 2-page Welcome Kit (PDF + Word DOCX) and Printable Desk QR Sheet (PDF + Word DOCX)
+    with embedded high-resolution clickable QR codes (Linktree & Google Drive vault) and zero footers.
     """
-    from docx import Document
-    from docx.shared import Pt
-    from docx.enum.text import WD_ALIGN_PARAGRAPH
-
-    # Download room template from Template Folder if available, or build standard
-    template_id_map = {
-        "KE1": "1Wbx3gTcfI1O7mK--GqU6y0TUN8Akc3h8",
-        "KE2": "1KpFS7OQRgpzh9DPynp43gkl6KYjenZiU",
-        "KE3": "1tDDu4TuTLJR2JuS-47FJKqgkb5SIB2jv",
-        "KE4": "1-grsqQQlDvMfD42o85Kouiq3S6n6dlfx"
-    }
-    tmpl_id = template_id_map.get(room_code, "1KpFS7OQRgpzh9DPynp43gkl6KYjenZiU")
-
-    req = urllib.request.Request(
-        f"https://www.googleapis.com/drive/v3/files/{tmpl_id}?alt=media",
-        headers={"Authorization": f"Bearer {token}"}
+    import sys
+    sys_path = os.path.dirname(os.path.abspath(__file__))
+    if sys_path not in sys.path:
+        sys.path.append(sys_path)
+    from generate_welcome_kit import generate_welcome_kit_pdf
+    from build_executive_welcome_and_desk_qr import (
+        build_welcome_kit_docx,
+        build_desk_qr_stand_docx,
+        render_desk_qr_stand_html,
+        html_to_pdf,
+        upload_or_update_drive_file,
+        LINKTREE_URLS,
     )
-    with urllib.request.urlopen(req) as resp:
-        tmpl_bytes = resp.read()
-
-    temp_in = f"/tmp/tmpl_welcome_{room_code}.docx"
-    with open(temp_in, "wb") as f:
-        f.write(tmpl_bytes)
-
-    doc = Document(temp_in)
-    contract_url = f"https://docs.google.com/document/d/{contract_doc_id}/edit"
-    contract_pdf_url = f"https://drive.google.com/file/d/{contract_pdf_id}/view"
-
-    d_s = datetime.datetime.strptime(start_date, "%Y-%m-%d").strftime("%d %B %Y").upper()
-    d_e = datetime.datetime.strptime(end_date, "%Y-%m-%d").strftime("%d %B %Y").upper()
-
-    for p in doc.paragraphs:
-        if "🌟 Welcome" in p.text:
-            p.text = f"🌟 Welcome {tenant_name} 🙂 – {room_code} ({ROOM_SPECS.get(room_code, {}).get('title', 'Suite')})"
-            p.style.font.size = Pt(20)
-            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        elif "01 NOVEMBER" in p.text or "Tenancy:" in p.text or "Booking Period:" in p.text:
-            p.text = f"📅 Booking Period: {d_s} – {d_e}\n📍 Address: Lichtenrader Damm 80, 12305 Berlin (2. OG, WE-11)"
-            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        elif "Scan this QR code" in p.text:
-            p.text = f"📄 View Your Digital Tenancy Agreement (Mietvertrag):\n{contract_url}\n(PDF Download: {contract_pdf_url})"
-        elif "Scannen Sie diesen QR-Code" in p.text:
-            p.text = "Scannen oder klicken Sie auf den obigen Link, um Ihren Mietvertrag einzusehen."
 
     clean_name = tenant_name.replace(" ", "_").replace("-", "_")
-    out_docx_path = f"/tmp/Welcome_Kit_{room_code}_{clean_name}.docx"
-    doc.save(out_docx_path)
-
-    with open(out_docx_path, "rb") as f:
-        docx_bytes = f.read()
-
-    boundary = "===============HOMELYO_BOUNDARY=="
     doc_name = f"Welcome_Kit_{room_code}_{clean_name}"
+    pdf_path = f"/tmp/{doc_name}.pdf"
+    docx_path = f"/tmp/{doc_name}.docx"
 
-    # 1. Google Doc
-    meta = {"name": doc_name, "mimeType": "application/vnd.google-apps.document", "parents": [folder_id]}
-    body = (
-        f"--{boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n{json.dumps(meta)}\r\n"
-        f"--{boundary}\r\nContent-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document\r\n\r\n"
-    ).encode("utf-8") + docx_bytes + f"\r\n--{boundary}--\r\n".encode("utf-8")
-    req_doc = urllib.request.Request(
-        "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
-        data=body,
-        headers={"Authorization": f"Bearer {token}", "Content-Type": f"multipart/related; boundary={boundary}"},
-        method="POST"
+    drive_folder_url = custom_drive_url or f"https://drive.google.com/drive/folders/{folder_id}"
+    contract_pdf_url = f"https://drive.google.com/file/d/{contract_pdf_id}/view" if contract_pdf_id else drive_folder_url
+    anmeldung_pdf_url = f"https://drive.google.com/file/d/{anmeldung_pdf_id}/view" if anmeldung_pdf_id else drive_folder_url
+    keys_pdf_url = f"https://drive.google.com/file/d/{keys_pdf_id}/view" if keys_pdf_id else drive_folder_url
+    linktree_url = LINKTREE_URLS.get(room_code, "https://linktr.ee/lichtenrder_damm_80")
+
+    rent = ROOM_SPECS.get(room_code, {}).get("rent", 609.0)
+    dep = ROOM_SPECS.get(room_code, {}).get("deposit", 1000.0)
+
+    generate_welcome_kit_pdf(
+        tenant_name=tenant_name,
+        room_code=room_code,
+        start_date=start_date,
+        end_date=end_date,
+        rent_amount=rent,
+        deposit_amount=dep,
+        drive_folder_url=drive_folder_url,
+        contract_pdf_url=contract_pdf_url,
+        anmeldung_pdf_url=anmeldung_pdf_url,
+        keys_pdf_url=keys_pdf_url,
+        out_pdf_path=pdf_path
     )
-    with urllib.request.urlopen(req_doc) as resp:
-        w_doc_id = json.loads(resp.read().decode())["id"]
 
-    # 2. Export PDF
-    exp_url = f"https://www.googleapis.com/drive/v3/files/{w_doc_id}/export?mimeType=application/pdf"
-    exp_req = urllib.request.Request(exp_url, headers={"Authorization": f"Bearer {token}"})
-    with urllib.request.urlopen(exp_req) as resp:
-        w_pdf_bytes = resp.read()
-
-    pdf_meta = {"name": f"{doc_name}.pdf", "mimeType": "application/pdf", "parents": [folder_id]}
-    pdf_body = (
-        f"--{boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n{json.dumps(pdf_meta)}\r\n"
-        f"--{boundary}\r\nContent-Type: application/pdf\r\n\r\n"
-    ).encode("utf-8") + w_pdf_bytes + f"\r\n--{boundary}--\r\n".encode("utf-8")
-    req_pdf = urllib.request.Request(
-        "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
-        data=pdf_body,
-        headers={"Authorization": f"Bearer {token}", "Content-Type": f"multipart/related; boundary={boundary}"},
-        method="POST"
+    build_welcome_kit_docx(
+        tenant_name=tenant_name,
+        room_code=room_code,
+        start_date=start_date,
+        end_date=end_date,
+        rent_amount=rent,
+        deposit_amount=dep,
+        drive_folder_url=drive_folder_url,
+        contract_pdf_url=contract_pdf_url,
+        anmeldung_pdf_url=anmeldung_pdf_url,
+        keys_pdf_url=keys_pdf_url,
+        out_docx_path=docx_path
     )
-    with urllib.request.urlopen(req_pdf) as resp:
-        w_pdf_id = json.loads(resp.read().decode())["id"]
 
-    # 3. Upload DOCX
-    docx_meta = {"name": f"{doc_name}.docx", "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "parents": [folder_id]}
-    docx_body = (
-        f"--{boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n{json.dumps(docx_meta)}\r\n"
-        f"--{boundary}\r\nContent-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document\r\n\r\n"
-    ).encode("utf-8") + docx_bytes + f"\r\n--{boundary}--\r\n".encode("utf-8")
-    req_raw = urllib.request.Request(
-        "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
-        data=docx_body,
-        headers={"Authorization": f"Bearer {token}", "Content-Type": f"multipart/related; boundary={boundary}"},
-        method="POST"
+    desk_name = f"Printable_Desk_QR_Sheet_{room_code}_{clean_name}"
+    desk_docx = f"/tmp/{desk_name}.docx"
+    desk_pdf = f"/tmp/{desk_name}.pdf"
+
+    build_desk_qr_stand_docx(
+        tenant_name=tenant_name,
+        room_code=room_code,
+        start_date=start_date,
+        end_date=end_date,
+        drive_folder_url=drive_folder_url,
+        linktree_url=linktree_url,
+        out_docx_path=desk_docx
     )
-    with urllib.request.urlopen(req_raw) as resp:
-        w_docx_id = json.loads(resp.read().decode())["id"]
+    desk_html = render_desk_qr_stand_html(
+        tenant_name=tenant_name,
+        room_code=room_code,
+        drive_folder_url=drive_folder_url,
+        linktree_url=linktree_url
+    )
+    html_to_pdf(desk_html, desk_pdf)
 
-    return w_doc_id, w_pdf_id, w_docx_id
+    docx_mime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    w_pdf_id = upload_or_update_drive_file(token, folder_id, f"{doc_name}.pdf", pdf_path, "application/pdf", convert_to_gdoc=False)
+    w_docx_id = upload_or_update_drive_file(token, folder_id, f"{doc_name}.docx", docx_path, docx_mime, convert_to_gdoc=False)
+    upload_or_update_drive_file(token, folder_id, f"{desk_name}.docx", desk_docx, docx_mime, convert_to_gdoc=False)
+    upload_or_update_drive_file(token, folder_id, f"{desk_name} (Google Doc)", desk_docx, docx_mime, convert_to_gdoc=True)
+    upload_or_update_drive_file(token, folder_id, f"{desk_name}.pdf", desk_pdf, "application/pdf", convert_to_gdoc=False)
+
+    return None, w_pdf_id, w_docx_id
 
 def upload_personalized_keys_acknowledgement(token, folder_id, tenant_name, room_code, start_date):
     """

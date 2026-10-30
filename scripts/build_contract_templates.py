@@ -55,7 +55,7 @@ ROOM_SPECS = {
         "size": "23.92",
         "floor": "2",
         "room_num": "2",
-        "rent": 649.00,
+        "rent": 629.00,
         "deposit": 1000.00,
     },
     "KE3": {

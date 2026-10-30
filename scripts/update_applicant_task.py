@@ -12,8 +12,8 @@ desc = """### 📋 Homelyo Inbound Booking Request & Tenant Onboarding Dossier
 * **Selected Room:** Room KE2 (Private Balcony Suite — 24 m²)
 * **Target Move-In Date:** 2026-11-02
 * **Stay Duration:** 6 months (2026-11-02 → 2027-04-30)
-* **Monthly Warm Rent:** €649.00 / month (all inclusive)
-* **Deposit (Kaution):** €1,298.00 (held in escrow)
+* **Monthly Warm Rent:** €629.00 / month (all inclusive)
+* **Deposit (Kaution):** €1,258.00 (held in escrow)
 * **Occupation / University:** Postdoctoral researcher at Freie Universität Berlin (FU Berlin)
 * **Notes & Inquiries:** None
 
@@ -55,8 +55,8 @@ To proceed with verifying your booking and preparing your digital tenancy agreem
 
 Room Summary & Financial Overview:
 • Room: KE2 (Balcony Suite)
-• Warm Rent: €649 / month (all inclusive: heating, electricity, water, high-speed WiFi)
-• Deposit (Kaution): €1,298 (held in escrow in accordance with German tenancy law)
+• Warm Rent: €629 / month (all inclusive: heating, electricity, water, high-speed WiFi)
+• Deposit (Kaution): €1,258 (held in escrow in accordance with German tenancy law)
 • Move-in Date: November 2, 2026
 • Initial Duration: 6 months
 
