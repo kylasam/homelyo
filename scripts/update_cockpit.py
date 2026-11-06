@@ -1,7 +1,8 @@
+from secrets_helper import get_secret
 import urllib.request
 import json
 
-TOKEN = "pk_308598557_9CP65EANIWJ0XHF9NUOFGMFUDCAMPPM5"
+TOKEN = get_secret("HOMELYO_CLICKUP_ADMIN_API_TOKEN")
 HEADERS = {"Authorization": TOKEN, "Content-Type": "application/json"}
 
 cockpit_md = """# 🚀 Homelyo Executive Cockpit — Quick Glance
@@ -13,11 +14,11 @@ cockpit_md = """# 🚀 Homelyo Executive Cockpit — Quick Glance
 
 ---
 
-### 🛏️ Live Room Occupancy & Free Dates (Accurate as of Oct 2026)
+### 🛏️ Live Room Occupancy & Free Dates
 | Room | Feature | Size | Warm Rent (All-inclusive) | Current Status | Available From |
 | :--- | :--- | :---: | :---: | :---: | :---: |
-| **KE1** | Master Bedroom | 21 m² | **€629 / mo** | 🟢 **FREE / VACANT** | **Nov 1, 2026** |
-| **KE2** | Private Balcony Suite | ~18 m² | **€629 / mo** | 🟢 **FREE / VACANT** | **Nov 1, 2026** |
+| **KE1** | Master Bedroom | 21 m² | **€639 / mo** | 🟡 Occupied (Lease ends Apr 30) | **May 1, 2027** |
+| **KE2** | Private Balcony Suite | ~24 m² | **€629 / mo** | 🟡 Occupied / Blocked (Lease ends Jan 31) | **Feb 1, 2027** |
 | **KE3** | Quiet Garden View | ~16 m² | **€619 / mo** | 🟡 Occupied (Lease ends Mar 31) | **Apr 1, 2027** |
 | **KE4** | Cozy Calm (Thick Mattress) | ~14 m² | **€569 / mo** | 🟡 Occupied (Lease ends Jul 31) | **Aug 1, 2027** |
 

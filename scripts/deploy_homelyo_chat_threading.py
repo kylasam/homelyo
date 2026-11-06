@@ -2,7 +2,7 @@
 """
 Deploy updated Homelyo Chatbot n8n workflow with:
 1. Clear Room Availability rules: Room KE1 is booked until May 1, 2027; ONLY Room KE2 is available for move-in.
-2. Smart thread nesting in ClickUp Chat channel 1ampw4t88mv-92 using bot token pk_314452952_...
+2. Smart thread nesting in ClickUp Chat channel 1ampw4t88mv-92 using the bot token from Secret Manager
 3. Preserves all verified tenant reviews (Naeem, Thiruvikkiraman) and Welcome Kit guidance.
 """
 import subprocess
@@ -10,6 +10,11 @@ import urllib.request
 import json
 
 def main():
+    clickup_token = subprocess.check_output(
+        ['gcloud', 'secrets', 'versions', 'access', 'latest', '--secret=HOMELYO_CLICKUP_API_TOKEN', '--project=n8n-homelyo'],
+        text=True
+    ).strip()
+
     n8n_key = subprocess.check_output(
         ['gcloud', 'secrets', 'versions', 'access', 'latest', '--secret=N8N_API_KEY', '--project=n8n-homelyo'],
         text=True
@@ -44,7 +49,7 @@ else if (msgLower.includes("pet") || msgLower.includes("dog") || msgLower.includ
 else if (msgLower.includes("train") || msgLower.includes("bus") || msgLower.includes("station") || msgLower.includes("supermarket")) intent = "location_transit";
 else if (msgLower.includes("washer") || msgLower.includes("wifi") || msgLower.includes("internet") || msgLower.includes("kitchen")) intent = "amenities";
 
-const clickupToken = "pk_314452952_6STD829UQJXD0ROPHUVS41YXEPHXUIE2";
+const clickupToken = "__CLICKUP_TOKEN__";
 let parentMessageId = null;
 
 // If this is Turn 2+, check if a parent thread exists for this session in ClickUp
@@ -133,7 +138,7 @@ for (const item of items) {
 text += `\\n============================================================\\nSECTION P: VERIFIED TENANT REVIEWS & HOUSINGANYWHERE VERIFICATION ⭐\\n============================================================\\nOfficial Credibility & Legitimacy Facts:\\n- Homelyo is 100% verified, legal, and legitimate.\\n- Address: Lichtenrader Damm 80, 12305 Berlin-Lichtenrade, Germany.\\n- All tenants receive official, legally binding German rental agreements and the official Wohnungsgeberbestätigung for Berlin city registration (Anmeldung).\\n- Rating: Straight 5.0/5 across Landlord, Communication, Move-in Process, Listing Accuracy, Cleanliness, Amenities, Furniture, and Location.\\n\\nActual Verified Tenant Reviews on HousingAnywhere:\\n1. Review from Naeem Ullah Khan (Stayed: Nov 2025 – Apr 2026, 5.0/5 Stars):\\n   - Listing Accuracy (5.0/5): "It was EXACTLY how it looked in the pictures. I was amazed. I had horrible experiences with properties from here. This was a pleasant change."\\n   - Move-in Process (5.0/5): "Went above and beyond to accommodate my early move in. Very pleased with the experience."\\n   - Landlord & Experience (5.0/5): "Met him in person on the day of move in. He was very nice and amazing person. Both for me and my girlfriend who moved into the same house with me in a different room."\\n   - Communication (5.0/5): "Always replied quickly."\\n   - Overall: "It was amazing. Both me and my girlfriend love the property, and our roommates and landlord both are very nice people so far. So we are happy."\\n\\n2. Review from Thiruvikkiraman Pandurangan (Stayed: Apr 2025 – Oct 2025, 5.0/5 Stars):\\n   - Ratings: Landlord 5.0/5, Communication 5.0/5, Move-in 5.0/5, Listing accuracy 5.0/5, Cleanliness 5.0/5, Amenities 5.0/5, Furniture 5.0/5, Location 5.0/5.\\n   - Comment: "A little bit out of the city. But, very calm to live and work. Almost everything nearby supermarkets and restaurants. Neighbours very friendly and prompt response from the landlord. Everything fine! Thank you!!"\\n\\nTenant Reviews Links:\\n- HousingAnywhere Tenant Reviews: https://housinganywhere.com/my/tenant-reviews\\n- Website Reviews & Testimonials: https://www.homelyo.eu/#reviews\\n\\nBooking Options & Price Transparency:\\n- Option 1: Book directly with Homelyo (via https://www.homelyo.eu/book or the in-chat booking request form).\\n- Option 2: Book via HousingAnywhere (our verified partner platform).\\n- The Key Difference:\\n  * On HousingAnywhere: The tenant must pay an extra platform/service fee charged by HousingAnywhere.\\n  * Directly with Homelyo: There are NO extra platform fees. The tenant pays ONLY the first month's rent and the advance refundable security deposit (Kaution).\\n  * Both booking options provide the exact same verified room, official rental contract, Anmeldung registration, and check-in support.\\n`;
 
 // Section Q: Current Live Room Availability and Pricing (Critical Update)
-text += `\\n============================================================\\nSECTION Q: CURRENT LIVE ROOM AVAILABILITY & PRICING (CRITICAL AVAILABILITY STATUS)\\n============================================================\\n- Room KE1: Master Bedroom (~21 m²), €639/month all-inclusive. CURRENT STATUS: FULLY BOOKED & OCCUPIED until April 30, 2027. EARLIEST NEXT AVAILABLE MOVE-IN: May 1, 2027. NOT available for move-in right now.\\n- Room KE2: Premium Room with Private Balcony (~24 m²), €629 (was €649 – special November offer of €20 off)/month all-inclusive. CURRENT STATUS: THE ONLY AVAILABLE ROOM! Available starting November 1, 2026 (Ready for Immediate Move-In!).\\n- Room KE3: Medium Bedroom (~16 m²), €619/month all-inclusive. CURRENT STATUS: Booked through March 31, 2027. EARLIEST NEXT AVAILABLE MOVE-IN: April 1, 2027.\\n- Room KE4: Cozy Value Bedroom (~14 m²), €569/month all-inclusive. CURRENT STATUS: Booked through July 31, 2027. EARLIEST NEXT AVAILABLE MOVE-IN: August 1, 2027.\\n\\nCRITICAL DIRECTIVES FOR SARA ON AVAILABILITY:\\n1. Room KE1 is fully BOOKED and occupied through April 30, 2027. If a visitor asks about KE1, inform them it is booked until May 1, 2027.\\n2. Room KE2 is CURRENTLY THE ONLY ROOM AVAILABLE for move-in!\\n3. Whenever anyone asks "What rooms are available?", "Can I move in soon?", or inquires about booking right now, ALWAYS explain that KE1 is already booked and enthusiastically recommend Room KE2 (with its lovely private balcony and all-inclusive rent of €629 (was €649 – special November offer of €20 off)/mo)!\\n`;
+text += `\\n============================================================\\nSECTION Q: CURRENT LIVE ROOM AVAILABILITY & PRICING (CRITICAL AVAILABILITY STATUS)\\n============================================================\\n- ALL 4 ROOMS (KE1, KE2, KE3, KE4) are CURRENTLY FULLY BOOKED AND OCCUPIED for the remainder of 2026 and January 2027!\\n- Room KE2: Premium Room with Private Balcony (~24 m²), €629/month all-inclusive. CURRENT STATUS: OCCUPIED & BLOCKED through January 31, 2027. EARLIEST NEXT AVAILABLE MOVE-IN: February 1, 2027 (This is our EARLIEST available room!).\\n- Room KE3: Medium Bedroom (~16 m²), €619/month all-inclusive. CURRENT STATUS: Booked through March 31, 2027. EARLIEST NEXT AVAILABLE MOVE-IN: April 1, 2027.\\n- Room KE1: Master Bedroom (~21 m²), €639/month all-inclusive. CURRENT STATUS: FULLY BOOKED & OCCUPIED until April 30, 2027. EARLIEST NEXT AVAILABLE MOVE-IN: May 1, 2027.\\n- Room KE4: Cozy Value Bedroom (~14 m²), €569/month all-inclusive. CURRENT STATUS: Booked through July 31, 2027. EARLIEST NEXT AVAILABLE MOVE-IN: August 1, 2027.\\n\\nCRITICAL DIRECTIVES FOR SARA ON AVAILABILITY:\\n1. The property is currently 100% full and occupied through January 31, 2027.\\n2. Room KE2 is blocked until January 31, 2027, and is the EARLIEST room becoming available, free starting February 1, 2027!\\n3. Whenever anyone asks "What rooms are available?", "Can I move in soon?", or inquires about booking right now, ALWAYS explain that the house is 100% occupied for the rest of 2026 and January 2027, and encourage them to pre-reserve Room KE2 (with its lovely private balcony and all-inclusive rent of €629/mo) starting February 1, 2027!\\n`;
 
 const userMessage = $node["Webhook"].json.body.message || '';
 const customerData = $node["Webhook"].json.body.customer_data || null;
@@ -162,14 +167,15 @@ KNOWLEDGE BASE:
 {{ $json.knowledge_base }}
 
 ROOM AVAILABILITY RULES (CRITICAL):
-- NOVEMBER OFFER: KE2 is €20 off in November. Always say the price is now €629/month, was €649, with the special November offer of €20 off. NEVER use markdown strikethrough (~~) or any markdown formatting; write plain text only.
-- Room KE1 is BOOKED and occupied through April 30, 2027 (earliest next move-in: May 1, 2027). It is NOT available for move-in now.
-- Room KE2 is CURRENTLY THE ONLY ROOM AVAILABLE for immediate or upcoming move-in (available starting November 1, 2026, €629 (was €649 – special November offer of €20 off)/mo all-inclusive with private sunny balcony).
-- Room KE3 is booked until April 2027, and Room KE4 is booked until August 2027.
-- If a user asks what rooms are available, when they can move in, or if Room KE1 is available:
-  1. Clearly state that Room KE1 is currently booked through April 30, 2027 (next available May 1, 2027).
-  2. Tell them that Room KE2 is currently the ONLY available room for move-in!
-  3. Enthusiastically share the highlights of Room KE2 (spacious ~24 m², private sunny balcony, €629 (was €649 – special November offer of €20 off)/mo all-inclusive).
+- ALL 4 ROOMS ARE CURRENTLY 100% OCCUPIED for the remainder of 2026 and January 2027.
+- Room KE2: Blocked & occupied until January 31, 2027. It is our EARLIEST available room, free starting February 1, 2027 (€629/month all-inclusive with private sunny balcony).
+- Room KE3: Booked until March 31, 2027 (Next available: April 1, 2027).
+- Room KE1: Booked and occupied through April 30, 2027 (Next available: May 1, 2027).
+- Room KE4: Booked until July 31, 2027 (Next available: August 1, 2027).
+- If a user asks what rooms are available, when they can move in, or if Room KE1/KE2 is available:
+  1. Clearly state that all rooms are currently fully occupied for 2026 and January 2027.
+  2. Tell them that Room KE2 is the EARLIEST room becoming available, free starting February 1, 2027!
+  3. Enthusiastically share the highlights of Room KE2 (spacious ~24 m², private sunny balcony, €629/mo all-inclusive) and invite them to pre-reserve/book for February 1, 2027.
 
 HOW TO RESPOND:
 
@@ -246,13 +252,13 @@ TIPS FOR GOOD RESPONSES:
 EXAMPLES:
 
 User: "What rooms are available?"
-Sara: "Right now, Room KE2 is our only available room for move-in! 😊 It's our largest and brightest room (~24 m²) and comes with its own private sunny balcony for €629 (was €649 – special November offer of €20 off) a month all-inclusive (heating, electricity, and 250 Mbps Wi-Fi included). Rooms KE1, KE3, and KE4 are currently booked. Would you like to check out photos of KE2 or see how the booking process works?"
+Sara: "Right now, all our rooms are 100% occupied for the rest of 2026 and January 2027! But the exciting news is that our earliest upcoming room is Room KE2, becoming available starting February 1, 2027. 😊 It's our largest and brightest room (~24 m²) with its own private sunny balcony for €629/month all-inclusive (heating, electricity, and 250 Mbps Wi-Fi included). Would you like to check out photos of KE2 or reserve it for February 1st?"
 
 User: "Is Room KE1 available?"
-Sara: "Room KE1 is currently fully booked through April 30, 2027 (earliest next move-in is May 1, 2027)! But the great news is that Room KE2 is currently available starting November 1, 2026. It's actually our largest room (~24 m²), features a private balcony, and is €629 (was €649 – special November offer of €20 off)/month all-inclusive. Would you like to take a look at KE2 instead? 😊"
+Sara: "Room KE1 is currently fully booked through April 30, 2027 (earliest next move-in is May 1, 2027)! But our earliest available room is Room KE2, which is free starting February 1, 2027. It's actually our largest room (~24 m²), features a private balcony, and is €629/month all-inclusive. Would you like to take a look at KE2 for February instead? 😊"
 
 User: "Tell me about KE2"
-Sara: "Oh, KE2 is one of my favorites! 😊 It comes with a private sunny balcony which is perfect for morning coffee or unwinding after work. It's our largest room (~24 m²), fully furnished, modern, and ready to move in from November 1, 2026 for €629 (was €649 – special November offer of €20 off) a month all-inclusive. The U6 station is super close too - just a quick bus ride! What else would you like to know about it?"
+Sara: "Oh, KE2 is one of my favorites! 😊 It comes with a private sunny balcony which is perfect for morning coffee or unwinding after work. It's our largest room (~24 m²), fully furnished, modern, and will be available starting February 1, 2027 for €629 a month all-inclusive (blocked until then). The U6 station is super close too - just a quick bus ride! Would you like to reserve it for February?"
 
 User: "Is Homelyo a real company? Can I trust this?"
 Sara: "I completely understand why you'd ask — finding accommodation in Berlin can be tricky and you should always be cautious! 😊 Yes, Homelyo is 100% real and verified. We provide official German rental contracts and the Wohnungsgeberbestätigung for your official Berlin city registration (Anmeldung). You can check out our verified tenant reviews on HousingAnywhere here: https://housinganywhere.com/my/tenant-reviews (past tenants like Naeem and Thiruvikkiraman have rated us 5.0/5 across communication, move-in, and cleanliness — Naeem even noted the apartment was 'EXACTLY how it looked in the pictures'!). You can choose to book directly with us or through HousingAnywhere — the only difference is that HousingAnywhere charges an extra platform fee, whereas with us directly you don't pay that extra fee, just the first month's rent and refundable advance deposit. Would you like to check out available rooms or submit a booking request?"
@@ -267,7 +273,7 @@ Remember: You're Sara - friendly, helpful, real. Not a robot. Chat naturally! �
 
     for n in wf['nodes']:
         if n['name'] == 'Format Chat Audit Log':
-            n['parameters']['jsCode'] = format_code
+            n['parameters']['jsCode'] = format_code.replace('__CLICKUP_TOKEN__', clickup_token)
         if n['name'] == 'Process Content':
             n['parameters']['jsCode'] = process_content_code
         if n['name'] == 'System Instructions':

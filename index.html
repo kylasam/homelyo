@@ -1658,7 +1658,7 @@ img {
             <div class="room-select-card" data-room="KE2" onclick="selectRoom('KE2')">
                 <h3>KE2</h3>
                 <p>€629/month</p>
-                <div class="room-avail-tag avail-soon" id="availTag-KE2">Next: Nov 1, 2026</div>
+                <div class="room-avail-tag" id="availTag-KE2">Next: Feb 1, 2027</div>
             </div>
             <div class="room-select-card" data-room="KE3" onclick="selectRoom('KE3')">
                 <h3>KE3</h3>
@@ -2081,7 +2081,7 @@ function parseDate(dateInput) {
 // Synchronous default room availability (instantly reactive without waiting for network)
 let roomAvailability = {
     'KE1': parseDate('2027-05-01'),
-    'KE2': parseDate('2026-11-01'),
+    'KE2': parseDate('2027-02-01'),
     'KE3': parseDate('2027-04-01'),
     'KE4': parseDate('2027-08-01')
 };
@@ -2154,7 +2154,7 @@ function updateRoomSummary() {
             </div>
         `;
     } 
-    // Condition 2: Viewing the EXACT year the room transitions to free (e.g. 2027 for KE1, KE3, KE4; 2026 for KE2)
+    // Condition 2: Viewing the EXACT year the room transitions to free (e.g. 2027 for KE1, KE2, KE3, KE4)
     else if (currentViewYear === freeYear) {
         if (freeDate <= startOfCurrentMonth) {
             html = `
