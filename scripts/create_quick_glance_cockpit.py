@@ -19,14 +19,14 @@ cockpit_md = """# 🚀 Homelyo Executive Cockpit — Quick Glance
 | Room | Feature | Size | Warm Rent (All-inclusive) | Current Status | Available From |
 | :--- | :--- | :---: | :---: | :---: | :---: |
 | **KE1** | Master Bedroom | 21 m² | **€639 / mo** | 🟡 Occupied (Lease ends Apr 30) | **May 1, 2027** |
-| **KE2** | Private Balcony Suite | ~24 m² | **€629 / mo** | 🟡 Occupied / Blocked (Lease ends Jan 31) | **Feb 1, 2027** |
-| **KE3** | Quiet Garden View | ~16 m² | **€619 / mo** | 🟡 Occupied (Lease ends Mar 31) | **Apr 1, 2027** |
-| **KE4** | Cozy Calm (Thick Mattress) | ~14 m² | **€569 / mo** | 🟡 Occupied (Lease ends Jul 31) | **Aug 1, 2027** |
+| **KE2** | Private Balcony Suite | ~24 m² | **€649 / mo** | 🟡 Occupied / Blocked (Lease ends Jan 31) | **Feb 1, 2027** |
+| **KE3** | Quiet Garden View | ~16 m² | **€629 / mo** | 🟡 Occupied (Lease ends Mar 31) | **Apr 1, 2027** |
+| **KE4** | Cozy Calm (Thick Mattress) | ~14 m² | **€589 / mo** | 🟡 Occupied (Lease ends Jul 31) | **Aug 1, 2027** |
 
 ---
 
 ### 💰 Financial Rollup & Cash Flow
-* **Gross Potential Monthly Revenue (100% Occupancy):** `€2,466.00 / month` (`€29,592.00 / year`)
+* **Gross Potential Monthly Revenue (100% Occupancy):** `€2,516.00 / month` (`€30,192.00 / year`)
 * **Total Operating Expenses (All Utilities + Hausgeld):** `€617.85 / month`
   * Hausgeld (HOA, Reserve, Maintenance): €385.00 / mo
   * Electricity (Vattenfall 100% Green): €115.00 / mo

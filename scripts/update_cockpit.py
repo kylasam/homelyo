@@ -18,9 +18,9 @@ cockpit_md = """# 🚀 Homelyo Executive Cockpit — Quick Glance
 | Room | Feature | Size | Warm Rent (All-inclusive) | Current Status | Available From |
 | :--- | :--- | :---: | :---: | :---: | :---: |
 | **KE1** | Master Bedroom | 21 m² | **€639 / mo** | 🟡 Occupied (Lease ends Apr 30) | **May 1, 2027** |
-| **KE2** | Private Balcony Suite | ~24 m² | **€629 / mo** | 🟡 Occupied / Blocked (Lease ends Jan 31) | **Feb 1, 2027** |
-| **KE3** | Quiet Garden View | ~16 m² | **€619 / mo** | 🟡 Occupied (Lease ends Mar 31) | **Apr 1, 2027** |
-| **KE4** | Cozy Calm (Thick Mattress) | ~14 m² | **€569 / mo** | 🟡 Occupied (Lease ends Jul 31) | **Aug 1, 2027** |
+| **KE2** | Private Balcony Suite | ~24 m² | **€649 / mo** | 🟡 Occupied / Blocked (Lease ends Jan 31) | **Feb 1, 2027** |
+| **KE3** | Quiet Garden View | ~16 m² | **€629 / mo** | 🟡 Occupied (Lease ends Mar 31) | **Apr 1, 2027** |
+| **KE4** | Cozy Calm (Thick Mattress) | ~14 m² | **€589 / mo** | 🟡 Occupied (Lease ends Jul 31) | **Aug 1, 2027** |
 
 ---
 
@@ -32,7 +32,7 @@ cockpit_md = """# 🚀 Homelyo Executive Cockpit — Quick Glance
 ---
 
 ### 💰 Financial Rollup, Escrow & Tenant Deposit Settlements
-* **Gross Potential Monthly Revenue (100% Occupancy):** €2,466.00 / month (€29,592.00 / year)
+* **Gross Potential Monthly Revenue (100% Occupancy):** €2,516.00 / month (€30,192.00 / year)
 * **Total Operating Expenses (All Utilities + Hausgeld):** €617.85 / month
   * Hausgeld (HOA, Reserve, Maintenance): €385.00 / mo
   * Electricity (Vattenfall 100% Green): €115.00 / mo
@@ -40,7 +40,7 @@ cockpit_md = """# 🚀 Homelyo Executive Cockpit — Quick Glance
   * GEZ Rundfunkbeitrag: €18.36 / mo (€55.08 / qtr)
   * Grundsteuer (Berlin Property Tax): €32.83 / mo (€98.50 / qtr)
   * Allianz Building Insurance: €40.00 / mo (€480.00 / yr)
-* **Net Operating Income (NOI):** €1,848.15 / month (€22,177.80 / year)
+* **Net Operating Income (NOI):** €1,898.15 / month (€22,777.80 / year)
 * **Total Escrow Kaution Managed:** €4,932.00
 * 👉 **[Open Tenant Expenses & Deposit Settlement Table](https://app.clickup.com/90122087374/v/li/1500350000002195?t=2kxv3uye-2292)**
   * **Room KE1 (Oct 31 move-out):** Deposit €1,258.00 + Expenses €38.50 - Clean fee €65.00 = **Net Return: €1,231.50** (Approved)

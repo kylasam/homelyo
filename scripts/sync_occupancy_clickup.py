@@ -1,8 +1,9 @@
+from secrets_helper import get_secret
 import json
 import time
 import requests
 
-CLICKUP_TOKEN = 'pk_314452952_6STD829UQJXD0ROPHUVS41YXEPHXUIE2'
+CLICKUP_TOKEN = get_secret("HOMELYO_CLICKUP_API_TOKEN")
 HEADERS = {
     'Authorization': CLICKUP_TOKEN,
     'Content-Type': 'application/json'
@@ -69,23 +70,24 @@ def main():
     set_cf('1ampw4tj4jj', FIELD_ANMELDUNG, True)
     print('✅ Task 1ampw4tj4jj updated.')
 
-    print('\n=== Step 2: Update KE2 – Ajithkumar Velasseril Sreenivasan (Task 1ampw4tj4ed) ===')
+    print('\n=== Step 2: Update KE2 – Blocked Suite (Task 1ampw4tj4ed) ===')
     update_task('1ampw4tj4ed', {
+        'name': '🟡 [BLOCKED / OCCUPIED until Jan 31, 2027] Room KE2 – Private Balcony Suite (Free Feb 1, 2027)',
         'status': 'in progress',
-        'priority': 2,
-        'start_date': 1793588400000, # 2026-11-02
-        'due_date': 1809050400000    # 2027-04-30
+        'priority': 3,
+        'start_date': None,
+        'due_date': 1801353600000
     })
     set_cf('1ampw4tj4ed', FIELD_ROOM, OPT_ROOM_KE2)
-    set_cf('1ampw4tj4ed', FIELD_TENANT_NAME, 'Ajithkumar Velasseril Sreenivasan')
-    set_cf('1ampw4tj4ed', FIELD_TENANT_EMAIL, 'ajithkmvs123@gmail.com')
-    set_cf('1ampw4tj4ed', FIELD_MONTHLY_RENT, 629.00)
-    set_cf('1ampw4tj4ed', FIELD_SECURITY_DEPOSIT, 1258.00)
-    set_cf('1ampw4tj4ed', FIELD_BOOKING_PLATFORM, OPT_PLATFORM_DIRECT)
-    set_cf('1ampw4tj4ed', FIELD_LEASE_START, 1793588400000)
-    set_cf('1ampw4tj4ed', FIELD_LEASE_END, 1809050400000)
-    set_cf('1ampw4tj4ed', FIELD_ANMELDUNG, True)
-    print('✅ Task 1ampw4tj4ed updated.')
+    set_cf('1ampw4tj4ed', FIELD_TENANT_NAME, '')
+    set_cf('1ampw4tj4ed', FIELD_TENANT_EMAIL, '')
+    set_cf('1ampw4tj4ed', FIELD_MONTHLY_RENT, 649.00)
+    set_cf('1ampw4tj4ed', FIELD_SECURITY_DEPOSIT, 1000.00)
+    set_cf('1ampw4tj4ed', FIELD_BOOKING_PLATFORM, None)
+    set_cf('1ampw4tj4ed', FIELD_LEASE_START, None)
+    set_cf('1ampw4tj4ed', FIELD_LEASE_END, None)
+    set_cf('1ampw4tj4ed', FIELD_ANMELDUNG, False)
+    print('✅ Task 1ampw4tj4ed updated to Blocked until Jan 31, 2027.')
 
     print('\n=== Step 3: Create / Populate KE3 – Thiruvikkiraman Pandurangan ===')
     ke3_desc = """🏠 Active Tenant Occupancy Profile — Thiruvikkiraman Pandurangan (KE3)
@@ -188,12 +190,6 @@ def main():
     print('Existing deposits:', existing_dep_names)
 
     deposits_to_ensure = [
-        {
-            'name': '🔒 [Room KE2] Ajithkumar Velasseril Sreenivasan – Deposit €1,298.00',
-            'description': '🔐 Deposit Escrow & Settlement Ledger — Ajithkumar Velasseril Sreenivasan (KE2)\nAdvance Deposit Paid: €1,298.00 (2 months cold rent equivalent)\nStatus: Held in Escrow (Active Lease)\nContract Term: 2026-11-02 to 2027-04-30',
-            'start_date': 1793588400000,
-            'due_date': 1809050400000
-        },
         {
             'name': '🔒 [Room KE3] Thiruvikkiraman Pandurangan – Deposit €1,000.00',
             'description': '🔐 Deposit Escrow & Settlement Ledger — Thiruvikkiraman Pandurangan (KE3)\nAdvance Deposit Paid: €1,000.00\nStatus: Held in Escrow (Active Lease)\nContract Term: 2025-11-01 to 2027-03-31',

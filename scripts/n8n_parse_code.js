@@ -80,7 +80,7 @@ const occupants = pick('number of occupants', 'occupants') || '1';
 const hearAbout = pick('how did you hear about us', 'source') || 'Direct Website';
 const notes = pick('notes or questions for owner', 'additional requests or question', 'notes', 'inquiries') || 'None';
 
-const rentMap = { KE1: 639, KE2: 649, KE3: 629, KE4: 599 };
+const rentMap = { KE1: 639, KE2: 649, KE3: 629, KE4: 589 };
 const depositMap = { KE1: 1000, KE2: 1000, KE3: 1000, KE4: 1000 };
 const depositAmount = 1000;
 const roomTitles = {
