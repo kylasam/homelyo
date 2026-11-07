@@ -80,7 +80,8 @@ const occupants = pick('number of occupants', 'occupants') || '1';
 const hearAbout = pick('how did you hear about us', 'source') || 'Direct Website';
 const notes = pick('notes or questions for owner', 'additional requests or question', 'notes', 'inquiries') || 'None';
 
-const rentMap = { KE1: 640, KE2: 629, KE3: 615, KE4: 569 };
+const rentMap = { KE1: 639, KE2: 649, KE3: 629, KE4: 599 };
+const depositMap = { KE1: 1000, KE2: 1000, KE3: 1000, KE4: 1000 };
 const depositAmount = 1000;
 const roomTitles = {
   KE1: 'Master Bedroom',
@@ -144,7 +145,7 @@ const emailHtml = `<!DOCTYPE html>
     <table cellpadding="0" cellspacing="0" border="0" style="width: 100%;">
       <tr>
         <td style="vertical-align: middle;">
-          <img src="https://storage.googleapis.com/wealthyo-social-media-assets/homelyo/Homelyo-logo-header.png" alt="Homelyo Coliving Berlin" style="height: 48px; width: auto; max-width: 220px; display: block; border: 0;" />
+          <img src="https://storage.googleapis.com/homelyo-lichtenraderdamm-assets/lichtenraderdamm/Homelyo-logo-header.png" alt="Homelyo Coliving Berlin" style="height: 48px; width: auto; max-width: 220px; display: block; border: 0;" />
         </td>
         <td style="vertical-align: middle; text-align: right; color: #94a3b8; font-size: 13px; line-height: 1.4;">
           <strong style="color: #f8fafc;">Homelyo Coliving</strong><br>
@@ -280,7 +281,7 @@ const adminEmailHtml = `<!DOCTYPE html>
     <div style="background-color: #0f172a; padding: 20px 24px; border-bottom: 3px solid #00D084;">
       <table cellpadding="0" cellspacing="0" border="0" style="width: 100%;">
         <tr>
-          <td><img src="https://storage.googleapis.com/wealthyo-social-media-assets/homelyo/Homelyo-logo-header.png" alt="Homelyo" style="height: 40px; display: block; border: 0;" /></td>
+          <td><img src="https://storage.googleapis.com/homelyo-lichtenraderdamm-assets/lichtenraderdamm/Homelyo-logo-header.png" alt="Homelyo" style="height: 40px; display: block; border: 0;" /></td>
           <td style="text-align: right; color: #00D084; font-weight: bold; font-size: 14px;">NEW BOOKING INQUIRY</td>
         </tr>
       </table>
